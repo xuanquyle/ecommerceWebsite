@@ -11,39 +11,77 @@ const sizeOpts = productModel.exp_sizeOpt;
 const warrantyOpts = productModel.exp_warrantyOpt;
 const category = productModel.exp_category
 class ProductController {
+
     index(req, res, next) {
 
         products.aggregate([
             {
-                "$lookup": {
-                    "from": "user",
-                    "let": { "userId": "$_id" },
-                    "pipeline": [
-                        { "$addFields": { "userId": { "$toObjectId": "$userId" } } },
-                        { "$match": { "$expr": { "$eq": ["$userId", "$$userId"] } } }
-                    ],
-                    "as": "output"
+                $lookup: {
+                    from: 'rom_opts',
+                    localField: 'sku.rom_code',
+                    foreignField: 'code',
+                    as: 'rom'
                 }
             },
             {
-                "$lookup": {
-                    "from": "user",
-                    "let": { "userId": "$_id" },
-                    "pipeline": [
-                        { "$addFields": { "userId": { "$toObjectId": "$userId" } } },
-                        { "$match": { "$expr": { "$eq": ["$userId", "$$userId"] } } }
-                    ],
-                    "as": "output"
-                }
+                $unwind: '$rom'
             },
             {
                 $lookup: {
-                    from: 'categorys',
+                    from: 'size_opts',
+                    localField: 'sku.size_code',
+                    foreignField: 'code',
+                    as: 'size'
+                }
+            },
+            {
+                $unwind: '$size'
+            },
+            {
+                $lookup: {
+                    from: 'warranty_opts',
+                    localField: 'sku.warranty_code',
+                    foreignField: 'code',
+                    as: 'warranty'
+                }
+            },
+            {
+                $unwind: '$warranty'
+            },
+            {
+                $lookup: {
+                    from: 'ram_opts',
+                    localField: 'sku.ram_code',
+                    foreignField: 'code',
+                    as: 'ram'
+                }
+            },
+            {
+                $unwind: '$ram'
+            },
+            {
+                $lookup: {
+                    from: 'color_opts',
+                    localField: 'sku.color_code',
+                    foreignField: 'code',
+                    as: 'color'
+                }
+            },
+            {
+                $unwind: '$color'
+            },
+            {
+                $lookup: {
+                    from: 'categories',
                     localField: 'category_id',
                     foreignField: '_id',
                     as: 'category'
                 }
-            }])
+            },
+            {
+                $unwind: '$category'
+            }
+        ])
             .then(products => res.json(products))
             .catch(next);
 
@@ -66,9 +104,84 @@ class ProductController {
     }
 
     detail(req, res, next) {
-        products.findOne({ slug: req.params.slug })
-            .then(product => { res.status(200).json(product) })
+        // products.findOne({ slug: req.params.slug })
+        //     .then(product => res.json(product))
+        //     .catch(next);
+        products.aggregate([
+            {
+                $lookup: {
+                    from: 'rom_opts',
+                    localField: 'sku.rom_code',
+                    foreignField: 'code',
+                    as: 'rom'
+                }
+            },
+            {
+                $unwind: '$rom'
+            },
+            {
+                $lookup: {
+                    from: 'size_opts',
+                    localField: 'sku.size_code',
+                    foreignField: 'code',
+                    as: 'size'
+                }
+            },
+            {
+                $unwind: '$size'
+            },
+            {
+                $lookup: {
+                    from: 'warranty_opts',
+                    localField: 'sku.warranty_code',
+                    foreignField: 'code',
+                    as: 'warranty'
+                }
+            },
+            {
+                $unwind: '$warranty'
+            },
+            {
+                $lookup: {
+                    from: 'ram_opts',
+                    localField: 'sku.ram_code',
+                    foreignField: 'code',
+                    as: 'ram'
+                }
+            },
+            {
+                $unwind: '$ram'
+            },
+            {
+                $lookup: {
+                    from: 'color_opts',
+                    localField: 'sku.color_code',
+                    foreignField: 'code',
+                    as: 'color'
+                }
+            },
+            {
+                $unwind: '$color'
+            },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'category_id',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            {
+                $unwind: '$category'
+            },
+            {
+                $match: {'slug':req.params.slug}
+            }
+
+        ])
+            .then(products => res.json(products))
             .catch(next);
+
     }
     create(req, res, next) {
         const data = new products(req.body);
@@ -85,6 +198,5 @@ class ProductController {
             })
             .catch(next);
     }
-
 }
 module.exports = new ProductController;
