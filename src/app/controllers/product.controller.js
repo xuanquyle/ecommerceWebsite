@@ -4,16 +4,9 @@ const { restart } = require("nodemon");
 
 const productModel = require('../models/product.model');
 const products = productModel.exp_product;
-const colorOpts = productModel.exp_colorOpt;
-const ramOpts = productModel.exp_ramOpt;
-const romOpts = productModel.exp_romOpt;
-const sizeOpts = productModel.exp_sizeOpt;
-const warrantyOpts = productModel.exp_warrantyOpt;
-const category = productModel.exp_category
 class ProductController {
 
     index(req, res, next) {
-
         products.aggregate([
             {
                 $lookup: {
@@ -80,9 +73,16 @@ class ProductController {
             },
             {
                 $unwind: '$category'
+            },
+            {
+                $match: { isActive: true }
             }
         ])
-            .then(products => res.json(products))
+            .then(products => res.status(200).json(
+                {
+                    success: true,
+                    products: products,
+                }))
             .catch(next);
 
         //---- Promise---//
@@ -107,6 +107,8 @@ class ProductController {
         // products.findOne({ slug: req.params.slug })
         //     .then(product => res.json(product))
         //     .catch(next);
+
+        const slug = req.params.slug;
         products.aggregate([
             {
                 $lookup: {
@@ -175,27 +177,76 @@ class ProductController {
                 $unwind: '$category'
             },
             {
-                $match: {'slug':req.params.slug}
+                $match: { $and: [{ isActive: true }, { slug: slug }] }
+
             }
 
         ])
-            .then(products => res.json(products))
+            .then(products => res.status(200).json(
+                {
+                    success: true,
+                    products
+                }))
             .catch(next);
 
     }
     create(req, res, next) {
         const data = new products(req.body);
         data.save() // create, insertMany
-            .then(() => res.status(201).redirect('/product'))
+            .then(() => res.status(201).json(
+                {
+                    success: true,
+                    message: 'Create successfully'
+                }
+            ))
             .catch(next);
     }
     delete(req, res, next) {
-        products.findOne({ slug: req.params.slug })
-            .then(product => {
-                product.remove()
-                    .then(() => res.status(200).redirect('/product'))
-                    .catch(next);
+        const slug = req.params.slug;
+        products.findByIdAndUpdate(
+            { slug: slug },
+            { $set: { isActive: 0 } },
+        )
+            .then((product) => {
+                if (product)
+                    return res.status(200).json(
+                        {
+                            success: true,
+                            message: 'Delete successfully',
+                            product
+                        }
+                    )
+                return res.status(500).json(
+                    {
+                        success: false,
+                        message: 'Invalid parameters'
+                    })
             })
+            .catch(next);
+    }
+    update(req, res, next) {
+        const slug = req.params.slug;
+        const updateProduct = req.body;
+        products.findOneAndUpdate(
+            { slug: slug },
+            { $set: updateProduct }
+        )
+            .then((product) => {
+                if (product)
+                    return res.status(200).json(
+                        {
+                            success: true,
+                            message: 'Update successfully',
+                            product
+                        }
+                    )
+                return res.status(500).json(
+                    {
+                        success: false,
+                        message: 'Invalid parameters'
+                    })
+            })
+
             .catch(next);
     }
 }

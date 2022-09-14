@@ -10,15 +10,15 @@ app.use(bodyParser.json())
 app.use(morgan('combined'));
 
 
-var db= require('./src/config/db');
+var db = require('./src/config/db');
 db.connect();
 
 
 
 const routes = require('./src/routes');
 routes(app);
-  
+
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`)
-  });
+  console.log(`Listening on port ${port}`)
+});

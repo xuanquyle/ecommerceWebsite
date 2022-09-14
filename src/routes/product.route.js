@@ -9,4 +9,5 @@ router.get('/',productRoute.index);
 router.post('/',productRoute.create);
 router.get('/:slug',productRoute.detail);
 router.delete('/:slug',productRoute.delete);
+router.put('/:slug', productRoute.update);
 module.exports = router;
