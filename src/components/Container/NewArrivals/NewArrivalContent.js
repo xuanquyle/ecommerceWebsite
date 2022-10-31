@@ -4,7 +4,7 @@ import ImageBG1 from "../../../assets/images/demos/demo-4/products/product-1.jpg
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-
+import { Link } from "react-router-dom";
 const NewArrivalsContent = () => {
     const settings = {
         infinite: true,
@@ -46,9 +46,9 @@ const NewArrivalsContent = () => {
                     <div key={item.id} >
                         <div className="product product-2" style={{ margin: "0px 10px" }} >
                             <figure className="product-media">
-                                <a href="/">
+                                <Link to="/ProductDetails">
                                     <img src={ImageBG1} alt="Product image" className="product-image" />
-                                </a>
+                                </Link>
                                 <div className="product-action">
                                     <a href="/" className="btn-product btn-cart" title="Add to cart"><span>add to cart</span></a>
                                     <a href="popup/quickView.html" className="btn-product btn-quickview" title="Quick view"><span>quick view</span></a>

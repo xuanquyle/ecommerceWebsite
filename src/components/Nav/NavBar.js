@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
 
 const NavBar = () => {
 
     let arrNavItem = [
-        { id: '001', name: 'Home', link: 'https://www.reactjs.org' },
-        { id: '002', name: 'Laptop', link: 'https://www.reactjs.org' },
-        { id: '003', name: 'Smart Phone', link: 'https://www.reactjs.org' },
-        { id: '004', name: 'Accessory', link: 'https://www.reactjs.org' }
+        { id: '001', name: 'Home', link: '/' },
+        { id: '002', name: 'Laptop', link: '/Laptop' },
+        { id: '003', name: 'Smart Phone', link: '/SmartPhone' },
+        { id: '004', name: 'Accessory', link: '/Accessory' }
     ]
 
     return (
@@ -18,15 +19,17 @@ const NavBar = () => {
                             <ul className="menu">
                                 {arrNavItem.map((item, index) => {
                                     return (
-                                        index === 0
-                                            ? (<li className="megamenu-container active" key={item.id}>
-                                                <a href={item.link} className="sf-with-ul">{item.name}</a>
-                                            </li>)
-                                            : (<li className="megamenu-container" key={item.id}>
-                                                <a href={item.link} className="sf-with-ul">{item.name}</a>
-                                            </li>)
+                                        <li className="megamenu-container" key={item.id} >
+                                            <NavLink end to={item.link} className="sf-with-ul">{item.name}</NavLink>
+                                        </li>
                                     )
                                 })}
+                                {/* <li className="megamenu-container">
+                                    <NavLink end to="/" className="sf-with-ul">Home</NavLink>
+                                </li>
+                                <li className="megamenu-container">
+                                    <NavLink to="/aaa" className="sf-with-ul">ffff</NavLink>
+                                </li> */}
                             </ul>
                         </nav>
                     </div>

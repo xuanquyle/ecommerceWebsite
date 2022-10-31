@@ -7,18 +7,19 @@ import p3 from "../../assets/images/payments.png"
 
 const Footer = () => {
     var aaa = {};
-    axios.get(`https://jsonplaceholder.typicode.com/users`)
-      .then(res => {
-        const persons = res.data;
-        aaa = persons;
-        console.log(">>> Check data: ", typeof(persons));
-        console.log(">>> Check data: ", aaa);
-      })
-      .catch(error => console.log(error));
-      console.log(">>> Check data: ", aaa);
+    // axios.get(`http://localhost:3000/products`)
+    //   .then(res => {
+    //     const persons = res.data;
+    //     aaa = persons;
+    //     console.log(">>> Check data: ", typeof(persons));
+    //     console.log(">>> Check data: ", aaa);
+    //   })
+    //   .catch(error => console.log(error));
+    //   console.log(">>> Check data: ", aaa);
     // fetch('https://jsonplaceholder.typicode.com/users')
     //     .then(response => response.json())
     //     .then(json => console.log(json))
+    //const API = {baseurl: process.env.REACT_APP_API}
     return (
         <>
             <div className="footer">

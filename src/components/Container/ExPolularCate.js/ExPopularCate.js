@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import p from "../../../assets/images/demos/demo-4/cats/1.png"
 
 const ExPopularCate = () => {
@@ -26,8 +27,8 @@ const ExPopularCate = () => {
                     <div className="row" >
                         {arrItem && arrItem.map((item, index) => {
                             return (
-                                <div className="col-6 col-sm-4 col-lg-2" key={item.id}>
-                                    <a href="category.html" className="cat-block">
+                                <Link to="/ProductDetails" className="col-6 col-sm-4 col-lg-2" key={item.id} style={{cursor: 'pointer'}}>
+                                    <div className="cat-block">
                                         <figure>
                                             <span>
                                                 <img src={p} alt="Category image" />
@@ -35,8 +36,8 @@ const ExPopularCate = () => {
                                         </figure>
 
                                         <h3 className="cat-block-title">{item.tittle}</h3>
-                                    </a>
-                                </div>
+                                    </div>
+                                </Link>
                             )
                         })}
                     </div>

@@ -1,13 +1,14 @@
 import IntroProduct from "./IntroProduct"
 import Container from "../Container/Container"
-
+import PageContent from "../ProductDetails/PageContent"
 const Main = () => {
 
     return (
-        <main className="main">
+        <>
             <IntroProduct />
             <Container />
-        </main>
+            {/* Product details */}
+        </>
     )
 }
 export default Main
