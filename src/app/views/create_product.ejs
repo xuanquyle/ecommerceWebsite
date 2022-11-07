@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form action="/product" method="post">
+        <div>
+            <div>
+                <span>Tên sp</span><input type="text" name="name">
+            </div>
+            <div>
+                <select name="color_opt" id="">
+                    <% for(let i=0;i<color_opts.length;i++)
+                    {
+                        %>
+                    <option value="<%= color_opts[i].code%>"><%= color_opts[i].name%></option>
+                    <%}%>
+                </select>
+            </div>
+            <div>
+                <select name="rom_opt" id="">
+                    <% for(let i=0;i<rom_opts.length;i++)
+                    {
+                        %>
+                    <option value="<%= rom_opts[i].code%>"><%= rom_opts[i].name%></option>
+                    <%}%>
+                </select>
+            </div>
+            <div>
+                <select name="ram_opt" id="">
+                    <% for(let i=0;i<ram_opts.length;i++)
+                    {
+                        %>
+                    <option value="<%= ram_opts[i].code%>"><%= ram_opts[i].name%></option>
+                    <%}%>
+                </select>
+            </div>
+            <span>Giá:</span><input type="text" name="">
+        </div>
+        <hr>
+        <div>
+            <div>
+                <span>Tên sp</span><input type="text" name="name">
+            </div>
+            <div>
+                <select name="color_opt" id="">
+                    <% for(let i=0;i<color_opts.length;i++)
+                    {
+                        %>
+                    <option value="<%= color_opts[i].code%>"><%= color_opts[i].name%></option>
+                    <%}%>
+                </select>
+            </div>
+            <div>
+                <select name="rom_opt" id="">
+                    <% for(let i=0;i<rom_opts.length;i++)
+                    {
+                        %>
+                    <option value="<%= rom_opts[i].code%>"><%= rom_opts[i].name%></option>
+                    <%}%>
+                </select>
+            </div>
+            <div>
+                <select name="ram_opt" id="">
+                    <% for(let i=0;i<ram_opts.length;i++)
+                    {
+                        %>
+                    <option value="<%= ram_opts[i].code%>"><%= ram_opts[i].name%></option>
+                    <%}%>
+                </select>
+            </div>
+            <span>Giá:</span><input type="text" name="price">
+        </div>
+        <hr>
+        <button type="submit"> Tạo</button>
+    </form>
+</body>
+</html>
