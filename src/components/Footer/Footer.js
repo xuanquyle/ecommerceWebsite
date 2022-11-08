@@ -7,7 +7,7 @@ import p3 from "../../assets/images/payments.png"
 
 const Footer = () => {
     var aaa = {};
-    // axios.get(`http://localhost:3000/products`)
+    // axios.get(`https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=89&limit=-1`)
     //   .then(res => {
     //     const persons = res.data;
     //     aaa = persons;

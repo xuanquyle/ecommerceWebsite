@@ -1,18 +1,24 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const NavBar = () => {
 
     let arrNavItem = [
-        { id: '001', name: 'Home', link: '/' },
+        { id: '001', name: 'Trang chủ', link: '/' },
         { id: '002', name: 'Laptop', link: '/Laptop' },
-        { id: '003', name: 'Smart Phone', link: '/SmartPhone' },
-        { id: '004', name: 'Accessory', link: '/Accessory' }
+        { id: '003', name: 'Điện thoại', link: '/SmartPhone' },
+        { id: '004', name: 'Phụ kiện', link: '/Accessory' }
     ]
 
+    // Sticky Navigation Bar
+    const [fix, setFix] = useState(false)
+    const setFixed = () => {
+        setFix((window.scrollY > 80) ? true : false)
+    }
+    window.addEventListener("scroll", setFixed)
     return (
         <>
-            <div className="header-bottom sticky-header">
+            <div className={fix ? 'header-bottom sticky-header fixed' : 'header-bottom sticky-header'}>
                 <div className="container">
                     <div className="header-center">
                         <nav className="main-nav">
@@ -24,12 +30,6 @@ const NavBar = () => {
                                         </li>
                                     )
                                 })}
-                                {/* <li className="megamenu-container">
-                                    <NavLink end to="/" className="sf-with-ul">Home</NavLink>
-                                </li>
-                                <li className="megamenu-container">
-                                    <NavLink to="/aaa" className="sf-with-ul">ffff</NavLink>
-                                </li> */}
                             </ul>
                         </nav>
                     </div>

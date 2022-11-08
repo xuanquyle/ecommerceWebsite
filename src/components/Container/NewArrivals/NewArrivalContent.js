@@ -49,17 +49,17 @@ const NewArrivalsContent = () => {
                                 <Link to="/ProductDetails">
                                     <img src={ImageBG1} alt="Product image" className="product-image" />
                                 </Link>
-                                <div className="product-action">
-                                    <a href="/" className="btn-product btn-cart" title="Add to cart"><span>add to cart</span></a>
-                                    <a href="popup/quickView.html" className="btn-product btn-quickview" title="Quick view"><span>quick view</span></a>
+                                <div className="product-action" style={{cursor: 'pointer'}}>
+                                    <p className="btn-product btn-cart" title="Add to cart"></p>
+                                    <p className="btn-product btn-quickview" title="Quick view"></p>
                                 </div>
                             </figure>
 
                             <div className="product-body">
                                 <div className="product-cat">
-                                    <a href="/">{item.cate}</a>
+                                    <p >{item.cate}</p>
                                 </div>
-                                <h3 className="product-title"><a href="product.html">{item.tittle}r</a></h3>
+                                <h3 className="product-title"><Link to="/ProductDetails">{item.tittle}r</Link></h3>
                                 <div className="product-price">
                                     {item.price}
                                 </div>

@@ -1,0 +1,15 @@
+export const path = {
+    HOME: '/',
+    LOGIN: '/Login',
+    LAPTOP: '/Laptop',
+    SMARTPHONE: '/SmartPhone',
+    ACCESSORY: '/Accessory',
+    PRODUCTDETAILS: '/ProductDetails',
+    CART: '/Cart',
+    REGISTER: '/Register',
+    FORGOTPASSWORD: '/ForgotPassword',
+    USERPROFILE: '/UserProfile',
+    USERPURECHASED: '/UserProfile/Purchased',
+    USERADDRESS: '/UserProfile/Address',
+    USERCHANGEPASS: '/UserProfile/ChangePassword',
+}

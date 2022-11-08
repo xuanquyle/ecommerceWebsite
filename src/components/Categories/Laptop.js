@@ -1,7 +1,22 @@
 import p1 from "../../assets/images/demos/demo-4/products/product-10.jpg";
+import { useEffect, useState } from "react";
+import Pagination from "../Pagination";
+import queryString from "query-string"
 
 
-const Laptop = () => {
+const Laptop = (props) => {
+    const [title, setTitle] = useState(props.title);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 4,
+        totalRow: 100
+    });
+    const [filter, setFilter] = useState({
+        page: 1,
+        limit: 4,
+        // any Filters
+    });
+
     const arrItem = [
         {
             id: '001', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
@@ -36,18 +51,35 @@ const Laptop = () => {
             rating: '0.8', review: '6',
         },
     ]
+
+    const handlePageChange = (newPage) => {
+        console.log("New page: ", newPage);
+        setFilter({
+            ...filter,
+            page: newPage
+        })
+        console.log('filter', filter)
+    }
+
+    useEffect(() => {
+        setPagination({
+            ...pagination,
+            page: filter.page
+        });
+        console.log('pagi', pagination)
+        try {
+            const paramString = queryString.stringify(filter);
+
+            // GET API
+        } catch (error) {
+
+        }
+    }, [filter])
     return (
         <>
-            <div className="mb-5"></div>
 
-            <div className="container for-you">
+            <div className="container" style={{backgroundColor: '#25304b', borderRadius: '20px', boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px'}}>
                 <div className="heading heading-flex mb-3">
-                    <div className="heading-left">
-                        <h2 className="title">GỢI Ý HÔM NAY</h2>
-                    </div>
-                    <div className="heading-right">
-                        <a href="/" className="title-link">Xem thêm <i className="icon-long-arrow-right"></i></a>
-                    </div>
                 </div>
                 <div className="products">
                     <div className="row justify-content-center">
@@ -57,16 +89,16 @@ const Laptop = () => {
                                     <div className="product product-2">
                                         <figure className="product-media">
                                             <a href="/">
-                                                <img src={p1} alt="Product image" className="product-image" />
+                                                <img src={p1} alt="Product" className="product-image"  />
                                             </a>
-                                            <div className="product-action">
+                                            {/* <div className="product-action">
                                                 <a href="#" className="btn-product btn-cart" title="Add to cart"><span>Thêm vào giỏ</span></a>
                                                 <a href="popup/quickView.html" className="btn-product btn-quickview" title="Quick view"><span>Xem nhanh</span></a>
-                                            </div>
+                                            </div> */}
                                         </figure>
                                         <div className="product-body">
                                             <div className="product-cat">
-                                                <a href="#">{item.cate}</a>
+                                                <span href="#">{item.cate}</span>
                                             </div>
                                             <h3 className="product-title"><a href="product.html">{item.tittle}</a></h3>
                                             <div className="product-price">
@@ -85,6 +117,10 @@ const Laptop = () => {
                         })}
                     </div>
                 </div>
+                <Pagination
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
+                />
             </div>
         </>
     )
