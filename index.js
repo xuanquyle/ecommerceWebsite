@@ -2,8 +2,9 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
-const ejs = require('ejs');
+var cookieParser = require('cookie-parser')
 
+app.use(cookieParser())
 const dotenv = require('dotenv');
 dotenv.config();
 

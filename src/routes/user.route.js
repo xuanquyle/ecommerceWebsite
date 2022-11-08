@@ -16,4 +16,5 @@ router.get('/',authMiddleware.verifyTokenAndAdmin,userRoute.getAllUser)
 // customer_address route
 router.get('/address/:id',userRoute.userAddress)
 router.post('/address/:id/create',userRoute.createUserAddress)
+router.post('/refresh-token', userRoute.requestRefreshToken)
 module.exports= router;

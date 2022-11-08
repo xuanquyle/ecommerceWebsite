@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.ObjectId;
 
 const user = new Schema({
-    email: { type: String, required: true,unique: true},
+    email: { type: String, required: true, unique: true},
     password: { type: String, required: true },
     fisrtname: { type: String, default: null},
     lastname: { type: String,default: null },
@@ -38,6 +38,10 @@ const userAddress = new Schema({
 
 })
 
+const refreshToken = new Schema({
+    user_id: {type: String, required: true},
+    refreshToken: {type: String,required: true}
+})
 
 const exp_user = mongoose.model('user', user)
 const exp_user_addr = mongoose.model('user_address', userAddress)
