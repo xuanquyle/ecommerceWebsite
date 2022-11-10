@@ -1,5 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Provider, useSelector } from 'react-redux';
+import store from './store/Store';
+
 import './index.css';
 import App from './components/App';
 import reportWebVitals from './reportWebVitals';
@@ -26,9 +29,12 @@ import Purchased from './components/UserProfile/Purchased';
 import ChangePass from './components/UserProfile/ChangePass';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
-  <BrowserRouter>
-    <React.StrictMode>
+  
+  <Provider store={store}>
+    <BrowserRouter>
+      {/* <React.StrictMode> */}
       <ScrollToTop />
       <Routes>
         <Route path={path.HOME} element={<App />}>
@@ -49,10 +55,10 @@ root.render(
         <Route path={path.LOGIN} element={<Login />} />
         <Route path={path.REGISTER} element={<Register />} />
         <Route path={path.FORGOTPASSWORD} element={<ForgotPassword />} />
-
       </Routes>
-    </React.StrictMode>
-  </BrowserRouter>
+      {/* </React.StrictMode> */}
+    </BrowserRouter>
+  </Provider>
 );
 
 // If you want to start measuring performance in your app, pass a function

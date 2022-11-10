@@ -2,17 +2,33 @@ import React from "react";
 import Search from "../Search/Search";
 import NavBar from "../Nav/NavBar";
 import { Link } from "react-router-dom";
+import "../../utils/constant"
 
 import logo from "../../assets/images/demos/demo-4/logo.png"
+import { path } from "../../utils/constant";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../store/actions/userActions";
 
 const Header = () => {
 
+    const userselector = useSelector(state => state);
+    const dispatch = useDispatch();
+    console.log(">>>a", userselector)
+    // console.log(">>>",userselector)
     let arrLanguage = [
         { id: '001', name: 'USA', link: 'https://www.reactjs.org' },
         { id: '002', name: 'ENGLAND', link: 'https://www.reactjs.org' },
         { id: '003', name: 'CHINA', link: 'https://www.reactjs.org' },
     ]
-
+    const nav = useNavigate();
+    const handleLogout = () => {
+        localStorage.removeItem('userInfo');
+        localStorage.removeItem('isLoggedIn');
+        dispatch(logout());
+        console.log(">>>", userselector)
+        nav(path.HOME);
+    }
     return (
         <>
             <div className="page-wrapper">
@@ -26,26 +42,45 @@ const Header = () => {
                             </div>
 
                             <div className="header-center">
-                                <Search/>
+                                <Search />
                             </div>
 
                             <div className="header-right">
-                                <div className="dropdown compare-dropdown">
-                                    <a href="/" className="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static" title="Compare Products" aria-label="Compare Products">
-                                        <div className="icon">
-                                            <i className="icon-random"></i>
-                                        </div>
-                                        <p>Compare</p>
-                                    </a>                       
-                                </div>
                                 <div className="dropdown cart-dropdown">
-                                    <Link to="/Cart" className="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                    <Link to={path.CART} className="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                                         <div className="icon">
                                             <i className="icon-shopping-cart"></i>
                                             <span className="cart-count">2</span>
                                         </div>
-                                        <p>Cart</p>
-                                    </Link> 
+                                        <p>Giỏ hàng</p>
+                                    </Link>
+                                </div>
+                                <div className="dropdown compare-dropdown">
+                                    {(userselector && (!userselector.userLogin.isLoggedIn || userselector.userLogin.isLoggedIn === false)) ? (
+                                        <Link to={path.LOGIN} className="dropdown-toggle">
+                                            <div className="icon">
+                                                <i className="icon-user"></i>
+                                            </div>
+                                            <p>Tài khoản</p>
+                                        </Link>
+                                    ) : (
+                                        <>
+                                            <Link to={path.USERPROFILE} className="dropdown-toggle">
+                                                <div className="icon">
+                                                    <i className="icon-user"></i>
+                                                </div>
+                                                {/* <p>Tài khoản</p> */}
+                                                <p>
+                                                    {(userselector && userselector.userLogin.isLoggedIn === true)
+                                                        ? userselector.userLogin.userInfo.username
+                                                        : 'Tài khoản'}
+                                                </p>
+                                            </Link>
+                                            <div className="icon" >
+                                                <i className="icon-sigin" onClick={handleLogout}>ssssssssssssss</i>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>

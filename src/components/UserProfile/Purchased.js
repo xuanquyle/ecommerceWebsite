@@ -53,7 +53,7 @@ const Purchased = () => {
                                             <td className="product-col">
                                                 <button type="button"
                                                     className="btn-info btn-sm"
-                                                    style={{ fontSize: '1.4rem' }}><i class="icon-edit"></i> Sửa</button>
+                                                    style={{ fontSize: '1.4rem' }}><i className="icon-edit"></i> Sửa</button>
                                             </td>
                                         </tr>
                                     )

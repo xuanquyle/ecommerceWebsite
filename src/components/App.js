@@ -4,14 +4,15 @@ import Footer from "./Footer/Footer";
 import "../assets/css/skins/skin-demo-4.css";
 import "../assets/css/demos/demo-4.css";
 
-import {Outlet} from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 function App() {
+
   return (
     <div className="App">
       <header className="App-header">
         <Header />
-        <main className="main">         
+        <main className="main">
           <Outlet />
         </main>
         <Footer />

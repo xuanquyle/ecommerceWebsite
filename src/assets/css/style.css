@@ -20133,7 +20133,7 @@ button:focus {
 
 }
 .custom-input-check {
-    padding-right: 10px;
+    margin-right: 10px !important;
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;

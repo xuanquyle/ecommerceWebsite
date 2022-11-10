@@ -21,7 +21,7 @@ const FilterOption = (props) => {
                         {arrOption && arrOption.map((item, index) => {
                             return (<div className="filter-item" key={item.id}>
                                 <div className="custom-control custom-checkbox">
-                                    <div style={{display: 'flex', alignItems: 'center', fontSize: '1.4rem'}}>
+                                    <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', fontSize: '1.4rem'}}>
                                         <input type="checkbox" 
                                         checked={curOption === item.id ? true : false}
                                         onChange={() => handleOnChange(item)}

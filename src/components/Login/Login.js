@@ -1,13 +1,21 @@
 
 import { useState } from "react";
 import {useForm} from "react-hook-form"
-import {Link} from "react-router-dom"
+import { useDispatch } from "react-redux";
+import {Link, useNavigate} from "react-router-dom"
 import "../../utils/constant"
 import { path } from "../../utils/constant";
+import {login} from "../../store/actions/userActions"
 
 const Login = () => {
     const {register, handleSubmit, formState: {errors}} = useForm();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const onSubmit = (data) => {
+        localStorage.setItem('isLoggedIn',JSON.stringify(true));
+        localStorage.setItem('userInfo', JSON.stringify(data));
+        dispatch(login(data));
+        navigate('/');
         console.log('>>>',data);
     }
     return (
@@ -35,7 +43,7 @@ const Login = () => {
                             </input>
                         </div>
                         <div className="col-12">
-                            <button className="btn btn-login">Đăng nhập</button>
+                            <button className="btn btn-login" type="submit">Đăng nhập</button>
                         </div>
                         <div className="col-12">
                             <Link to={path.FORGOTPASSWORD}><span style={{fontSize: '14px'}}>Quên mật khẩu?</span></Link>
@@ -50,5 +58,12 @@ const Login = () => {
         </div>
     );
 }
+
+const mapStateToProp = state => {
+    return {
+
+    }
+}
+
 
 export default Login;
