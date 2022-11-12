@@ -7,17 +7,26 @@ const mongoose_delete = require('mongoose-delete');
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
+const Option = new Schema({
+    color: { type: String},
+    rom: { type: Number },
+    ram: { type: Number },
+    price: { type: Number },
+    qty: { type: Number }
+})
 
-const product = new Schema(
+const Product = new Schema(
     {
         name: { type: String, required: true },
         description: { type: String },
         short_description: { type: String },
         thumb: { type: String },
-        category_id: { type: ObjectId, required: true },
+        category_id: { type: String, required: true },
         slug: {
             type: String, slug: 'name', unique: true
-        }
+        },
+        options: [Option]
+
     },
     {
         timestamps:
@@ -28,23 +37,9 @@ const product = new Schema(
     },
     { versionKey: false });
 
-
 mongoose.plugin(slug);
-product.plugin(mongoose_delete, { overrideMethods: 'all', deletedAt: true, deletedBy: true });
+Product.plugin(mongoose_delete, { overrideMethods: 'all', deletedAt: true, deletedBy: true });
+const productModel = mongoose.model('product', Product);
 
-
-const productOption = new Schema({
-    product_id: { type: String },
-    color_opt: { type: String },
-    rom_opt: { type: String },
-    ram_opt: { type: String },
-    price: { type: Number },
-    qty: { type: Number }
-})
-const exp_product = mongoose.model('product', product);
-const exp_productOpt = mongoose.model('product_opts', productOption);
-
-module.exports = {
-    exp_product, exp_productOpt
-}
+module.exports = productModel
 

@@ -1,72 +1,97 @@
+
 const { response } = require("express");
 const { restart } = require("nodemon");
-const productModel = require('../models/product.model');
+const mongodb = require('mongodb');
+const ObjectID = mongodb.ObjectID;
+const Products  = require('../models/product.model');
 
-const productOptModel = require('../models/option.model');
 const { data } = require("jquery");
-const products = productModel.exp_product;
-const product_opts = productModel.exp_productOpt;
-const color_options = productOptModel.exp_color;
-const rom_options = productOptModel.exp_rom;
-const ram_options = productOptModel.exp_ram;
 
 class ProductController {
 
     //--------get(/product--------)//
-    index(req, res, next) {
-
+    async index(req, res, next) {
         //---- Promise---//
-        products.find({})
-            .then(products => {
-                // products=products.map(product=>product.toObject());
-                res.status(200).send(products);
-            })
-            .catch()
+        try {
+            let perPage = 2; // số lượng sản phẩm xuất hiện trên 1 page
+            let page
+            if (req.query.page)
+                page = req.query.page || 1;
 
-        // ---callback---//
-        // product.find({}, function (err, product) {
-        //     if (!err) 
-        //         res.json(product);
-        //     else 
-        //         res.status(400).json({err:'ERROR'});
-        //   });
+            // Filtering ]
+            let query = {};
+            if (req.query.category_id)
+                query.category_id = Object.assign({}, { category_id: req.query.category_id })
+            if (req.query.max_price && req.query.min_price)
+                query.filterPrice = { options: { $elemMatch: { price: { $lte: req.query.max_price, $gte: req.query.min_price } } } }
+            if (req.query.max_rom && req.query.min_rom)
+                query.filterRom = { options: { $elemMatch: { rom: { $lte: req.query.max_rom, $gte: req.query.min_rom } } } }
+            if (req.query.max_ram && query.min_ram)
+                query.filterRam = { options: { $elemMatch: { ram: { $lte: req.query.max_ram, $gte: req.query.min_ram } } } }
+            Products
+                .find(query.filterRom) // find tất cả các data
+                .skip((perPage * page) - perPage) // Trong page đầu tiên sẽ bỏ qua giá trị là 0
+                .limit(perPage)
+                .exec((err, products) => {
+                    if (err) return res.status(404).json(err);
+                    if (!products || products.length == 0)
+                        return res.status(400).json('Product not found');
+                    return res.status(200).json(products)
+                })
+        }
+        catch (err) {
+            res.status(404).json("Can not find products")
+        }
     }
+
+    //     // ---callback---//
+    //     // product.find({}, function (err, product) {
+    //     //     if (!err) 
+    //     //         res.json(product);
+    //     //     else 
+    //     //         res.status(400).json({err:'ERROR'});
+    //     //   });
+    // }
 
     // [GET] /product/:slug   //
-    detail(req, res, next) {
-        const slug = req.params.slug;
-        products.aggregate([
-            {
-                $addFields: {
-                    product_options: 'product_options'
-                }
-            },
-            {
-                $lookup: {
-                    from: 'product_opts',
-                    localField: '_id',
-                    foreignField: 'product_id',
-                    as: 'product_options'
-                }
-            },
-            {
-                $match: { slug: slug }
-            }
-        ])
-            .then(products => res.send(products))
-            .catch(next)
+    // getDetailProduct(req, res, next) {
+    //     const slug = req.params.slug;
 
-    }
-    // [POST] /product
-    create(req, res, next) {
-        const data = new products(req.body);
-        data.save()
+
+    // }
+    // // [POST] /product
+    createProduct(req, res, next) {
+        res.json(req.body)
+        const data = req.body;
+        let options = [];
+        data.options.forEach(option => {
+            options.push({
+                color_opt: option.color_opt,
+                rom_opt: option.rom_opt,
+                ram_opt: option.ram_opt,
+                price: option.price,
+                qty: option.qty,
+                image: option.image
+            });
+        }
+        )
+        const newProduct = new Products({
+            name: data.name,
+            description: data.description,
+            short_description: data.short_description,
+            thumb: data.thumb,
+            category_id: data.category_id,
+            options: options
+        });
+        // res.json(newProduct)
+        newProduct.save()
             .then(product => res.status(200).send(product))
             .catch(next)
     }
+
     //[DELETE] /product/:id
-    delete(req, res, next) {
-        products.delete(
+    deleteProduct(req, res, next) {
+        Products.delete(
             {
                 _id: req.params.id
             }
@@ -89,29 +114,37 @@ class ProductController {
             })
             .catch(next);
     }
-
-    //  [GET] /product/:id/edit
-    edit_product(req, res, next) {
-        const id = req.params.id;
-
-        products.findById(id)
+    // [PUT] /products/:id/restore
+    restoreProduct(req, res, next) {
+        Products.restore(
+            {
+                _id: req.params.id
+            }
+        )
             .then((product) => {
-                product_opts.find({ product_id: id })
-                    .then(product_opts => {
-                        res.status(200).send({
-                            product,
-                            product_opts
-                        })
+                if (product) {
+                    return res.status(200).send(
+                        {
+                            success: true,
+                            message: 'Restore successfully',
+                            product
+                        }
+                    )
+                }
+                return res.status(400).send(
+                    {
+                        success: false,
+                        message: 'Invalid parameters'
                     })
-                    .catch(next)
             })
             .catch(next);
     }
+
     // [PUT] /product/:id
-    update(req, res, next) {
+    updateProduct(req, res, next) {
         const id = req.params.id;
         const updateProduct = req.body;
-        products.findOneAndUpdate(
+        Products.findOneAndUpdate(
             { _id: id },
             {
                 $set: {
@@ -138,109 +171,38 @@ class ProductController {
             .catch(next);
     }
 
-
-    // [GET] /product/product_opt/:id/add
-    // Các input để thêm data + bảng hiển thị các option đã có của product
-    getProductOpt(req, res, next) {
+    //[PUT] /add-options/:id
+    addOption(req, res, next) {
         const id = req.params.id;
-        product_opts.find({ product_id: id })
-            .then(async product_opt => {
-                const color_opts = await color_options.find({})
-                const rom_opts = await rom_options.find({}).sort({ code: 1 })
-                const ram_opts = await ram_options.find({}).sort({ code: 1 })
-                res.status(200).send({
-                    product_opt,
-                    options: {
-                        color_opts,
-                        rom_opts,
-                        ram_opts
-                    }
-                })
-            })
-            .catch(next);
-    }
-
-    //[POST] /product/option
-    // Chọn trong list sản phẩm đã được thêm vào db -> load lên bảng option đã có
-    storedProductOpt(req, res, next) {
-        products.findById(req.params.id)
-            .then(async product => {
-                const productOpts = await product_opts.find({ product_id: req.params.id });
-                const color_opts = await color_options.find({})
-                const rom_opts = await rom_options.find({}).sort({ code: 1 })
-                const ram_opts = await ram_options.find({}).sort({ code: 1 })
-                res.status(200).render('create_product_option', {
-                    product,
-                    productOpts,
-                    color_opts,
-                    rom_opts,
-                    ram_opts
-                })
-            })
-
-    }
-    createProductOpt(req, res, next) {
-        const product_id = req.params.id;
-        const productOptions = req.body;
-        let arrProductOpt = [];
-        for (let i = 0; i < productOptions.color_opt.length; i++) {
-            const color = productOptions.color_opt[i];
-            const rom = productOptions.rom_opt[i];
-            const ram = productOptions.ram_opt[i];
-            const price = productOptions.price[i];
-            const qty = productOptions.qty[i];
-            const productOpt = {
-                product_id: product_id,
-                color_opt: color,
-                rom_opt: rom,
-                ram_opt: ram,
-                price: price,
-                qty: qty,
-            };
-            arrProductOpt.push(productOpt);
-        }
-        product_opts.insertMany(arrProductOpt)
-            .then(productOpt => res.status(200).json(productOpt))
-            .catch();
-    }
-    //GET /product/option/:id
-
-    editProductOpt(req, res, next) {
-        const id = req.params.id;
-        product_opts.findById({ _id: id })
-            .then(async product_opt => {
-                const all_productOpt = await product_opts.find({ product_id: product_opt.product_id })
-                const color_opts = await color_options.find({})
-                const rom_opts = await rom_options.find({}).sort({ code: 1 })
-                const ram_opts = await ram_options.find({}).sort({ code: 1 })
-                res.status(200).send({
-                    product_opt,
-                    options: {
-                        color_opts,
-                        rom_opts,
-                        ram_opts
-                    },
-                    all_productOpt
-                })
-            })
-            .catch(next);
-    }
-    //PUT /product/option/:id
-    updateProductOpt(req, res, next) {
-        const id = req.params.id;
-        const updateOption = req.body;
-        product_opts.findByIdAndUpdate({ _id: id }, {
-            rom_opt: updateOption.rom_opt,
-            ram_opt: updateOption.ram_opt,
-            color_opt: updateOption.color_opt,
-        }).exec()
-            .then(option => {
-                if (option) {
-                    return res.status(200).send(option);
+        const newOptions = req.body;
+        Products.findByIdAndUpdate(
+            id,
+            {
+                $push: {
+                    options: newOptions
                 }
-            }).then(null, err => {
-                console.error(err);
-                res.status(400).json(err);
+            }
+        )
+            .then(products => res.status(200).json(products))
+            .catch(err => {
+                res.status(404).json(err)
+            })
+    }
+
+    // [DELETE] /delele-options/:id
+    deleteOption(req, res, next) {
+        const id = req.params.id;
+        const optionId = req.params.optId;
+        Products.findByIdAndUpdate(id,
+            {
+                "$pull":
+                    { options: { _id: new ObjectID(optionId) } }
+            },
+            { safe: true, multi: true }, (err, obj) => {
+                if (!err) {
+                    res.status(200).json(obj)
+                }
+                else res.status(404).json(err)
             });
     }
 }

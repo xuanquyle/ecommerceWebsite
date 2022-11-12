@@ -8,7 +8,7 @@ app.use(cookieParser())
 const dotenv = require('dotenv');
 dotenv.config();
 
-const bcrypt= require('bcrypt');
+const bcrypt = require('bcrypt');
 
 var cors = require('cors')
 
@@ -41,10 +41,15 @@ var db = require('./src/config/db');
 db.connect();
 
 //--------call route
+
+const sortMiddleware = require('./src/app/middlewares/sort.middleware');
+app.use(sortMiddleware)
+
 const routes = require('./src/routes');
 routes(app);
 
 const port = process.env.PORT;
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)
 });
