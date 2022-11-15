@@ -7,9 +7,10 @@ const authMiddleware = require('../app/middlewares/auth.middleware')
 // Product
 router.get('/', productRoute.index);
 router.post('/' /*,authMiddleware.verifyTokenAndAdmin*/, productRoute.createProduct);
-router.get('/:slug', productRoute.index);
+router.get('/:slug', productRoute.getDetailProduct);
 router.put('/update/:id/restore',/*authMiddleware.verifyTokenAndAdmin,*/ productRoute.restoreProduct);
 router.put('/update/:id/add-options',authMiddleware.verifyTokenAndAdmin, productRoute.addOption);
+router.put('/update/:id/update-options',/*authMiddleware.verifyTokenAndAdmin,*/ productRoute.updateOption);
 router.put('/:id',authMiddleware.verifyTokenAndAdmin, productRoute.updateProduct);
 router.delete('/update/:id/delete-options/:optId'/*,authMiddleware.verifyTokenAndAdmin*/, productRoute.deleteOption);
 router.delete('/:id',/*authMiddleware.verifyTokenAndAdmin,*/ productRoute.deleteProduct);

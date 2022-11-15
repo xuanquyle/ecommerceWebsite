@@ -21,12 +21,11 @@ const Product = new Schema(
         description: { type: String },
         short_description: { type: String },
         thumb: { type: String },
-        category_id: { type: String, required: true },
+        category: { type: String, required: true, ref: 'category'},
         slug: {
             type: String, slug: 'name', unique: true
         },
         options: [Option]
-
     },
     {
         timestamps:

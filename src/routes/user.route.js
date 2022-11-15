@@ -12,7 +12,7 @@ const authMiddleware = require('../app/middlewares/auth.middleware');
 // customer route 
 router.post('/login', userRoute.login)
 router.post('/register', userRoute.register)
-router.get('/:id',authMiddleware.verifyToken, userRoute.getDetailUser)
+router.get('/:id',authMiddleware.verifyTokenAndUserAuthorization, userRoute.getDetailUser)
 router.put('/:id',authMiddleware.verifyTokenAndUserAuthorization, userRoute.updateUser)
 router.delete('/:id', /*authMiddleware.verifyTokenAndAdmin,*/userRoute.deleteUser)
 router.get('/',authMiddleware.verifyTokenAndAdmin,userRoute.getAllUser)

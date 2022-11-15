@@ -2,8 +2,8 @@
 const { response } = require("express");
 const { restart } = require("nodemon");
 const mongodb = require('mongodb');
-const ObjectID = mongodb.ObjectID;
-const Products  = require('../models/product.model');
+const ObjectId = mongodb.ObjectId;
+const Products = require('../models/product.model');
 
 const { data } = require("jquery");
 
@@ -13,34 +13,42 @@ class ProductController {
     async index(req, res, next) {
         //---- Promise---//
         try {
-            let perPage = 2; // số lượng sản phẩm xuất hiện trên 1 page
+            let perPage = 5; // số lượng sản phẩm xuất hiện trên 1 page
             let page
             if (req.query.page)
                 page = req.query.page || 1;
 
             // Filtering ]
-            let query = {};
-            if (req.query.category_id)
-                query.category_id = Object.assign({}, { category_id: req.query.category_id })
-            if (req.query.max_price && req.query.min_price)
-                query.filterPrice = { options: { $elemMatch: { price: { $lte: req.query.max_price, $gte: req.query.min_price } } } }
-            if (req.query.max_rom && req.query.min_rom)
-                query.filterRom = { options: { $elemMatch: { rom: { $lte: req.query.max_rom, $gte: req.query.min_rom } } } }
-            if (req.query.max_ram && query.min_ram)
-                query.filterRam = { options: { $elemMatch: { ram: { $lte: req.query.max_ram, $gte: req.query.min_ram } } } }
-            Products
-                .find(query.filterRom) // find tất cả các data
+            const categoryQuery = req.query.category;
+            const priceQuery = req.query.max_price && req.query.min_price;
+            const romQuery = req.query.max_rom && req.query.min_rom;
+            const ramQuery = req.query.max_ram && req.query.min_ram;
+            let filter = {}
+            let query = {}
+
+            categoryQuery ? query.category = req.query.category : query = query;
+
+            priceQuery ?
+                filter = Object.assign(filter, { price: { $lte: req.query.max_price, $gte: req.query.min_price } }) : filter = filter;
+            romQuery ?
+                filter = Object.assign(filter, { rom: { $lte: req.query.max_rom, $gte: req.query.min_rom } }) : filter = filter;
+            ramQuery ?
+                filter = Object.assign(filter, { ram: { $lte: req.query.max_ram, $gte: req.query.min_ram } }) : filter = filter;
+
+            Object.keys(filter).length === 0 ? query = query : query.options = { $elemMatch: filter };
+            const products = await Products
+                .find(query)
+                .populate('category')
+                .sort(query.sort) // find tất cả các data
                 .skip((perPage * page) - perPage) // Trong page đầu tiên sẽ bỏ qua giá trị là 0
                 .limit(perPage)
-                .exec((err, products) => {
-                    if (err) return res.status(404).json(err);
-                    if (!products || products.length == 0)
-                        return res.status(400).json('Product not found');
-                    return res.status(200).json(products)
-                })
+
+            if (!products || products.length === 0)
+                return res.status(400).json('Can not get products');
+            return res.status(200).json(products)
         }
         catch (err) {
-            res.status(404).json("Can not find products")
+            res.status(404).json("Failed to get products")
         }
     }
 
@@ -54,11 +62,23 @@ class ProductController {
     // }
 
     // [GET] /product/:slug   //
-    // getDetailProduct(req, res, next) {
-    //     const slug = req.params.slug;
-
-
-    // }
+    getDetailProduct(req, res, next) {
+        Products.find({ slug: req.params.slug })
+            .then(product => {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Get detail product successfully',
+                    product
+                })
+            })
+            .catch(err => {
+                return res.status(200).json({
+                    success: false,
+                    message: 'Failed to get detail product ',
+                    err
+                })
+            })
+    }
     // // [POST] /product
     createProduct(req, res, next) {
         res.json(req.body)
@@ -80,7 +100,7 @@ class ProductController {
             description: data.description,
             short_description: data.short_description,
             thumb: data.thumb,
-            category_id: data.category_id,
+            category: data.category,
             options: options
         });
         // res.json(newProduct)
@@ -152,7 +172,7 @@ class ProductController {
                     description: updateProduct.description,
                     short_description: updateProduct.short_description,
                     thumb: updateProduct.thumb,
-                    category_id: updateProduct.category_id
+                    category: updateProduct.category
                 }
             }
         )
@@ -196,7 +216,7 @@ class ProductController {
         Products.findByIdAndUpdate(id,
             {
                 "$pull":
-                    { options: { _id: new ObjectID(optionId) } }
+                    { options: { _id: new ObjectId(optionId) } }
             },
             { safe: true, multi: true }, (err, obj) => {
                 if (!err) {
@@ -205,5 +225,46 @@ class ProductController {
                 else res.status(404).json(err)
             });
     }
+    updateOption(req, res, next) {
+        Products.findOneAndUpdate({
+            _id: req.params.id,
+            options: {
+                $elemMatch: {
+                    _id: req.body.id
+                }
+            }
+        }, {
+            $set: {
+                'options.$.color': req.body.color,
+                'options.$.rom': req.body.rom,
+                'options.$.ram': req.body.ram,
+                'options.$.price': req.body.price,
+                'options.$.qty': req.body.qty
+            }
+        }
+        )
+            .then(updateProduct => {
+                if (!updateProduct)
+                    return res.status(200).json({
+                        success: false,
+                        message: 'Product option not found',
+                    })
+                return res.status(200).json({
+                    success: true,
+                    message: 'Update option successfully',
+                    updateProduct
+                })
+
+            })
+            .catch(err => {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Update option failed',
+                    err
+                })
+            }
+            )
+    }
 }
+
 module.exports = new ProductController;
