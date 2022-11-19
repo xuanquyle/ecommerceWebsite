@@ -4,6 +4,8 @@ const { restart } = require("nodemon");
 const mongodb = require('mongodb');
 const ObjectId = mongodb.ObjectId;
 const Products = require('../models/product.model');
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
 
 const { data } = require("jquery");
 
@@ -51,7 +53,26 @@ class ProductController {
             res.status(404).json("Failed to get products")
         }
     }
-
+    getAllProduct() {
+        Products.find()
+            .then(products => {
+                if (!products || products.length === 0)
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Product not found'
+                    })
+                return res.status(200).json({
+                    success: true,
+                    message: 'Get all products successfully',
+                    products
+                })
+            })
+            .catch(err => res.status(404).json({
+                success: false,
+                message: err
+            })
+            )
+    }
     //     // ---callback---//
     //     // product.find({}, function (err, product) {
     //     //     if (!err) 
@@ -80,19 +101,33 @@ class ProductController {
             })
     }
     // // [POST] /product
-    createProduct(req, res, next) {
-        res.json(req.body)
+    async createProduct(req, res, next) {
+        return res.json(req.file)
         const data = req.body;
+        const productExist = await Products.findOne({ name: data.name });
+        if (productExist) return res.status(400).json({
+            success: false,
+            message: 'Product already exists in the database, please try again'
+        })
         let options = [];
         data.options.forEach(option => {
-            options.push({
-                color_opt: option.color_opt,
-                rom_opt: option.rom_opt,
-                ram_opt: option.ram_opt,
+            option = {
+                color: option.color.toString().toLowerCase(),
+                rom: option.rom,
+                ram: option.ram,
                 price: option.price,
                 qty: option.qty,
                 image: option.image
-            });
+            }
+            if (!options.filter(value =>
+                value.color == option.color
+                && value.rom == option.rom
+                && value.ram == option.ram).length > 0) {
+                options.push(option)
+            }
+            else {
+                console.log('Some options overlap')
+            }
         }
         )
         const newProduct = new Products({
@@ -103,7 +138,6 @@ class ProductController {
             category: data.category,
             options: options
         });
-        // res.json(newProduct)
         newProduct.save()
             .then(product => res.status(200).send(product))
             .catch(next)
@@ -212,7 +246,7 @@ class ProductController {
     // [DELETE] /delele-options/:id
     deleteOption(req, res, next) {
         const id = req.params.id;
-        const optionId = req.params.optId;
+        const optionId = req.params.option_id;
         Products.findByIdAndUpdate(id,
             {
                 "$pull":
@@ -230,7 +264,7 @@ class ProductController {
             _id: req.params.id,
             options: {
                 $elemMatch: {
-                    _id: req.body.id
+                    _id: req.params.option_id
                 }
             }
         }, {

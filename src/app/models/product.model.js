@@ -12,7 +12,8 @@ const Option = new Schema({
     rom: { type: Number },
     ram: { type: Number },
     price: { type: Number },
-    qty: { type: Number }
+    qty: { type: Number },
+    image: { type: String }
 })
 
 const Product = new Schema(

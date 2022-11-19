@@ -198,13 +198,26 @@ class OrderController {
                     })
                 if (order.status.deliveryStartedAt != null)
                     return res.status(404).json({
-                        success:false,
+                        success: false,
                         message: 'The order has been delivered to the carrier, cannot be cancelled'
                     })
-                    return res.status(200).json({
-                        success:true,
-                        message: 'Cancel order successfully'
-                    })
+                else {
+                    order.deliveryStartedAt = Date.now();
+                    order.save()
+                        .then(order => res.status(200).json({
+                            success: false,
+                            message: 'Cancel order successfully',
+                            order
+                        }))
+                        .catch(err => res.status(500).json({
+                            success: false,
+                            message: err
+                        }))
+                }
+                return res.status(200).json({
+                    success: true,
+                    message: 'Cancel order successfully'
+                })
             })
             .catch(err => res.status(404).json({
                 success: false,
