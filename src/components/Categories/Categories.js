@@ -1,3 +1,4 @@
+import { Outlet } from "react-router-dom"
 import Filters from "./Filters"
 import Laptop from "./Laptop"
 
@@ -12,7 +13,7 @@ const Categories = () => {
                         <Filters />
                     </aside>
                     <aside className="col-lg-9">
-                        <Laptop title="MAC BOOK" />
+                        <Laptop />
                     </aside>
                 </div>
             </div>

@@ -12,18 +12,18 @@ const NewArrivalTittle = () => {
             <div className="heading-left">
                 <h2 className="title">SẢN PHẨM MỚI</h2>
             </div>
-            <div className="heading-right">
+            {/* <div className="heading-right">
                 <ul className="nav nav-pills nav-border-anim justify-content-center" role="tablist">
                     {arrItem && arrItem.map((item, index) => {
                         return (
                             <li className="nav-item" key={item.id}>
-                                {/* <a className="nav-link" id="new-acc-link" data-toggle="tab" href="/" role="tab" aria-controls="new-acc-tab" aria-selected="false">{item.tittle}</a> */}
+                                {/* <a className="nav-link" id="new-acc-link" data-toggle="tab" href="/" role="tab" aria-controls="new-acc-tab" aria-selected="false">{item.tittle}</a> 
                                 <p className="nav-link" id="new-acc-link" data-toggle="tab" role="tab" aria-controls="new-acc-tab" aria-selected="false" style={{cursor: 'pointer'}}>{item.tittle}</p>
                             </li>
                         )
                     })}
                 </ul>
-            </div>
+            </div> */}
         </div>
     )
 }

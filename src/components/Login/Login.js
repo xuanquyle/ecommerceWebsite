@@ -1,13 +1,14 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {useForm} from "react-hook-form"
-import { useDispatch } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import {Link, useNavigate} from "react-router-dom"
 import "../../utils/constant"
 import { path } from "../../utils/constant";
 import {login} from "../../store/actions/userActions"
+// import { connect } from "react-redux";
 
-const Login = () => {
+const Login = (props) => {
     const {register, handleSubmit, formState: {errors}} = useForm();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -16,8 +17,9 @@ const Login = () => {
         localStorage.setItem('userInfo', JSON.stringify(data));
         dispatch(login(data));
         navigate('/');
-        console.log('>>>',data);
+        // console.log('>>>',data);
     }
+    
     return (
         <div className='login-background'>
             <div className='login-container' style={{height: '450px'}}>
@@ -61,9 +63,9 @@ const Login = () => {
 
 const mapStateToProp = state => {
     return {
-
+        user: state.userLoginReducer
     }
 }
 
 
-export default Login;
+export default connect(mapStateToProp)(Login);

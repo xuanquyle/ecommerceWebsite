@@ -26,7 +26,8 @@ const TrendingProducts = () => {
         <>
             <div className="mb-5"></div>
 
-            <div className="bg-light pt-5 pb-6">
+            <div className="pt-5 pb-6"
+            style={{backgroundColor: 'rgb(211, 228, 243)'}}>
                 <div className="container trending-products">
                     <div className="heading heading-flex mb-5">
                         <div className="heading-left">

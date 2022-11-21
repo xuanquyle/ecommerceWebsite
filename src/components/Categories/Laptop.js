@@ -2,10 +2,14 @@ import p1 from "../../assets/images/demos/demo-4/products/product-10.jpg";
 import { useEffect, useState } from "react";
 import Pagination from "../Pagination";
 import queryString from "query-string"
+import { getAllProduct } from "../../api";
+import { connect, useDispatch, useSelector } from "react-redux";
+import { filter as funFilter } from "../../store/actions/filterAction"
 
 
 const Laptop = (props) => {
-    const [title, setTitle] = useState(props.title);
+    const dispatch = useDispatch();
+    const userselector = useSelector(state => state);
     const [pagination, setPagination] = useState({
         page: 1,
         limit: 4,
@@ -13,60 +17,77 @@ const Laptop = (props) => {
     });
     const [filter, setFilter] = useState({
         page: 1,
-        limit: 4,
+        limit: 10,
         // any Filters
     });
 
-    const arrItem = [
-        {
-            id: '001', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '60%', review: '4',
-        },
-        {
-            id: '002', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '80%', review: '6',
-        },
-        {
-            id: '003', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '0.6', review: '4',
-        },
-        {
-            id: '004', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '0.8', review: '6',
-        },
-        {
-            id: '005', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '0.6', review: '4',
-        },
-        {
-            id: '006', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '0.8', review: '6',
-        },
-        {
-            id: '007', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '0.8', review: '6',
-        },
-        {
-            id: '008', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
-            rating: '0.8', review: '6',
-        },
-    ]
+    // const arrProduct = [
+    //     {
+    //         id: '001', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '60%', review: '4',
+    //     },
+    //     {
+    //         id: '002', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '80%', review: '6',
+    //     },
+    //     {
+    //         id: '003', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '0.6', review: '4',
+    //     },
+    //     {
+    //         id: '004', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '0.8', review: '6',
+    //     },
+    //     {
+    //         id: '005', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '0.6', review: '4',
+    //     },
+    //     {
+    //         id: '006', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '0.8', review: '6',
+    //     },
+    //     {
+    //         id: '007', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '0.8', review: '6',
+    //     },
+    //     {
+    //         id: '008', cate: 'TV', tittle: 'MacBook Pro 13" Display, i5', price: '1,199.99',
+    //         rating: '0.8', review: '6',
+    //     },
+    // ]
 
+    const [arrProduct, setArrProduct] = useState();
     const handlePageChange = (newPage) => {
-        console.log("New page: ", newPage);
+        // console.log("New page: ", newPage);
         setFilter({
             ...filter,
             page: newPage
         })
-        console.log('filter', filter)
+        let pagiTemp = {
+            ...filter,
+            page: newPage
+        }
+        var data = { ...props.filters, filter: pagiTemp };
+        localStorage.removeItem('pagination');
+        localStorage.setItem('pagination', JSON.stringify(filter));
+        dispatch(funFilter(data));
+        // console.log('filter', filter)
     }
+    const fetchDataProduct = async () => {
+        try {
+            const data = await getAllProduct();
+            setArrProduct(data.data);
+            // console.log(data.data);
+        } catch (error) {
 
+        }
+    }
     useEffect(() => {
         setPagination({
             ...pagination,
             page: filter.page
         });
-        console.log('pagi', pagination)
+        // console.log('pagi', pagination)
         try {
             const paramString = queryString.stringify(filter);
 
@@ -74,22 +95,25 @@ const Laptop = (props) => {
         } catch (error) {
 
         }
+        fetchDataProduct();
     }, [filter])
+
+
     return (
         <>
 
-            <div className="container" style={{backgroundColor: '#25304b', borderRadius: '20px', boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px'}}>
+            <div className="container" style={{ backgroundColor: '#25304b', borderRadius: '20px', boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px' }}>
                 <div className="heading heading-flex mb-3">
                 </div>
                 <div className="products">
                     <div className="row justify-content-center">
-                        {arrItem && arrItem.map((item, index) => {
+                        {arrProduct && arrProduct.map((item, index) => {
                             return (
-                                <div className="col-6 col-md-4 col-lg-3" key={item.id}>
+                                <div className="col-6 col-md-4 col-lg-3" key={item._id}>
                                     <div className="product product-2">
                                         <figure className="product-media">
                                             <a href="/">
-                                                <img src={p1} alt="Product" className="product-image"  />
+                                                <img src={p1} alt="Product" className="product-image" />
                                             </a>
                                             {/* <div className="product-action">
                                                 <a href="#" className="btn-product btn-cart" title="Add to cart"><span>Thêm vào giỏ</span></a>
@@ -98,11 +122,12 @@ const Laptop = (props) => {
                                         </figure>
                                         <div className="product-body">
                                             <div className="product-cat">
-                                                <span href="#">{item.cate}</span>
+                                                <span href="#">{item.category ? item.category.name : ''}</span>
                                             </div>
-                                            <h3 className="product-title"><a href="product.html">{item.tittle}</a></h3>
+                                            <h3 className="product-title"><a href="product.html">{item.name}</a></h3>
                                             <div className="product-price">
-                                                $214.49
+
+                                                {item.options[0] ? item.options[0].price.toLocaleString('de-DE') : ''} &nbsp; <sup>₫</sup>
                                             </div>
                                             <div className="ratings-container">
                                                 <div className="ratings">
@@ -126,4 +151,11 @@ const Laptop = (props) => {
     )
 }
 
-export default Laptop
+const mapStateToProp = state => {
+    return {
+        filters: state.filters
+    }
+}
+
+
+export default connect(mapStateToProp)(Laptop);

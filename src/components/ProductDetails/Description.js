@@ -13,7 +13,7 @@ const Description = () => {
         setNavActive(item.id)
     }
     return (
-        <div className="product-details-tab mt-10">
+        <div className="product-details-tab mt-5 shadow p-3 mb-5 bg-white rounded">
             <ul className="nav nav-pills " role="tablist">
                 {menu && menu.map((item, index) => {
                     return (

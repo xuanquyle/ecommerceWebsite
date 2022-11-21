@@ -9,8 +9,9 @@ import { path } from "../../utils/constant";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../store/actions/userActions";
+import { connect } from "react-redux";
 
-const Header = () => {
+const Header = (props) => {
 
     const userselector = useSelector(state => state);
     const dispatch = useDispatch();
@@ -71,14 +72,18 @@ const Header = () => {
                                                 </div>
                                                 {/* <p>Tài khoản</p> */}
                                                 <p>
-                                                    {(userselector && userselector.userLogin.isLoggedIn === true)
-                                                        ? userselector.userLogin.userInfo.username
+                                                    {(props.user && props.user.isLoggedIn === true)
+                                                        ? props.user.userInfo.username
                                                         : 'Tài khoản'}
                                                 </p>
                                             </Link>
-                                            <div className="icon" >
-                                                <i className="icon-sigin" onClick={handleLogout}>ssssssssssssss</i>
-                                            </div>
+                                            <Link className="dropdown-toggle ml-3"
+                                                style={{ fontFamily: 'aria !important' }}>
+                                                <span onClick={handleLogout}
+                                                    style={{ fontSize: '1.4rem', }}>
+                                                    <i className="icon-signout"></i>
+                                                </span>
+                                            </Link>
                                         </>
                                     )}
                                 </div>
@@ -93,4 +98,9 @@ const Header = () => {
     );
 }
 
-export default Header;
+const mapStateToProp = state => {
+    return {
+        user: state.userLogin
+    }
+}
+export default connect(mapStateToProp)(Header);

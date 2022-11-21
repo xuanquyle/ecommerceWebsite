@@ -5,7 +5,11 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { Link } from "react-router-dom";
-const NewArrivalsContent = () => {
+import { useState, useEffect } from "react"
+import axios from "axios"
+import {getAllProduct} from "../../../api"
+
+const NewArrivalsContent = (props) => {
     const settings = {
         infinite: true,
         speed: 500,
@@ -39,14 +43,29 @@ const NewArrivalsContent = () => {
         },
     ]
 
+    // const [product, setProduct] = useState();
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const data  = await getAllProduct();
+    //             setProduct(data.data)
+    //             // console.log(data);
+    //         } catch (error) {
+    //             console.log(error);
+    //         }
+    //     }
+    //     fetchData();
+    // },[])
+
     return (
+        // console.log('a',props.arrProduct[0]) &&
         <Slider {...settings}>
-            {arrItem && arrItem.map((item, index) => {
+            {props.arrProduct && props.arrProduct.slice(0,10).map((item, index) => {
                 return (
-                    <div key={item.id} >
+                    <div key={item._id} >
                         <div className="product product-2" style={{ margin: "0px 10px" }} >
                             <figure className="product-media">
-                                <Link to="/ProductDetails">
+                                <Link to={'/ProductDetails/'+ item.slug}>
                                     <img src={ImageBG1} alt="Product image" className="product-image" />
                                 </Link>
                                 <div className="product-action" style={{cursor: 'pointer'}}>
@@ -57,9 +76,9 @@ const NewArrivalsContent = () => {
 
                             <div className="product-body">
                                 <div className="product-cat">
-                                    <p >{item.cate}</p>
+                                    <p >{(item.category) ? (item.category.name) : ''}</p>
                                 </div>
-                                <h3 className="product-title"><Link to="/ProductDetails">{item.tittle}r</Link></h3>
+                                <h3 className="product-title"><Link to={"/ProductDetails/" + item.slug }>{item.name}r</Link></h3>
                                 <div className="product-price">
                                     {item.price}
                                 </div>

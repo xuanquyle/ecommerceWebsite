@@ -1,109 +1,64 @@
-const Profile = () => {
+import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form';
 
+const Profile = () => {
+    const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+    const onSubmit = (data) => {
+    }
     return (
         <>
-            <div className="col-md-4">
+            <div className="col-md-8">
                 <div className="card mb-3">
                     <div className="card-body">
                         <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Full Name</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                Kenneth Valdez
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Email</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                fip@jukmuh.al
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Phone</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                (239) 816-9029
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Mobile</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                (320) 380-4539
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Address</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                Bay Area, San Francisco, CA
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="col-md-4">
-                <div className="card mb-3">
-                    <div className="card-body">
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Full Name</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                Kenneth Valdez
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Email</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                fip@jukmuh.al
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Phone</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                (239) 816-9029
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Mobile</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                (320) 380-4539
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-3">
-                                <h6 className="mb-0">Address</h6>
-                            </div>
-                            <div className="col-sm-9 text-secondary">
-                                Bay Area, San Francisco, CA
-                            </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                            <div className="col-sm-12" style={{display: 'flex', justifyContent: 'right'}}>
-                                <button className="btn btn-info " target="__blank" href="https://www.bootdey.com/snippets/view/profile-edit-data-and-skills" >Edit</button>
-                            </div>
+                            <form onSubmit={handleSubmit(onSubmit)}
+                                style={{ display: 'flex', width: '100%' }}>
+                                <aside className="col-lg-6">
+
+                                    <div className="form-group col-md-12">
+                                        <label htmlFor="inputEmail4">Email</label>
+                                        <input type="Email" className="form-control" id="inputEmail4"
+                                            disabled />
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label htmlFor="inputPassword4">Số điện thoại</label>
+                                        <input type="text" className="form-control" id="inputPassword4" placeholder="..."
+                                            {...register("name", {
+                                                required: true,
+                                            })} />
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label htmlFor="inputPassword4">Họ tên</label>
+                                        <input type="text" className="form-control" id="inputPassword4" placeholder="..."
+                                            {...register("name", {
+                                                required: true,
+                                            })} />
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label htmlFor="inputPassword4">Giới tính</label>
+                                        <input type="text" className="form-control" id="inputPassword4" placeholder="..."
+                                            {...register("name", {
+                                                required: true,
+                                            })} />
+                                    </div>
+                                </aside>
+                                <aside className="col-lg-6">
+                                    <div className="form-group col-md-12">
+                                        <label htmlFor="inputPassword4">Ngày tham gia</label>
+                                        <input type="text" className="form-control" id="inputPassword4" placeholder="..."
+                                            {...register("name", {
+                                                required: true,
+                                            })} />
+                                    </div>
+                                    <div className="form-group col-md-12">
+                                        <label htmlFor="inputPassword4">Tổng tiền đã mua</label>
+                                        <input type="text" className="form-control" id="inputPassword4" placeholder="..."
+                                            {...register("name", {
+                                                required: true,
+                                            })} />
+                                    </div>
+                                </aside>
+                            </form>
                         </div>
                     </div>
                 </div>

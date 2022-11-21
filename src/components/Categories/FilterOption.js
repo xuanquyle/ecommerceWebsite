@@ -2,13 +2,12 @@ import { useState } from "react"
 
 const FilterOption = (props) => {
 
-    const [curOption, setCurOption] = useState(props.option[0].id)
-    const [arrOption, setArrOption] = useState(props.option)
-    console.log(arrOption);
-    const handleOnChange = (item) => {
-        setCurOption(item.id)
+    // const [curOption, setCurOption] = useState(props.option[0].id)
+    // console.log(arrOption);
+    // const handleOnChange = (item) => {
+    //     setCurOption(item.id)
 
-    }
+    // }
 
     return (
         <div className="widget widget-collapsible">
@@ -18,13 +17,13 @@ const FilterOption = (props) => {
             <div className="collapse show" >
                 <div className="widget-body">
                     <div className="filter-items filter-items-count">
-                        {arrOption && arrOption.map((item, index) => {
+                        {props.option && props.option.map((item, index) => {
                             return (<div className="filter-item" key={item.id}>
                                 <div className="custom-control custom-checkbox">
                                     <div style={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', fontSize: '1.4rem'}}>
                                         <input type="checkbox" 
-                                        checked={curOption === item.id ? true : false}
-                                        onChange={() => handleOnChange(item)}
+                                        checked={props.curOption === item.id ? true : false}
+                                        onChange={() => props.handleOnChange(item)}
                                         className="custom-input-check" />
                                         {item.content}
                                     </div>
@@ -35,7 +34,7 @@ const FilterOption = (props) => {
                     </div>
                 </div>
             </div>
-            <hr></hr>
+            <hr style={{margin: '0px'}}/>
         </div>
         
     )

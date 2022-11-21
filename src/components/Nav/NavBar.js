@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { path }  from "../../utils/constant"
 
 const NavBar = () => {
 
     let arrNavItem = [
-        { id: '001', name: 'Trang chủ', link: '/' },
-        { id: '002', name: 'Laptop', link: '/Laptop' },
-        { id: '003', name: 'Điện thoại', link: '/SmartPhone' },
-        { id: '004', name: 'Phụ kiện', link: '/Accessory' }
+        { id: '001', name: 'Trang chủ', link: path.HOME },
+        { id: '002', name: 'Laptop', link: path.PRODUCT },
+        // { id: '003', name: 'Điện thoại', link: path.SMARTPHONE },
+        // { id: '004', name: 'Phụ kiện', link: path.TABLET }
     ]
 
     // Sticky Navigation Bar

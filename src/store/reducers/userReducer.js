@@ -8,6 +8,7 @@ import {
 export const userLoginReducer = (state = {}, action) => {
     switch (action.type) {
         case USER_LOGIN_SUCCESS:
+            // console.log('ac', action)
             return {
                 ...state,
                 isLoggedIn: true, userInfo: action.payload

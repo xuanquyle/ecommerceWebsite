@@ -12821,7 +12821,7 @@ button:focus {
     display: flex;
     align-items: center;
     flex-flow: row wrap;
-    margin-bottom: 2rem
+    margin-bottom: 1rem
 }
 
 .details-filter-row .form-control {
@@ -13378,7 +13378,8 @@ button:focus {
 
 .product-details-sidebar .details-action-col .btn-product {
     flex: 1 1 auto;
-    max-width: 230px
+    max-width: 180px;
+    border-radius: 5px;
 }
 
 .product-details-sidebar .product-details-action {
@@ -18681,6 +18682,14 @@ button:focus {
 .icon-envira:before {
     content: '\f299'
 }
+/* .icon-signout {
+    position: relative;
+}*/
+.icon-signout:before {
+    content: "\f08b";
+    font-family: FontAwesome !important;
+    font-size: 2.5rem
+} 
 
 .icon-glide:before {
     content: '\f2a5'
@@ -19947,6 +19956,7 @@ button:focus {
     height: 100%;
     width: 100% !important;
 }
+
 .img-product-cau img {
     object-fit: fill;
     margin: 0 !important;
@@ -19955,45 +19965,51 @@ button:focus {
 }
 
 .details-filter-row .btn-choose {
-    margin: 15px;
+    margin: 0px 5px;
     padding: 0 15px;
     font-size: 1.6rem;
     text-align: center;
     vertical-align: middle;
-    color: #39f;
+    color: #21313c;
     background-color: transparent;
     background-image: none;
-    border-color: #39f;
+    /* border-color: #21313c; */
     box-shadow: none;
-    border: 1px solid #39f;
+    border: 1px solid #21313c;
     border-radius: 5px;
     cursor: pointer;
     /* width: 60px; */
 }
 
 .details-filter-row .btn-choose.actived {
-    background-color: #79c8ed;
+    background-color: #c96;
+    color: #fff;
+    border-color: #fff;
+
 }
 
 .nav-pills .nav-link.active {
     background-color: #fff !important;
 }
-.login-form{
+
+.login-form {
     font: normal 300 1.4rem/1.86 "Poppins", sans-serif;
     color: #666;
     font-size: 1.6rem;
 }
-.login-form p{
+
+.login-form p {
     text-align: center;
     margin-bottom: 15px;
     text-transform: capitalize;
     font-weight: 600;
     font-size: 24px;
     letter-spacing: -.025em;
-} 
+}
+
 /*  */
 .login-background {
-    background: linear-gradient(135deg, rgba(34,193,195,1) 0%,     rgba(253,187,45,1) 100%);
+    background: linear-gradient(135deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
     height: 100vh;
 }
 
@@ -20010,30 +20026,35 @@ button:focus {
     margin: auto;
     /* left: 25%; */
 }
+
 .login-background .login-container .login-content {
     padding: 10px;
 }
-.login-background .login-container .login-content  .login-text{
+
+.login-background .login-container .login-content .login-text {
     text-align: center;
     font-weight: 600;
     font-size: 24px;
     padding-top: 10px;
 }
+
 .login-background .login-container .login-content .login-input {
     margin: 7px 0;
     font-size: 24px;
 }
+
 .login-background .login-container .login-content .login-input input {
     font-size: 16px;
 }
+
 .login-background .login-container .login-content .btn-login {
     width: 100%;
     margin: 30px 0px 10px 0px;
-    height:  30px;
+    height: 30px;
     border-radius: 3px;
     outline: none;
     border: none;
-    background: linear-gradient(90deg, rgba(34,193,195,1) 0%,     rgba(253,187,45,1) 100%);
+    background: linear-gradient(90deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
     color: white;
     border-radius: 15px;
 }
@@ -20045,29 +20066,32 @@ button:focus {
     border-radius: 10px;
     height: 100vh;
 }
-.user-panel {
-    
-}
+
+.user-panel {}
+
 .pagination {
     color: #c96;
     padding: 3px 15px;
     border-radius: 10px;
 }
+
 .pagination.active {
     color: #fff;
     background-color: #c96;
 }
+
 .btn-next-prev {
     outline: none;
     border: none;
     border-radius: 7px;
-    padding: 0rem  1.5rem; 
+    padding: 0rem 1.5rem;
     height: 30px;
     color: white;
     background-color: #c96;
     font-size: 1.6rem;
     margin: auto 0;
 }
+
 .slick-prev {
     background-color: #39f !important;
     left: -13px !important;
@@ -20076,9 +20100,11 @@ button:focus {
     z-index: 1000 !important;
     border-radius: 10px;
 }
-.slick-prev::before{
+
+.slick-prev::before {
     content: '\1F860' !important;
 }
+
 .slick-next {
     background-color: #39f !important;
     right: -13px !important;
@@ -20087,23 +20113,27 @@ button:focus {
     z-index: 1000 !important;
     border-radius: 10px;
 }
-.slick-next::before{
+
+.slick-next::before {
     content: '\1F862' !important;
 }
 
 /* UserProfile */
 .user-main {
-    margin-top:20px;
+    margin-top: 20px;
     color: #1a202c;
     text-align: left;
-    background-color: #e2e8f0;    
+    background-color: #e2e8f0;
 }
+
 .main-body {
     padding: 15px;
 }
+
 .main-body .card {
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
 }
+
 .main-body .card {
     position: relative;
     display: flex;
@@ -20112,7 +20142,7 @@ button:focus {
     word-wrap: break-word;
     background-color: #fff;
     background-clip: border-box;
-    border: 0 solid rgba(0,0,0,.125);
+    border: 0 solid rgba(0, 0, 0, .125);
     border-radius: .25rem;
 }
 
@@ -20132,6 +20162,7 @@ button:focus {
     width: 100%; */
 
 }
+
 .custom-input-check {
     margin-right: 10px !important;
     font-family: inherit;
@@ -20139,4 +20170,10 @@ button:focus {
     line-height: inherit;
     height: 1.6rem;
     width: 1.6rem;
+}
+
+input[type=text]:disabled, 
+input[type=email]:disabled,
+input[type=number]:disabled {
+    background: #fff;
 }
