@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 var cookieParser = require('cookie-parser')
+require('express-async-errors');
 
 app.use(cookieParser())
 const dotenv = require('dotenv');
@@ -23,8 +24,6 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src/app/views'))
 
 //------ static folder
-app.use("/bootstrap", express.static(path.join(__dirname, '/node_modules/bootstrap/dist')));
-app.use("/jquery", express.static(path.join(__dirname, '/node_modules/jquery/dist')));
 app.use("/public", express.static(__dirname + '/src/public'));
 
 
@@ -41,14 +40,10 @@ var db = require('./src/config/db');
 db.connect();
 
 //--------call route
-
-const sortMiddleware = require('./src/app/middlewares/sort.middleware');
-app.use(sortMiddleware)
-
 const routes = require('./src/routes');
 routes(app);
 
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)

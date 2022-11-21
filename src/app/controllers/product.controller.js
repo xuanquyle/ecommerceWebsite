@@ -2,12 +2,9 @@
 const { response } = require("express");
 const { restart } = require("nodemon");
 const mongodb = require('mongodb');
-const ObjectId = mongodb.ObjectId;
 const Products = require('../models/product.model');
-const multer = require('multer')
-const upload = multer({ dest: 'uploads/' })
-
-const { data } = require("jquery");
+const ErrorHandler = require('../errors/errorHandler');
+const fs = require('fs');
 
 class ProductController {
 
@@ -15,7 +12,7 @@ class ProductController {
     async index(req, res, next) {
         //---- Promise---//
         try {
-            let perPage = 5; // số lượng sản phẩm xuất hiện trên 1 page
+            let perPage = 10; // số lượng sản phẩm xuất hiện trên 1 page
             let page
             if (req.query.page)
                 page = req.query.page || 1;
@@ -44,34 +41,23 @@ class ProductController {
                 .sort(query.sort) // find tất cả các data
                 .skip((perPage * page) - perPage) // Trong page đầu tiên sẽ bỏ qua giá trị là 0
                 .limit(perPage)
-
-            if (!products || products.length === 0)
-                return res.status(400).json('Can not get products');
+            if (!products.length)
+                throw new ErrorHandler.NotFoundError('Can not get products');
             return res.status(200).json(products)
         }
         catch (err) {
-            res.status(404).json("Failed to get products")
+            throw new ErrorHandler.BadRequestError('err.message');
         }
     }
-    getAllProduct() {
-        Products.find()
-            .then(products => {
-                if (!products || products.length === 0)
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Product not found'
-                    })
-                return res.status(200).json({
-                    success: true,
-                    message: 'Get all products successfully',
-                    products
-                })
-            })
-            .catch(err => res.status(404).json({
-                success: false,
-                message: err
-            })
-            )
+    async getAllProduct(req, res, next) {
+        try {
+            const products = await Products.find();
+            if (!products.length) throw new ErrorHandler.NotFoundError('Product not found');
+            return res.status(200).json(products)
+        }
+        catch (err) {
+            throw new ErrorHandler.NotFoundError(err.message);
+        }
     }
     //     // ---callback---//
     //     // product.find({}, function (err, product) {
@@ -83,222 +69,125 @@ class ProductController {
     // }
 
     // [GET] /product/:slug   //
-    getDetailProduct(req, res, next) {
-        Products.find({ slug: req.params.slug })
-            .then(product => {
-                return res.status(200).json({
-                    success: true,
-                    message: 'Get detail product successfully',
-                    product
-                })
-            })
-            .catch(err => {
-                return res.status(200).json({
-                    success: false,
-                    message: 'Failed to get detail product ',
-                    err
-                })
-            })
+    async getDetailProduct(req, res, next) {
+        try {
+            const product = await Products.findOne({ slug: req.params.slug });
+            if (!product) throw new ErrorHandler.NotFoundError('Product not found');
+            return res.status(200).json(product)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message);
+        }
     }
     // // [POST] /product
     async createProduct(req, res, next) {
-        return res.json(req.file)
-        const data = req.body;
-        const productExist = await Products.findOne({ name: data.name });
-        if (productExist) return res.status(400).json({
-            success: false,
-            message: 'Product already exists in the database, please try again'
-        })
-        let options = [];
-        data.options.forEach(option => {
-            option = {
-                color: option.color.toString().toLowerCase(),
-                rom: option.rom,
-                ram: option.ram,
-                price: option.price,
-                qty: option.qty,
-                image: option.image
+        try {
+            let err = [];
+            req.body.name ? err : err.push({ name: 'Product name is required' });
+            req.body.description ? err : err.push({ description: 'Product description is required' });
+            req.body.short_description ? err : err.push({ short_description: 'Product short_description is required' });
+            req.body.category ? err : err.push({ category: 'Product category is required' });
+            const data = req.body;
+            const productExist = await Products.findOne({ name: data.name });
+            if (productExist) return res.status(400).json({
+                success: false,
+                message: 'Product already exists in the database, please try again'
+            })
+            let options = [];
+            if (data.options)
+                data.options.forEach(option => {
+                    option = {
+                        color: option.color.toString().toLowerCase(),
+                        rom: option.rom,
+                        ram: option.ram,
+                        price: option.price,
+                        qty: option.qty,
+                        image: option.image
+                    }
+                    if (!options.filter(value =>
+                        value.color == option.color
+                        && value.rom == option.rom
+                        && value.ram == option.ram).length > 0) {
+                        options.push(option)
+                    }
+                    else {
+                        console.log('Some options overlap')
+                    }
+                })
+            const newProduct = new Products({
+                name: data.name,
+                description: data.description,
+                short_description: data.short_description,
+                thumb: req.file ? req.file.filename : '',
+                category: data.category,
+                options: options
+            });
+            const productCreated = await newProduct.save()
+            if (!productCreated.length) {
+                if (fs.existsSync(`src/public/images/${req.file.filename}`))
+                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
+                        if (err) throw new Error(err.message);
+                    });
+                throw new ErrorHandler.BadRequestError('Can not create product')
             }
-            if (!options.filter(value =>
-                value.color == option.color
-                && value.rom == option.rom
-                && value.ram == option.ram).length > 0) {
-                options.push(option)
-            }
-            else {
-                console.log('Some options overlap')
-            }
+            res.status(200).json(newProduct)
         }
-        )
-        const newProduct = new Products({
-            name: data.name,
-            description: data.description,
-            short_description: data.short_description,
-            thumb: data.thumb,
-            category: data.category,
-            options: options
-        });
-        newProduct.save()
-            .then(product => res.status(200).send(product))
-            .catch(next)
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
 
     //[DELETE] /product/:id
-    deleteProduct(req, res, next) {
-        Products.delete(
-            {
-                _id: req.params.id
-            }
-        )
-            .then((product) => {
-                if (product) {
-                    return res.status(200).send(
-                        {
-                            success: true,
-                            message: 'Delete successfully',
-                            product
-                        }
-                    )
-                }
-                return res.status(400).send(
-                    {
-                        success: false,
-                        message: 'Invalid parameters'
-                    })
-            })
-            .catch(next);
+    async deleteProduct(req, res, next) {
+        try {
+            const product = await Products.delete({ _id: req.params.id })
+            if (!product.length)
+                throw new ErrorHandler.NotFoundError('Product not found')
+            res.json('Delete product successfully')
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
     // [PUT] /products/:id/restore
-    restoreProduct(req, res, next) {
-        Products.restore(
-            {
-                _id: req.params.id
-            }
-        )
-            .then((product) => {
-                if (product) {
-                    return res.status(200).send(
-                        {
-                            success: true,
-                            message: 'Restore successfully',
-                            product
-                        }
-                    )
-                }
-                return res.status(400).send(
-                    {
-                        success: false,
-                        message: 'Invalid parameters'
-                    })
-            })
-            .catch(next);
+    async restoreProduct(req, res, next) {
+        try {
+            const productRestore = await Products.restore({ _id: req.params.id })
+            if (!productRestore.length) throw new ErrorHandler.NotFoundError('Product not found')
+            res.json(productRestore)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
 
     // [PUT] /product/:id
-    updateProduct(req, res, next) {
-        const id = req.params.id;
-        const updateProduct = req.body;
-        Products.findOneAndUpdate(
-            { _id: id },
-            {
-                $set: {
-                    name: updateProduct.name,
-                    description: updateProduct.description,
-                    short_description: updateProduct.short_description,
-                    thumb: updateProduct.thumb,
-                    category: updateProduct.category
+    async updateProduct(req, res, next) {
+        try {
+            const updateProduct = await Products.findByIdAndUpdate(
+                req.params.id,
+                {
+                    $set: {
+                        name: req.body.name,
+                        description: req.body.description,
+                        short_description: req.body.short_description,
+                        thumb: req.file.filename,
+                        category: req.body.category,
+                        options: req.body.options
+                    }
                 }
-            }
-        )
-            .then((product) => {
-                if (product) {
-                    product.save();
-                    res.status(200).redirect('back');
-                }
-                else
-                    return res.status(400).send(
-                        {
-                            success: false,
-                            message: 'Invalid parameters'
-                        })
-            })
-            .catch(next);
-    }
-
-    //[PUT] /add-options/:id
-    addOption(req, res, next) {
-        const id = req.params.id;
-        const newOptions = req.body;
-        Products.findByIdAndUpdate(
-            id,
-            {
-                $push: {
-                    options: newOptions
-                }
-            }
-        )
-            .then(products => res.status(200).json(products))
-            .catch(err => {
-                res.status(404).json(err)
-            })
-    }
-
-    // [DELETE] /delele-options/:id
-    deleteOption(req, res, next) {
-        const id = req.params.id;
-        const optionId = req.params.option_id;
-        Products.findByIdAndUpdate(id,
-            {
-                "$pull":
-                    { options: { _id: new ObjectId(optionId) } }
-            },
-            { safe: true, multi: true }, (err, obj) => {
-                if (!err) {
-                    res.status(200).json(obj)
-                }
-                else res.status(404).json(err)
-            });
-    }
-    updateOption(req, res, next) {
-        Products.findOneAndUpdate({
-            _id: req.params.id,
-            options: {
-                $elemMatch: {
-                    _id: req.params.option_id
-                }
-            }
-        }, {
-            $set: {
-                'options.$.color': req.body.color,
-                'options.$.rom': req.body.rom,
-                'options.$.ram': req.body.ram,
-                'options.$.price': req.body.price,
-                'options.$.qty': req.body.qty
-            }
-        }
-        )
-            .then(updateProduct => {
-                if (!updateProduct)
-                    return res.status(200).json({
-                        success: false,
-                        message: 'Product option not found',
-                    })
-                return res.status(200).json({
-                    success: true,
-                    message: 'Update option successfully',
-                    updateProduct
-                })
-
-            })
-            .catch(err => {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Update option failed',
-                    err
-                })
-            }
             )
+            if (!updateProduct) throw new ErrorHandler.NotFoundError('Product not found')
+            if (fs.existsSync(`src/public/images/${updateProduct.thumb}`))
+                fs.unlink(`src/public/images/${updateProduct.thumb}`, (err) => {
+                    if (err) throw new Error(err.message);
+                });
+
+            res.status(200).json(`Update product ${updateProduct._id} successfully`)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
 }
-
 module.exports = new ProductController;

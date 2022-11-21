@@ -1,42 +1,55 @@
 const Categories = require('../models/category.model');
+const ErrorHandler = require('../errors/errorHandler');
 
 class CategoryController {
     // [GET] /api/categories
-    index(req, res, next) {
-        Categories.find()
-            .then(categories => res.status(200).json({
-                success: true,
-                message: 'Get category successfully',
-                categories
-            }))
-            .catch(err => res.status(500).json({
-                success: true,
-                message: 'Get category not successful',
-                err
-            }))
+    async index(req, res, next) {
+        try {
+            const categories = await Categories.find()
+            if (!categories.length) throw new ErrorHandler.NotFoundError('Category not found')
+            res.status(200).json(categories)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
 
     // [GET] /api/categories/:id
-    getDetailCategory(req, res, next) {
-        Categories.findById(req.params.id)
-            .then(category => res.status(200).json({
-                success: true,
-                message: 'Get category successfully',
-                category
-            }))
-            .catch(err => res.status(500).json({
-                success: true,
-                message: 'Get category not successful',
-                err
-            }))
+    async getDetailCategory(req, res, next) {
+        try {
+            const category = await Categories.findById(req.params.id);
+            if (!category) throw new ErrorHandler.NotFoundError('Category not found')
+            res.status(200).json(category)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
     // [POST] /api/categories
-    createNewCategory(req, res, next) {
-        
+    async createNewCategory(req, res, next) {
+        try {
+            const categoryExist = await Categories.find({ name: req.body.name });
+            if (categoryExist.length) throw new ErrorHandler.BadRequestError('Category exist in database. Please try again')
+            const category = new Categories({
+                name: req.body.name,
+                description: req.body.description
+            })
+            const createdCategory = await category.save();
+            if (!createdCategory.length) throw new ErrorHandler.BadRequestError('Can not create new Category. Please try again')
+            res.status(200).json(createdCategory)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
 
     //[PUT] /api/categories/:id
     updateCategory(req, res, next) {
+        try {
+            // const category 
+        } catch (err) {
+            
+        }
     }
 
     // [DELETE] /api/categories/:id
