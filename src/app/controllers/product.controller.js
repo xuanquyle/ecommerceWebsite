@@ -86,6 +86,7 @@ class ProductController {
             req.body.description ? err : err.push({ description: 'Product description is required' });
             req.body.short_description ? err : err.push({ short_description: 'Product short_description is required' });
             req.body.category ? err : err.push({ category: 'Product category is required' });
+
             const data = req.body.data;
             const productExist = await Products.findOne({ name: data.name });
             const productDeleted = await Products.findOneDeleted({ name: data.name });

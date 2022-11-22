@@ -3,7 +3,7 @@ module.exports = {
 		constructor(message) {
 			super(message);
 			this.name = 'NotFoundError';
-			this.status = "404";
+			this.status = 404;
 		}
 	},
 	NoData: class NoData extends Error {
@@ -22,11 +22,10 @@ module.exports = {
 		}
 	},
 	ValidationError: class ValidationError extends Error {
-		constructor() {
-			super();
+		constructor(message) {
+			super(message);
 			this.name = 'ValidationError';
 			this.status = 422;
-			this.messageObject = message;
 		}
 	},
 	UnauthorizedError: class UnauthorizedError extends Error {
@@ -39,10 +38,16 @@ module.exports = {
 	},
 	ForbiddenError: class ForbiddenError extends Error {
 		constructor(message) {
+			super(message),
+			this.status = 403
+		}
+	},
+	ServerError: class ServerError extends Error {
+		constructor(message) {
 			super();
-			this.name = 'ForbiddenError';
-			this.status = 403;
+			this.name = 'ServerError';
+			this.status = 500;
 			this.messageObject = message;
 		}
-	}
+	},
 }

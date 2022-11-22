@@ -11,8 +11,8 @@ const UserAddressSchema = new Schema({
     city_code: { type: String, default: null },
     postal_code: { type: String, default: null },
     contry: { type: String, default: null },
-    user_name: { type: String, default: null },
-    user_phone: { type: String, default: null },
+    customer_name: { type: String, default: null },
+    customer_phone: { type: String, default: null },
     is_default: { type: Boolean, default: null, default: false },
     // emailVerificationToken: { type: String },
     // resetPasswordToken: { type: String },
@@ -40,8 +40,6 @@ const UserSchema = new Schema({
 
 UserSchema.plugin(mongoose_delete, { overrideMethods: 'all', deletedAt: true, deletedBy: true });
 
-
 const User = mongoose.model('user', UserSchema)
-
 
 module.exports = User;

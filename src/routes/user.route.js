@@ -1,30 +1,30 @@
 var express = require('express');
 app = express();
-const router= express.Router();
+const router = express.Router();
 
 const userRoute = require('../app/controllers/user.controller');
 const authMiddleware = require('../app/middlewares/auth.middleware');
 
 
 
-
-
-// customer route 
-router.post('/login', userRoute.login)
-router.post('/register', userRoute.register)
-router.get('/:id',authMiddleware.verifyTokenAndUserAuthorization, userRoute.getDetailUser)
-router.put('/:id',authMiddleware.verifyTokenAndUserAuthorization, userRoute.updateUser)
-router.delete('/:id', /*authMiddleware.verifyTokenAndAdmin,*/userRoute.deleteUser)
-router.get('/',authMiddleware.verifyTokenAndAdmin,userRoute.getAllUser)
-
-// customer_address route
-router.get('/address/:id',userRoute.createUserAddress)
-router.post('/address/:id/create',userRoute.createUserAddress)
-
 // REFRESH TOKEN
 router.post('/refresh-token', userRoute.requestRefreshToken)
 
 //VERIFY EMAIL
-router.post('/verify',userRoute.verifyEmail)
+router.get('/verify', userRoute.verifyEmail)
 
-module.exports= router;
+// customer route 
+router.post('/login', userRoute.login)
+router.post('/register', userRoute.register)
+router.get('/:id', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userRoute.getDetailUser)
+router.put('/:id', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userRoute.updateUser)
+router.delete('/:id', /*authMiddleware.verifyTokenAndAdmin,*/userRoute.deleteUser)
+router.get('/', /*authMiddleware.verifyTokenAndAdmin,*/ userRoute.getAllUser)
+
+// customer_address route
+router.post('/address/:id/add', userRoute.createUserAddress)
+router.delete('/address/:id/delete/:address_id', userRoute.deleteUserAddress)
+router.get('/address/:id/detail/:address_id', userRoute.getDetailAddress)
+
+
+module.exports = router;
