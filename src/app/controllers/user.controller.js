@@ -11,48 +11,44 @@ const dotenv = require('dotenv');
 dotenv.config();
 // let refreshTokens = [];
 const generateToken = require('../utils/generateToken');
-const authMiddleware = require('../middlewares/auth.middleware');
+const ErrorHandler = require('../errors/errorHandler')
 
 class UserController {
-    getAllUser(req, res, next) {
-        Users.find()
-            .then(user => {
-                res.status(200).json(user);
+    async getAllUser(req, res, next) {
+        try {
+            const users = await Users.find()
+            if (!users.length) throw new ErrorHandler.NotFoundError('User not found')
+            const allUser = users.map(user => {
+                const { password, ...orther } = user._doc;
+                user = { ...orther };
+                return user
             })
-            .catch(next);
+            res.status(200).json(allUser)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
 
     getDetailUser(req, res, next) {
         try {
-            Users.findById(req.params.id)
-                .then(user => {
-                    const { password, ...orther } = user._doc;
-                    res.json({ ...orther });
-                })
-                .catch(next);
+            const user = Users.findById(req.params.id);
+            if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin người dùng');
+            const { password, ...orther } = user._doc;
+            res.status(200).json({ ...orther });
         }
         catch {
-            res.json("User is not found")
+            throw new ErrorHandler.BadRequestError(err.message)
         }
     }
 
     async login(req, res, next) {
         try {
-            const user = await Users.findOne({ email: [req.body.email] });
-            if (!user) {
-                res.status(404).json({
-                    message: 'Email address is not found',
-                    err_code: 1
-                })
-            }
+            const user = await Users.findOne({ email: req.body.email });
+            if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy email người dùng')
             const validPassword = await bcrypt.compare(req.body.password, user.password);
 
-            if (!validPassword) {
-                return res.status(404).json({
-                    message: 'Password wrong',
-                    err_code: 2
-                })
-            }
+            if (!validPassword) throw new ErrorHandler.ForbiddenError('Sai mật khẩu. Vui lòng đăng nhập lại')
             if (user && validPassword) {
                 const accessToken = generateToken.generateAccessToken(user);
                 const refreshToken = generateToken.generateRefreshToken(user);
@@ -67,15 +63,21 @@ class UserController {
             }
 
         } catch (err) {
-            return res.status(400).json(err)
+            throw new ErrorHandler.BadRequestError(err.message)
         }
     }
     async register(req, res, next) {
+        let err = '';
         if (!validate.validate(req.body.email))
-            return res.status(400).json({
-                success: false,
-                message: "Wrong email address"
-            })
+            err += 'Email không đúng. Vui lòng thử lại'
+        if (req.body.password.length < 6) {
+            err += 'Password phải nhiều hơn 6 ký tự. Vui lòng thử lại';
+            if (!Boolean(str.match(/[A-Z]/)))
+                err += 'Password phải chứa ít nhất 1 ký tự viết hoa. Vui lòng thử lại'
+        }
+        if (re)
+
+            throw new ErrorHandler.ValidationError('')
 
         try {
             const salt = await bcrypt.genSalt(parseInt(process.env.BCRYPT_SALT_ROUND));

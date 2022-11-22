@@ -22,7 +22,7 @@ module.exports = {
 		}
 	},
 	ValidationError: class ValidationError extends Error {
-		constructor(message) {
+		constructor() {
 			super();
 			this.name = 'ValidationError';
 			this.status = 422;
@@ -34,6 +34,14 @@ module.exports = {
 			super();
 			this.name = 'UnauthorizedError';
 			this.status = 401;
+			this.messageObject = message;
+		}
+	},
+	ForbiddenError: class ForbiddenError extends Error {
+		constructor(message) {
+			super();
+			this.name = 'ForbiddenError';
+			this.status = 403;
 			this.messageObject = message;
 		}
 	}

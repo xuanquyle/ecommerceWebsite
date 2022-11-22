@@ -16,7 +16,6 @@ class ProductController {
             let page
             if (req.query.page)
                 page = req.query.page || 1;
-
             // Filtering ]
             const categoryQuery = req.query.category;
             const priceQuery = req.query.max_price && req.query.min_price;
@@ -87,17 +86,28 @@ class ProductController {
             req.body.description ? err : err.push({ description: 'Product description is required' });
             req.body.short_description ? err : err.push({ short_description: 'Product short_description is required' });
             req.body.category ? err : err.push({ category: 'Product category is required' });
-            const data = req.body;
+            const data = req.body.data;
             const productExist = await Products.findOne({ name: data.name });
-            if (productExist) return res.status(400).json({
-                success: false,
-                message: 'Product already exists in the database, please try again'
-            })
+            const productDeleted = await Products.findOneDeleted({ name: data.name });
+            if (productExist) {
+                if (req.file && fs.existsSync(`src/public/images/${req.file.filename}`))
+                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
+                        if (err) throw new Error(err.message);
+                    });
+                throw new ErrorHandler.BadRequestError('Sản phẩm đã tồn tại. Vui lòng thử lai')
+            }
+            if (productDeleted) {
+                if (req.file && fs.existsSync(`src/public/images/${req.file.filename}`))
+                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
+                        if (err) throw new Error(err.message);
+                    });
+                throw new ErrorHandler.BadRequestError('Sản phẩm đã bị xóa gần đây. Vui lòng thử lai')
+            }
             let options = [];
             if (data.options)
                 data.options.forEach(option => {
                     option = {
-                        color: option.color.toString().toLowerCase(),
+                        color: option.color,
                         rom: option.rom,
                         ram: option.ram,
                         price: option.price,
@@ -111,21 +121,21 @@ class ProductController {
                         options.push(option)
                     }
                     else {
-                        console.log('Some options overlap')
+                        console.log('Một số lựa chọn đã có sẵn')
                     }
                 })
             const newProduct = new Products({
                 name: data.name,
                 description: data.description,
                 short_description: data.short_description,
-                thumb: req.file ? req.file.filename : '',
+                thumb: req.file ? `public/images/${req.file.filename}` : '',
                 category: data.category,
                 options: options
             });
             const productCreated = await newProduct.save()
-            if (!productCreated.length) {
-                if (fs.existsSync(`src/public/images/${req.file.filename}`))
-                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
+            if (!productCreated) {
+                if (req.file && fs.existsSync(`src/ public / images / ${req.file.filename}`))
+                    fs.unlink(`src / public / images / ${req.file.filename}`, (err) => {
                         if (err) throw new Error(err.message);
                     });
                 throw new ErrorHandler.BadRequestError('Can not create product')
@@ -141,7 +151,7 @@ class ProductController {
     async deleteProduct(req, res, next) {
         try {
             const product = await Products.delete({ _id: req.params.id })
-            if (!product.length)
+            if (!product)
                 throw new ErrorHandler.NotFoundError('Product not found')
             res.json('Delete product successfully')
         }
@@ -149,11 +159,15 @@ class ProductController {
             throw new ErrorHandler.BadRequestError(err.message)
         }
     }
+
+    hardDeleteProduct(req, res, next) {
+
+    }
     // [PUT] /products/:id/restore
     async restoreProduct(req, res, next) {
         try {
             const productRestore = await Products.restore({ _id: req.params.id })
-            if (!productRestore.length) throw new ErrorHandler.NotFoundError('Product not found')
+            if (!productRestore) throw new ErrorHandler.NotFoundError('Product not found')
             res.json(productRestore)
         }
         catch (err) {
@@ -178,8 +192,8 @@ class ProductController {
                 }
             )
             if (!updateProduct) throw new ErrorHandler.NotFoundError('Product not found')
-            if (fs.existsSync(`src/public/images/${updateProduct.thumb}`))
-                fs.unlink(`src/public/images/${updateProduct.thumb}`, (err) => {
+            if (fs.existsSync(`src / public / images / ${updateProduct.thumb}`))
+                fs.unlink(`src / public / images / ${updateProduct.thumb}`, (err) => {
                     if (err) throw new Error(err.message);
                 });
 

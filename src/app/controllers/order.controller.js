@@ -9,7 +9,13 @@ class OrderController {
         try {
             const orders = await Orders.find().populate('user').populate('orderItems.product')
             if (!orders.length) throw new ErrorHandler('Order not found');
-            return res.status(200).json(orders)
+            const allOrders = orders.map(order => {
+                const { user, ...orther } = order._doc;
+                const { password, ...user_orther } = user._doc;
+                order = Object.assign({}, { ...orther }, { user: { ...user_orther } });
+                return order;
+            })
+            return res.status(200).json(allOrders)
         }
         catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
@@ -29,7 +35,10 @@ class OrderController {
                 res.status(200);
                 throw new ErrorHandler.NoData('No orders yet')
             }
-            res.status(200).json(order)
+            const { user, ...orther } = order._doc;
+            const { password, ...user_orther } = user._doc;
+            const userOrder = Object.assign({}, { ...orther }, { user: { ...user_orther } });
+            res.status(200).json(userOrder)
         }
         catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
