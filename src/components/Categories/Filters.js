@@ -2,16 +2,18 @@ import FilterOption from "./FilterOption";
 import { useState, useEffect } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { filter } from "../../store/actions/filterAction"
+import { getAllCategories } from "../../api";
 
 const Filters = (props) => {
     const dispatch = useDispatch();
     const userselector = useSelector(state => state);
-    const arrCate = [
-        { id: '000', cate: 'ALL', content: 'Tất cả' },
-        { id: '001', cate: '6306f097ba3833d3583ee727', content: 'Laptop' },
-        { id: '002', cate: '6306eea9ba3833d3583ee706', content: 'Điện thoại' },
-        { id: '003', cate: '6306f09fba3833d3583ee728', content: 'Máy tính bản' },
-    ];
+    // const arrCate = [
+    //     { id: '000', cate: 'ALL', content: 'Tất cả' },
+    //     { id: '001', cate: '6306f097ba3833d3583ee727', content: 'Laptop' },
+    //     { id: '002', cate: '6306eea9ba3833d3583ee706', content: 'Điện thoại' },
+    //     { id: '003', cate: '6306f09fba3833d3583ee728', content: 'Máy tính bản' },
+    // ];
+    const [arrCate, setArrCate] = useState();
     const arrPrice = [
         { id: '000', price: 'ALL', content: 'Tất cả' },
         { id: '001', price: '10', content: 'Dưới 10 triệu' },
@@ -43,16 +45,30 @@ const Filters = (props) => {
         { id: '009', rom: '2048', content: '2048GB' },
     ];
 
-    const [cate, setCate] = useState(arrCate[0].id);
-    const [price, setPrice] = useState(arrPrice[0].id);
-    const [ram, setRam] = useState(arrRam[0].id);
-    const [rom, setRom] = useState(arrRom[0].id);
+    function FindID(arr, value) {
+        let id = ''
+        arr.map((item, index) => {
+            // console.log(item[Object.keys(item)[1]])
+            if (item[Object.keys(item)[1]] === value) {
+                // console.log(item[Object.keys(item)[0]])
+                return id = item[Object.keys(item)[0]]
+            }
+        })
+        // console.log('id', id)
+        return id
+    }
+    // console.log('ID', FindID(arrPrice, props.filters.price))
+
+    const [cate, setCate] = useState(props.filters.cate === 'ALL' ? '000' : props.filters.cate);
+    const [price, setPrice] = useState(props.filters.price !== 'ALL' ? FindID(arrPrice, props.filters.price) : '000');
+    const [ram, setRam] = useState(props.filters.ram !== 'ALL' ? FindID(arrRam, props.filters.ram) : '000');
+    const [rom, setRom] = useState(props.filters.rom !== 'ALL' ? FindID(arrRom, props.filters.rom) : '000');
 
     const onChangeCate = (item) => {
 
         setCate(item.id);
-        console.log(props.filters);
-        var data = { ...props.filters, price: item.cate };
+        // console.log(props.filters);
+        var data = { ...props.filters, cate: item.cate };
         // console.log('1111', data);
         // data['price'] = item.price
         localStorage.removeItem('cate');
@@ -62,7 +78,7 @@ const Filters = (props) => {
     const onChangePrice = (item) => {
 
         setPrice(item.id);
-        console.log(props.filters);
+        // console.log(props.filters);
         var data = { ...props.filters, price: item.price };
         // console.log('1111', data);
         // data['price'] = item.price
@@ -75,7 +91,7 @@ const Filters = (props) => {
 
         setRam(item.id);
         var data = { ...props.filters, ram: item.ram };
-        // console.log('1111', data);
+        // console.log('1111', props.filters.ram);
         localStorage.removeItem('ram');
         localStorage.setItem('ram', JSON.stringify(item.ram));
         dispatch(filter(data));
@@ -89,6 +105,31 @@ const Filters = (props) => {
         localStorage.setItem('rom', JSON.stringify(item.rom));
         dispatch(filter(data));
     }
+    const fetchDataCate = async () => {
+        try {
+            let arrCate = await getAllCategories();
+            let temp = [{ id: '000', cate: 'ALL', content: 'Tất cả' }]
+            // let temp = []
+            // Object.assign(temp,temp1)
+            arrCate.data.map((item, index) => {
+                temp[index + 1] = { id: item._id, cate: item._id, content: item.name }
+            })
+            // const temp = {
+            //     ...temp1, ...temp2
+            // }
+            // console.log('check cate', temp);
+            // (cate !== '000') ? setCate(props.filters.cate) : setCate(temp[0].id)
+            setArrCate(temp)
+        } catch (error) {
+
+        }
+    }
+    
+    useEffect(() => {
+        fetchDataCate()
+        // console.log('change', props.filters)
+        // getFiltersProduct()
+    }, [])
     return (
         <div className="filter-content">
             {/* <div className="sidebar sidebar-shop">

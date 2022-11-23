@@ -11,7 +11,7 @@ import "./assets/css/bootstrap.min.css";
 import "./assets/css/style.css";
 import "./assets/css/plugins/magnific-popup/magnific-popup.css";
 import "./assets/css/plugins/jquery.countdown.css";
-
+// require('dotenv').config()
 
 
 

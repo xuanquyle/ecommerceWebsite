@@ -16,8 +16,9 @@ const reducer = combineReducers({
 })
 // login
 // const userInfoFromLocalStorage = localStorage.getItem('userLogin') ? JSON.parse(localStorage.getItem('userLogin')) : null;
-const userInfoFromLocalStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
-const userIsLoggedINFromLocalStorage = localStorage.getItem('isLoggedIn') ? JSON.parse(localStorage.getItem('isLoggedIn')) : false;
+const emailF = localStorage.getItem('email') ? JSON.parse(localStorage.getItem('email')) : null;
+const userIsLoggedINFromLocalStorage = localStorage.getItem('isLoggedIn') ? JSON.parse(localStorage.getItem('isLoggedIn')) : '';
+const idF = localStorage.getItem('id') ? JSON.parse(localStorage.getItem('id')) : '';
 // userInfoFromLocalStorage ? console.log(userInfoFromLocalStorage) : console.log('eo');
 // console.log(userIsLoggedINFromLocalStorage);
 const priceF = localStorage.getItem('price') ? JSON.parse(localStorage.getItem('price')) : 'ALL';
@@ -29,7 +30,8 @@ const paginationF = localStorage.getItem('pagination') ? JSON.parse(localStorage
 const initialState = {
     userLogin: {
         isLoggedIn: userIsLoggedINFromLocalStorage,
-        userInfo: userInfoFromLocalStorage ? userInfoFromLocalStorage : null
+        email: emailF,
+        id: idF
     },
     filters: {
         cate: cateF,

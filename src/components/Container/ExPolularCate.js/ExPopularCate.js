@@ -1,7 +1,8 @@
 import axios from "axios"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import p from "../../../assets/images/demos/demo-4/cats/1.png"
+import p from "../../../assets/images/demos/demo-4/cats/2.png"
+import hinh from "../../../assets/images/contact-header-bg.jpg"
 import { getAllCategories } from "../../../api"
 
 const ExPopularCate = () => {
@@ -26,7 +27,7 @@ const ExPopularCate = () => {
         const fetchData = async () => {
             try {
                 const data = await getAllCategories();
-                setArrCate(data.data.categories);
+                setArrCate(data.data);
                 // console.log(data);
             } catch (error) {
 
@@ -48,7 +49,7 @@ const ExPopularCate = () => {
                                     <div className="cat-block">
                                         <figure>
                                             <span>
-                                                <img src={p} alt="Category image" />
+                                                <img src={hinh} alt="Category image" />
                                             </span>
                                         </figure>
 

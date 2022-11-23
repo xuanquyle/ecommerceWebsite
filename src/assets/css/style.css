@@ -18055,9 +18055,9 @@ button:focus {
     content: '\f12b'
 }
 
-/* .icon-bars:before {
+.icon-bars:before {
     content: '\f131'
-} */
+}
 
 .icon-maxcdn:before {
     content: '\f136'
@@ -18465,6 +18465,10 @@ button:focus {
 
 .icon-medium:before {
     content: '\f23a'
+}
+
+.icon-trash:before {
+    font-family: FontAwesome !important;
 }
 
 .icon-y-combinator:before {
@@ -20172,8 +20176,8 @@ button:focus {
     width: 1.6rem;
 }
 
-input[type=text]:disabled, 
+/* input[type=text]:disabled, 
 input[type=email]:disabled,
 input[type=number]:disabled {
     background: #fff;
-}
+} */

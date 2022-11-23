@@ -4,6 +4,7 @@ import axios from "axios"
 import p1 from "../../assets/images/demos/demo-4/bg-5.jpg"
 import p2 from "../../assets/images/demos/demo-4/logo-footer.png"
 import p3 from "../../assets/images/payments.png"
+import { Link } from 'react-router-dom'
 
 const Footer = () => {
     var aaa = {};
@@ -28,8 +29,8 @@ const Footer = () => {
                         <div className="row justify-content-center">
                             <div className="col-sm-10 col-md-8 col-lg-6">
                                 <div className="cta-heading text-center">
-                                    <h3 className="cta-title text-white">Get The Latest Deals</h3>
-                                    <p className="cta-desc text-white">and receive <span className="font-weight-normal">$20 coupon</span> for first shopping</p>
+                                    {/* <h3 className="cta-title text-white">Get The Latest Deals</h3>
+                                    <p className="cta-desc text-white">and receive <span className="font-weight-normal">$20 coupon</span> for first shopping</p> */}
                                 </div>
                             </div>
                         </div>
@@ -37,35 +38,35 @@ const Footer = () => {
                 </div>
                 <div className="footer-middle">
                     <div className="container">
-                        <div className="row">
+                        <div className="row"
+                        style={{justifyContent: 'start'}}>
                             <div className="col-sm-6 col-lg-3">
                                 <div className="widget widget-about">
                                     <img src={p2} className="footer-logo" alt="Footer Logo" width="105" height="25" />
-                                    <p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. </p>
+                                    <p>Cửu hàng chuyên cung cấp các thiết bị điện tử: điện thoại, laptop, máy tính bảng,...</p>
 
-                                    <div className="widget-call">
+                                    {/* <div className="widget-call">
                                         <i className="icon-phone"></i>
                                         Got Question? Call us 24/7
                                         <a href="tel:#">+0123 456 789</a>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
 
                             <div className="col-sm-6 col-lg-3">
                                 <div className="widget">
-                                    <h4 className="widget-title">Useful Links</h4>
+                                    <h4 className="widget-title">Liên hệ</h4>
 
                                     <ul className="widget-list">
-                                        <li><a href="about.html">About Molla</a></li>
-                                        <li><a href="#">Our Services</a></li>
-                                        <li><a href="#">How to shop on Molla</a></li>
-                                        <li><a href="faq.html">FAQ</a></li>
-                                        <li><a href="contact.html">Contact us</a></li>
+                                        <li><Link to={'/'}>Facebook</Link></li>
+                                        <li><Link to={'/'}>Zalo : 036456123</Link></li>
+                                        <li><Link to={'/'}>Instagram</Link></li>
+                                        <li><Link to={'/'}>Email</Link></li>
                                     </ul>
                                 </div>
                             </div>
 
-                            <div className="col-sm-6 col-lg-3">
+                            {/* <div className="col-sm-6 col-lg-3">
                                 <div className="widget">
                                     <h4 className="widget-title">Customer Service</h4>
 
@@ -78,9 +79,9 @@ const Footer = () => {
                                         <li><a href="#">Privacy Policy</a></li>
                                     </ul>
                                 </div>
-                            </div>
+                            </div> */}
 
-                            <div className="col-sm-6 col-lg-3">
+                            {/* <div className="col-sm-6 col-lg-3">
                                 <div className="widget">
                                     <h4 className="widget-title">My Account</h4>
 
@@ -92,17 +93,17 @@ const Footer = () => {
                                         <li><a href="#">Help</a></li>
                                     </ul>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
 
                 <div className="footer-bottom">
                     <div className="container">
-                        <p className="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p>
-                        <figure className="footer-payments">
+                        <p className="footer-copyright">Copyright © 2022 Molla Store - Tuyên & Quý</p>
+                        {/* <figure className="footer-payments">
                             <img src={p3} alt="Payment methods" width="272" height="20" />
-                        </figure>
+                        </figure> */}
                     </div>
                 </div>
             </div>

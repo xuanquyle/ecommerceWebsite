@@ -46,8 +46,8 @@ function Pagination(props) {
             }
 
             onPageChange(newPage);
-
         }
+        window.scrollTo(0, 0)
     }
     return (
         <div style={{ display: 'flex', justifyContent: 'center' }}>

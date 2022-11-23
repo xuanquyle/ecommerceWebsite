@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react"
 import axios from "axios"
 import {getAllProduct} from "../../../api"
+import {path} from "../../../utils/constant"
 
 const NewArrivalsContent = (props) => {
     const settings = {
@@ -66,7 +67,7 @@ const NewArrivalsContent = (props) => {
                         <div className="product product-2" style={{ margin: "0px 10px" }} >
                             <figure className="product-media">
                                 <Link to={'/ProductDetails/'+ item.slug}>
-                                    <img src={ImageBG1} alt="Product image" className="product-image" />
+                                    <img src={path.SERVER_URL + '/' + item.thumb} alt="Product image" className="product-image" />
                                 </Link>
                                 <div className="product-action" style={{cursor: 'pointer'}}>
                                     <p className="btn-product btn-cart" title="Add to cart"></p>

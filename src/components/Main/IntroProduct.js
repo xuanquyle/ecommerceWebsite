@@ -44,21 +44,21 @@ const IntroProduct = () => {
                                         <div className="container intro-content">
                                             <div className="row justify-content-end">
                                                 <div className="col-auto col-sm-7 col-md-6 col-lg-5">
-                                                    <h3 className="intro-subtitle text-third">{item.header_1}</h3>
+                                                    {/* <h3 className="intro-subtitle text-third">{item.header_1}</h3>
                                                     <h1 className="intro-title">{item.header_2}</h1>
-                                                    <h1 className="intro-title">{item.header_3}</h1>
+                                                    <h1 className="intro-title">{item.header_3}</h1> */}
 
-                                                    <div className="intro-price">
+                                                    {/* <div className="intro-price">
                                                         <sup className="intro-old-price">{item.oldPrice}</sup>
                                                         <span className="text-third">
                                                             {item.newPrice}<sup>{item.supNewPrice}</sup>
                                                         </span>
-                                                    </div>
+                                                    </div> */}
 
-                                                    <a href="category.html" className="btn btn-primary btn-round">
-                                                        <span>Shop More</span>
+                                                    {/* <a href="category.html" className="btn btn-primary btn-round">
+                                                        <span>Mua ngay</span>
                                                         <i className="icon-long-arrow-right"></i>
-                                                    </a>
+                                                    </a> */}
                                                 </div>
                                             </div>
                                         </div>

@@ -2,82 +2,109 @@
 // import 'react-table/react-table.css'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllProvinces } from '../../api'
+import { getAllProvinces, deleteAddress } from '../../api'
+import { connect, useSelector } from "react-redux";
 import ModalAddress from './ModalAddress';
+import { useOutletContext } from 'react-router-dom';
+import { notify } from '../../utils/constant';
 
-const Address = () => {
+const Address = (props) => {
+    const userselector = useSelector(state => state);
     const [isOpenModal, setIsOpenModal] = useState(false)
-    const [cart, setCart] = useState([
-        { id: '001', name: 'Beige knitted ', price: 'shoes', quantity: 'elastic runner ', a: 'elastic runner ' },
-        { id: '003', name: 'Beige knitted ', price: 'elastic  shoes', quantity: 'runner', a: 'elastic runner ' },
-        { id: '002', name: 'Beige knitted ', price: 'elastic shoes', quantity: 'runner', a: 'elastic runner ' },
-    ]);
+    const [cart, setCart] = useState();
+    const [profile, getProfile] = useOutletContext()
 
     const [provinces, setProvinces] = useState('');
+    // const getDataAddress = async () => {
+    //     console.log(props.user)
+    //     if (props.user) {
+    //         try {
+    //             const data = await getAllAddress(props.user.IsLoggedIn, props.user.id)
+    //             console.log(data);
+    //         } catch (error) {
 
+    //         }
+    //     }
+
+    // }
     useEffect(() => {
         let getPronvice = async () => {
-            let data = await getAllProvinces();
-            setProvinces(data.data.data.data);
-            // console.log('>>>', data.data.data.data);
+            try {
+                let data = await getAllProvinces();
+                setProvinces(data.data.data.data);
+                // console.log('>>>', data.data.data.data);
+            } catch (error) {
+
+            }
         }
 
         getPronvice();
+        // getDataAddress();
     }, [])
 
     const handleAddAR = () => {
         setIsOpenModal(true)
     }
-    const toggle = () => setIsOpenModal(!isOpenModal);
+    const toggle = () => {
+        setIsOpenModal(!isOpenModal);
+        getProfile();
+    }
+    // if(props.profile) console.log('có')
+    // console.log('có', profile)
+    // getProfile();
+    // DELETE
+    const onDeleteAddress = async (idAddress) => {
+        try {
+            const rep = await deleteAddress(props.user.isLoggedIn, props.user.id, idAddress)
+            notify('success', 'Xóa địa chỉ thành công !')
+            getProfile();
+        } catch (error) {
+
+        }
+    }
     return (
+        profile &&
         <div className="col-md-8">
             <ModalAddress
-            isOpen = {isOpenModal}
-            toggle = {toggle} />
+                isOpen={isOpenModal}
+                toggle={toggle}
+                // reloadData={getProfile} 
+                />
             <div className="card mb-3">
                 <div className="card-body">
-                    <div className="row">
+                    <div className="row m-3">
                         <table className="table table-cart table-mobile" style={{ margin: '10px' }}>
                             <thead>
                                 <tr>
-                                    <th>STT</th>
-                                    <th>Tỉnh, thành phố</th>
-                                    <th>Huyện</th>
-                                    <th>Xã</th>
-                                    <th>Số nhà, tên đường</th>
+                                    <th>Tên người nhận</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Địa chỉ</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {cart && cart.map((item, index) => {
+                                {profile.addresses && profile.addresses.map((item, index) => {
                                     return (
-                                        <tr key={item.id}>
+                                        <tr key={item._id}>
                                             <td className="product-col">
                                                 <div className="product">
-                                                    <h3 className="product-title">
-                                                        <Link to="/ProductDetails">{item.id}</Link>
-                                                    </h3>
+                                                    {item.customer_name}
                                                 </div>
                                             </td>
                                             <td className="product-col">
                                                 <div className="product">
-                                                    <h3 className="product-title">
-                                                        <Link to="/ProductDetails">{item.name}</Link>
-                                                    </h3>
+                                                    {item.customer_phone}
                                                 </div>
                                             </td>
-                                            <td className="product-col">{item.price}<sup>đ</sup></td>
                                             <td className="product-col">
-                                                <div className="cart-product-quantity">
-                                                    <input type="number" className="form-control"
-                                                        style={{ fontSize: '16px' }}
-                                                    />
+                                                <div className="product">
+                                                    {item.address}
                                                 </div>
                                             </td>
-                                            <td className="product-col">$84.00</td>
                                             <td className="product-col">
                                                 <button type="button"
-                                                    className="btn-info btn-sm"
-                                                    style={{ fontSize: '1.4rem' }}><i className="icon-edit"></i>Sửa</button>
+                                                    className="btn-danger btn-sm"
+                                                    style={{ fontSize: '1.4rem' }}
+                                                    onClick={() => onDeleteAddress(item._id)}><i className="icon-trash"></i></button>
                                             </td>
                                         </tr>
                                     )
@@ -85,9 +112,10 @@ const Address = () => {
                             </tbody>
                         </table>
                         <div className="col-sm-12 mt-2 mb-2 mr-2" style={{ display: 'flex', justifyContent: 'right' }}>
-                            <button 
-                            className="btn btn-info"
-                            onClick={() => handleAddAR()}><i className="icon-plus" style={{marginLeft: '0'}}></i> Thêm địa chỉ</button>
+                            <button
+                                className="btn btn-info"
+                                style={{ borderRadius: "5px" }}
+                                onClick={() => handleAddAR()}><i className="icon-plus" style={{ marginLeft: '0' }}></i> Thêm địa chỉ</button>
                         </div>
                     </div>
                 </div>
@@ -96,4 +124,11 @@ const Address = () => {
     )
 }
 
-export default Address
+const mapStateToProp = state => {
+    return {
+        user: state.userLogin
+    }
+}
+
+
+export default connect(mapStateToProp)(Address);

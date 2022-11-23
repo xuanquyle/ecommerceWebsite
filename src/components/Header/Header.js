@@ -17,14 +17,10 @@ const Header = (props) => {
     const dispatch = useDispatch();
     console.log(">>>a", userselector)
     // console.log(">>>",userselector)
-    let arrLanguage = [
-        { id: '001', name: 'USA', link: 'https://www.reactjs.org' },
-        { id: '002', name: 'ENGLAND', link: 'https://www.reactjs.org' },
-        { id: '003', name: 'CHINA', link: 'https://www.reactjs.org' },
-    ]
     const nav = useNavigate();
     const handleLogout = () => {
-        localStorage.removeItem('userInfo');
+        localStorage.removeItem('email');
+        localStorage.removeItem('id');
         localStorage.removeItem('isLoggedIn');
         dispatch(logout());
         console.log(">>>", userselector)
@@ -72,8 +68,8 @@ const Header = (props) => {
                                                 </div>
                                                 {/* <p>Tài khoản</p> */}
                                                 <p>
-                                                    {(props.user && props.user.isLoggedIn === true)
-                                                        ? props.user.userInfo.username
+                                                    {(props.user && props.user.isLoggedIn !== '')
+                                                        ? props.user.email
                                                         : 'Tài khoản'}
                                                 </p>
                                             </Link>

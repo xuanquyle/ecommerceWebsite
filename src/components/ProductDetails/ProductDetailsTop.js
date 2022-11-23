@@ -6,11 +6,13 @@ import hinh5 from "../../assets/images/products/single/sidebar-gallery/4-small.j
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react"
 import Option from "./Option"
+import { path } from "../../utils/constant"
 
 const ProductDetailsTop = (props) => {
+    const navigate = useNavigate()
     const [product, setProduct] = useState(props.product)
     const [curColor, setCurColor] = useState(props.product.options[0].color)
     const [curRam, setCurRam] = useState(props.product.options[0].ram)
@@ -72,19 +74,20 @@ const ProductDetailsTop = (props) => {
         setFullOption(true)
     }
 
-    const handleChangeOption = (color, ram, rom) => {
-        setCurColor(color);
-        setCurColor(ram);
-        setCurColor(rom);
-        setColor(props.product.options.map((item, index) => {
-            return (
-                { 'id': item._id, 'op': item.color, 's': 1 }
-            )
-        }))
+    // const handleChangeOption = (color, ram, rom) => {
+    //     setCurColor(color);
+    //     setCurColor(ram);
+    //     setCurColor(rom);
+    //     setColor(props.product.options.map((item, index) => {
+    //         return (
+    //             { 'id': item._id, 'op': item.color, 's': 1 }
+    //         )
+    //     }))
 
-    }
+    // }
     const addToCart = () => {
-        alert("sss")
+        // alert("sss")
+        navigate(path.CART)
     }
     const settings = {
         // customPaging: function (i) {
@@ -136,7 +139,7 @@ const ProductDetailsTop = (props) => {
                 </div>
 
                 <div className="col-md-8">
-                    <div className="product-details product-details-sidebar ml-5">
+                    <div className="product-details product-details-sidebar ml-5 shadow p-5 mb-5">
                         <h1 className="product-title">IPhone 13 Pro Max</h1>
                         <div className="ratings-container">
                             <div className="ratings">
@@ -165,18 +168,29 @@ const ProductDetailsTop = (props) => {
                                 curOption={curRom} />
                         </div>
                         <div className="product-details-action"
-                            style={{ marginTop: '40px' }}>
+                            style={{ marginTop: '40px', color: '#fff !important' }}>
                             {(fullOption === true) ?
                                 <div className="details-action-col">
-                                    <button className="btn-product btn-cart"
+                                    <button className="btn btn-info rounded"
+                                        style={{ color: '#fff', fontSize: '1.6rem' }}
                                         onClick={addToCart}>
-                                        <span>Thêm vào giỏ</span>
+                                        <span><i className="icon-plus ml-n1"></i>Thêm vào giỏ</span>
+                                    </button>
+                                    <button className="btn btn-warning rounded ml-5"
+                                        style={{ color: '#fff', fontSize: '1.6rem' }}
+                                        onClick={addToCart}>
+                                        <span><i className="icon-shopping-cart ml-n1"></i>Mua ngay</span>
                                     </button>
                                 </div>
                                 : <div className="details-action-col">
-                                    <button className="btn-product btn-cart"
-                                        disabled>
-                                        <span>Thêm vào giỏ</span></button>
+                                    <button className="btn btn-info rounded ml-5"
+                                        style={{ opacity: '0.6', color: '#fff', fontSize: '1.6rem' }}>
+                                        <span><i className="icon-plus ml-n1"></i>Thêm vào giỏ</span></button>
+                                    <button className="btn btn-warning rounded"
+                                        style={{ color: '#fff', fontSize: '1.6rem', opacity: '0.6' }}
+                                        onClick={addToCart}>
+                                        <span><i className="icon-shopping-cart ml-n1"></i>Mua ngay</span>
+                                    </button>
                                 </div>}
                         </div>
                     </div>

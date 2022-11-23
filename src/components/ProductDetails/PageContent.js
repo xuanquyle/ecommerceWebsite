@@ -12,10 +12,10 @@ const PageContent = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                console.log("slug", slug)
+                // console.log("slug", slug)
                 const data = await getProductBySlug(slug.slug);
-                setProduct(data.data.product[0])
-                console.log('sss', data.data.product[0]);
+                setProduct(data.data)
+                console.log('sss', data.data);
             } catch (error) {
                 console.log(error);
             }

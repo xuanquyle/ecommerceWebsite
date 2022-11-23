@@ -2,7 +2,7 @@ import p1 from "../../assets/images/demos/demo-4/products/product-10.jpg";
 import { useEffect, useState } from "react";
 import Pagination from "../Pagination";
 import queryString from "query-string"
-import { getAllProduct } from "../../api";
+import { getFiltersProduct } from "../../api";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { filter as funFilter } from "../../store/actions/filterAction"
 
@@ -12,12 +12,13 @@ const Laptop = (props) => {
     const userselector = useSelector(state => state);
     const [pagination, setPagination] = useState({
         page: 1,
-        limit: 4,
-        totalRow: 100
+        limit: 12,
+        totalRow: 14,
+        maxPage: 5,
     });
     const [filter, setFilter] = useState({
         page: 1,
-        limit: 10,
+        limit: 12,
         // any Filters
     });
 
@@ -71,32 +72,28 @@ const Laptop = (props) => {
         localStorage.removeItem('pagination');
         localStorage.setItem('pagination', JSON.stringify(filter));
         dispatch(funFilter(data));
-        // console.log('filter', filter)
-    }
-    const fetchDataProduct = async () => {
-        try {
-            const data = await getAllProduct();
-            setArrProduct(data.data);
-            // console.log(data.data);
-        } catch (error) {
 
-        }
     }
+    // const fetchDataProduct = async () => {
+    //     try {
+    //         const data = await getAllProduct();
+    //         setArrProduct(data.data);
+    //     } catch (error) {
+
+    //     }
+    // }
     useEffect(() => {
-        setPagination({
-            ...pagination,
-            page: filter.page
-        });
-        // console.log('pagi', pagination)
+        fetchDataProductFilters();
+    }, [props.filters])
+    const fetchDataProductFilters = async () => {
         try {
-            const paramString = queryString.stringify(filter);
-
-            // GET API
+            let arrProduct = await getFiltersProduct(props.filters);
+            // console.log("FILTWERS", arrProduct)
+            setArrProduct(arrProduct.data);
         } catch (error) {
 
         }
-        fetchDataProduct();
-    }, [filter])
+    }
 
 
     return (
@@ -107,7 +104,7 @@ const Laptop = (props) => {
                 </div>
                 <div className="products">
                     <div className="row justify-content-center">
-                        {arrProduct && arrProduct.map((item, index) => {
+                        {arrProduct && arrProduct.slice(filter.limit * (filter.page - 1), filter.limit * (filter.page - 1) + filter.limit).map((item, index) => {
                             return (
                                 <div className="col-6 col-md-4 col-lg-3" key={item._id}>
                                     <div className="product product-2">

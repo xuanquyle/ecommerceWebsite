@@ -19,6 +19,7 @@ import Address from './UserProfile/Address';
 import Purchased from './UserProfile/Purchased';
 import ChangePass from './UserProfile/ChangePass';
 import Laptop from './Categories/Laptop';
+import Contact from './Contact/Contact';
 
 
 function App() {
@@ -32,11 +33,11 @@ function App() {
         <ScrollToTop />
         <Routes>
           <Route path={path.HOME} element={<MainPage />}>
-            <Route path={path.PRODUCT} element={<Categories />}>
-              {/* <Route path={path.SMARTPHONE} element={<Address />} />
+            <Route path={path.PRODUCT} element={<Categories />} />
+            {/* <Route path={path.SMARTPHONE} element={<Address />} />
               <Route path={path.TABLET} element={<Address />} />
               <Route path={path.LAPTOP} element={<Laptop />} /> */}
-            </Route>
+            <Route path={path.CONTACT} element={<Contact />} />
             <Route path={path.PRODUCTDETAILS} element={<PageContent />} />
             <Route path={path.CART} element={<Cart />} />
             <Route path={path.USERPROFILE} element={<UserProfile />}>
