@@ -8,7 +8,6 @@ class CartController {
     async getUserCart(req, res, next) {
         try {
             const cart = await Carts.find({ user: req.params.id }).populate('cartItems.product');
-            if (!cart.length || cart.cartItems.length !== 0) res.status(200).json('Chưa có sản phẩm nào trong giỏ hàng')
             res.status(200).json(cart)
         } catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
@@ -21,7 +20,7 @@ class CartController {
             const productExist = await Products.findById(req.body.product)
             if (!productExist) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm')
 
-            const productInCart = await Carts.find({ user: req.params.id, cartItems: { $elemMatch: { product: req.body.product} } })
+            const productInCart = await Carts.find({ user: req.params.id, cartItems: { $elemMatch: { product: req.body.product, option: req.body.option } } })
             if (productInCart.length) throw new ErrorHandler.BadRequestError('Sản phẩm đã có trong giỏ hàng')
 
             const newCartItem = {
@@ -96,9 +95,9 @@ class CartController {
             throw new ErrorHandler.BadRequestError(error.message)
         }
     }
-    deleteCart(req, res, next) {
+    async deleteCart(req, res, next) {
         try {
-            const deletedCart = Carts.findOneAndUpdate(
+            const deletedCart = await Carts.findOneAndUpdate(
                 {
                     user: req.params.id,
                     cartItems: {
@@ -109,7 +108,9 @@ class CartController {
                 },
                 {
                     "$pull":
-                        { cartItems: { _id: req.body.id } }
+                    {
+                        cartItems: { _id: req.body.id }
+                    }
                 },
                 { safe: true, multi: true })
             if (!deletedCart) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm trong giỏ hàng')
