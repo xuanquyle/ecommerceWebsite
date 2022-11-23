@@ -2677,7 +2677,7 @@ pre code {
 
 .form-control:disabled,
 .form-control[readonly] {
-  background-color: #e9ecef;
+  background-color: #fff !important;
   opacity: 1;
 }
 
@@ -14890,4 +14890,85 @@ File: scss
   display: flex;
   align-items: center;
   padding: 15px 0px;
+}
+
+/* LOGIN */
+.login-background {
+  background: linear-gradient(135deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
+  height: 100vh;
+}
+
+.login-background .login-container {
+  /* border: 1px solid red; */
+  width: 400px;
+  border-radius: 10px;
+  background-color: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  /* left: 25%; */
+}
+
+.login-background .login-container .login-content {
+  padding: 10px;
+}
+
+.login-background .login-container .login-content .login-text {
+  text-align: center;
+  font-weight: 600;
+  font-size: 24px;
+  padding-top: 10px;
+}
+
+.login-background .login-container .login-content .login-input {
+  margin: 7px 0;
+  /* font-size: 24px; */
+}
+
+.login-background .login-container .login-content .login-input input {
+  font-size: 16px;
+}
+
+.login-background .login-container .login-content .btn-login {
+  width: 100%;
+  margin: 30px 0px 10px 0px;
+  /* height:  30px; */
+  border-radius: 3px;
+  outline: none;
+  border: none;
+  background: linear-gradient(90deg, rgba(34, 193, 195, 1) 0%, rgba(253, 187, 45, 1) 100%);
+  color: white;
+  border-radius: 15px;
+}
+
+input[type="text"]:read-only,
+input[type="textarea"]:read-only,
+input[type="email"]:read-only,
+input[type="email"]:disabled {
+  background-color: #fff !important;
+}
+
+.form-textarea :disabled {
+  background-color: #fff !important;
+}
+
+/* .form-control :disabled,
+.form-control :read-only {
+  background-color: #fff !important;
+} */
+/* .form-group .select-read :read-only,
+.form-group .select-read :disabled {
+  width: 50px;
+  background: #fff !important;
+} */
+
+.preview-image {
+  width: 200px;
+  height: 200px;
+  border: 1px solid #ced4da;
+  background: center center no-repeat;
+  background-size: contain;
 }

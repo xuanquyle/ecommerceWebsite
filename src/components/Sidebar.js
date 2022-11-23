@@ -6,10 +6,12 @@ const Sidebar = () => {
 
     const menu = [
         { id: '1', title: 'Trang chủ', icon: 'fa far fa-home', link: path.HOME},
+        { id: '100', title: 'Danh mục', icon: 'fas fa-server', link: path.CATEGORIES },
         { id: '2', title: 'Sản phẩm', icon: 'fa fa-laptop', link: path.PRODUCTMANAGER },
-        { id: '3', title: 'Đơn hàng', icon: 'fa fa-cart-plus', link: path.ORDER },
+        { id: '3', title: 'Đơn hàng', icon: 'fa fa-cart-plus', link: path.ORDERMANAGER },
         { id: '4', title: 'Tài khoản', icon: 'fa fa-user', link: path.USERMANAGER },
-        { id: '5', title: 'Đăng xuất', icon: 'fa fa-sign-out-alt', link: path.HOME },
+        { id: '5', title: 'Tùy chỉnh', icon: 'fab fa-whmcs', link: path.SETTING },
+        { id: '6', title: 'Đăng xuất', icon: 'fa fa-sign-out-alt', link: path.HOME },
     ]
 
     const [isActive, setIsActive] = useState('1');
