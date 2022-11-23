@@ -3,6 +3,7 @@ const { request, response } = require('express');
 const { restart } = require('nodemon');
 const bcrypt = require('bcrypt');
 const Users = require('../models/user.model');
+const Tokens = require('../models/token.model')
 const validate = require('email-validator');
 const jwt = require('jsonwebtoken');
 const mailer = require('../utils/nodemailer');
@@ -33,14 +34,14 @@ class UserController {
         }
     }
 
-    getDetailUser(req, res, next) {
+    async getDetailUser(req, res, next) {
         try {
-            const user = Users.findById(req.params.id);
+            const user = await Users.findById(req.params.id);
             if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin người dùng');
             const { password, ...orther } = user._doc;
             res.status(200).json({ ...orther });
         }
-        catch {
+        catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
         }
     }
@@ -60,7 +61,20 @@ class UserController {
                     secure: false,
                     path: "/",
                     sameSite: "strict",
+                    maxAge: 7 * 24 * 60 * 60 * 1000
                 });
+
+                const expired_at = new Date();
+                expired_at.setDate(expired_at.getDate() + 7);
+
+                const newToken = new Tokens({
+                    user: user._id,
+                    token: refreshToken,
+                    expiredAt: expired_at
+                })
+                const savedTokens = await newToken.save()
+                if (!savedTokens) throw new ErrorHandler.BadRequestError('Có lỗi xảy ra. Vui lòng đăng nhập lại')
+
                 const { password, ...orther } = user._doc;
                 return res.status(200).json({ ...orther, accessToken });
             }
@@ -143,12 +157,6 @@ class UserController {
     // USER_ADDRESS controller
     // [GET] /users/address/:id
     async getUserAddress(req, res, next) {
-        try {
-            const userAddresses = await UserAddresses.find();
-            if (!userAddresses.length) throw new ErrorHandler.NotFoundError('')
-        } catch (err) {
-
-        }
     }
 
     // [POST] /users/address/:id
@@ -197,43 +205,34 @@ class UserController {
         }
     }
     //[GET] /users/address/:id/:address_id
-    async getDetailAddress(req, res, next) {
-        try {
-            const user = await Users.findById(req.params.id);
-            if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin người dùng')
-            const address = user.addresses.filter(address => address._id == req.params.address_id)
-            if (!address.length) throw new ErrorHandler.NotFoundError('Không tìm thấy địa chỉ')
-            res.status(200).json(address)
-        } catch (error) {
-            throw new ErrorHandler.BadRequestError(error.message)
-        }
-    }
 
 
     // REQUEST REFRESH TOKEN
-    requestRefreshToken(req, res, next) {
+    async requestRefreshToken(req, res, next) {
         const refreshToken = req.cookies.refreshToken;
-
         //Send error if token is not valid
-        if (!refreshToken) return res.status(401).json("You're not authenticated");
-        jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, user) => {
-            if (err) {
-                res.json(err);
-            }
-            // refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
-            //create new access token, refresh token and send to user
-            const newAccessToken = generateToken.generateAccessToken(user);
-            const newRefreshToken = generateToken.generateRefreshToken(user);
-            res.cookie("refreshToken", newRefreshToken, {
-                httpOnly: true,
-                secure: false,
-                path: "/",
-                sameSite: "strict",
-            });
-            res.status(200).json({
-                accessToken: newAccessToken,
-                refreshToken: newRefreshToken,
-            });
+        if (!refreshToken) throw new ErrorHandler.ForbiddenError("Bạn chưa đăng nhập");
+
+        const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+        if (!payload) throw new ErrorHandler.ForbiddenError('Bạn không có quyền truy cập');
+        const tokenExist = await Tokens.findOne({
+            user: payload._id,
+            token: refreshToken,
+            expiredAt: { $gte: new Date() }
+        })
+        if (!tokenExist) throw new ErrorHandler.ForbiddenError('Không thể xác thực');
+        const newAccessToken = generateToken.generateAccessToken({ _id: payload._id, isAdmin: payload.isAdmin });
+        const newRefreshToken = generateToken.generateRefreshToken({ _id: payload._id, isAdmin: payload.isAdmin });
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: false,
+            path: "/",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        res.status(200).json({
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
         });
     }
 

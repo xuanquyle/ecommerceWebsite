@@ -3,7 +3,7 @@ module.exports = {
     generateAccessToken: (user) => {
         return jwt.sign(
             {
-                id: user._id,
+                _id: user._id,
                 isAdmin:user.isAdmin
             },
             process.env.JWT_ACCESS_KEY,
@@ -14,11 +14,11 @@ module.exports = {
     generateRefreshToken: (user) => {
         return jwt.sign(
             {
-                id: user._id,
+                _id: user._id,
                 isAdmin:user.isAdmin
             },
             process.env.JWT_REFRESH_KEY,
-            { expiresIn: "365d" }
+            { expiresIn: "1w" }
         );
     }
 }

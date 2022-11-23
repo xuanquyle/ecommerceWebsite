@@ -19,7 +19,7 @@ class authMiddleware {
     }
     verifyTokenAndUserAuthorization = (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user.id === req.params.id) {
+            if (req.user._id === req.params.id) {
                 next();
             } else {
                 res.status(403).json("You're not allowed to do that!");
@@ -29,10 +29,9 @@ class authMiddleware {
 
     verifyTokenAndAdmin = (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user.isAdmin && req.user.isAdmin) {
+            if (req.user.id === req.params.id || req.user.isAdmin) {
                 next();
             } else {
-                
                 res.status(403).json("You're not allowed to do that!");
             }
         });
