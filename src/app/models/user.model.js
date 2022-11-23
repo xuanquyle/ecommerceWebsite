@@ -21,7 +21,7 @@ const UserAddressSchema = new Schema({
 const UserSchema = new Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    fisrtname: { type: String, default: null },
+    firstname: { type: String, default: null },
     lastname: { type: String, default: null },
     phone: { type: String, default: null },
     sex: { type: String, default: null },

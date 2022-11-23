@@ -19,7 +19,6 @@ const sendMail = (to, subject, htmlContent) => {
         subject: subject,
         html: htmlContent
     }
-    return transport.sendMail(options);
+    transport.sendMail(options);
 }
-
 module.exports = { sendMail }

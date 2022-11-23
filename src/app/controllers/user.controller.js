@@ -7,6 +7,7 @@ const Tokens = require('../models/token.model')
 const validate = require('email-validator');
 const jwt = require('jsonwebtoken');
 const mailer = require('../utils/nodemailer');
+const mailContent = require('../utils/email');
 const dotenv = require('dotenv');
 dotenv.config();
 // let refreshTokens = [];
@@ -14,38 +15,6 @@ const generateToken = require('../utils/generateToken');
 const ErrorHandler = require('../errors/errorHandler')
 
 class UserController {
-    deletePassword(user) {
-        const { password, ...orther } = user._doc;
-        return { ...orther }
-    }
-    async getAllUser(req, res, next) {
-        try {
-            const users = await Users.find()
-            if (!users.length) throw new ErrorHandler.NotFoundError('User not found')
-            const allUser = users.map(user => {
-                const { password, ...orther } = user._doc;
-                user = { ...orther };
-                return user
-            })
-            res.status(200).json(allUser)
-        }
-        catch (err) {
-            throw new ErrorHandler.BadRequestError(err.message)
-        }
-    }
-
-    async getDetailUser(req, res, next) {
-        try {
-            const user = await Users.findById(req.params.id);
-            if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin người dùng');
-            const { password, ...orther } = user._doc;
-            res.status(200).json({ ...orther });
-        }
-        catch (err) {
-            throw new ErrorHandler.BadRequestError(err.message)
-        }
-    }
-
     async login(req, res, next) {
         try {
             const user = await Users.findOne({ email: req.body.email });
@@ -108,15 +77,73 @@ class UserController {
             });
             // Save user to DB
             const user = await newUser.save();
-            if (!user) throw new ErrorHandler.ServerError('Không thể đăng ký. Vui lòng kiểm tra lại')
+            if (!user) throw new ErrorHandler.ServerError('Không thể đăng ký. Vui lòng kiểm tra lại');
 
-            const hashedEmail = await bcrypt.hash(user.email, parseInt(process.env.BCRYPT_SALT_ROUND))
-            if (!hashedEmail) throw new ErrorHandler.ServerError('Không thể đăng ký ngay lúc này. Vui lòng kiểm tra lại')
-            const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/verify?email=${user.email}&token=${hashedEmail}`;
-            const html = `<a><b>Verify your acccount</b></a>`;
-            mailer.sendMail(user.email, html, url)
+            const hashedEmail = await bcrypt.hash(user.email, parseInt(process.env.BCRYPT_SALT_ROUND));
+            if (!hashedEmail) throw new ErrorHandler.ServerError('Không thể đăng ký ngay lúc này. Vui lòng kiểm tra lại');
+            const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/auth/verify?email=${user.email}&token=${hashedEmail}`;
+
+            const subject = `VERIFY YOUR EMAIL FOR COUNTINUE SHOP`;
+            mailer.sendMail(user.email, subject, mailContent(url))
             res.status(200).json("Vui lòng kiểm tra email để xác thực tài khoản")
         } catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
+    }
+    async changePassword(req, res, next) {
+        try {
+            const user = await Users.findById(req.params.id);
+            if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy người dùng')
+            const validPassword = await bcrypt.compare(req.body.oldPassword, user.password);
+            if (!validPassword) throw new ErrorHandler.ForbiddenError('Mật khẩu cũ đã nhập không đúng. Vui lòng thử lại');
+            if (req.body.newPassword !== req.body.reNewPassword) throw new ErrorHandler.BadRequestError('Mật khẩu mới đã nhập không giống nhau')
+            if (user && validPassword) {
+                const hashed = await bcrypt.hash(req.body.newPassword, parseInt(process.env.BCRYPT_SALT_ROUND));
+                if (!hashed) throw new ErrorHandler.BadRequestError('Không thể đổi mật khẩu, vui lòng thử lại')
+                user.password = hashed;
+            }
+            const changedPassword = await user.save()
+            if (!changedPassword) throw new ErrorHandler.BadRequestError('Không thể đổi mật khẩu, vui lòng thử lại')
+            res.status(200).json('Đã đổi mật khẩu thành công')
+        } catch (error) {
+            throw new ErrorHandler.BadRequestError(error.message)
+        }
+    }
+    async logout(req, res, next) {
+        try {
+            const accessToken = req.headers.token;
+            if (!accessToken) throw new ErrorHandler.ForbiddenError('Vui lòng đăng nhập');
+            res.clearCookie('refreshToken');
+        } catch (error) {
+            throw new ErrorHandler.BadRequestError(error.message)
+        }
+
+    }
+
+    async getAllUser(req, res, next) {
+        try {
+            const users = await Users.find()
+            if (!users.length) throw new ErrorHandler.NotFoundError('User not found')
+            const allUser = users.map(user => {
+                const { password, ...orther } = user._doc;
+                user = { ...orther };
+                return user
+            })
+            res.status(200).json(allUser)
+        }
+        catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
+    }
+
+    async getDetailUser(req, res, next) {
+        try {
+            const user = await Users.findById(req.params.id);
+            if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin người dùng');
+            const { password, ...orther } = user._doc;
+            res.status(200).json({ ...orther });
+        }
+        catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
         }
     }
@@ -126,12 +153,11 @@ class UserController {
                 req.params.id,
                 {
                     $set: {
-                        fisrtname: req.body.fisrtname,
+                        firstname: req.body.firstname,
                         lastname: req.body.lastname,
-                        email: req.body.email,
                         phone: req.body.phone,
                         sex: req.body.sex,
-                        birth: new Date(req.body.birth)
+                        birth: req.body.birth
                     }
                 }
             )
@@ -210,8 +236,10 @@ class UserController {
     // REQUEST REFRESH TOKEN
     async requestRefreshToken(req, res, next) {
         const refreshToken = req.cookies.refreshToken;
+        const accessToken = req.headers.token;
         //Send error if token is not valid
         if (!refreshToken) throw new ErrorHandler.ForbiddenError("Bạn chưa đăng nhập");
+        if (!accessToken) throw new ErrorHandler.ForbiddenError("Hết thời gian chờ. Vui lòng đăng nhập lại");
 
         const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
         if (!payload) throw new ErrorHandler.ForbiddenError('Bạn không có quyền truy cập');

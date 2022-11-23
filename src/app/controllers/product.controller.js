@@ -87,7 +87,7 @@ class ProductController {
             req.body.short_description ? err : err.push({ short_description: 'Product short_description is required' });
             req.body.category ? err : err.push({ category: 'Product category is required' });
 
-            const data = req.body.data;
+            const data = JSON.parse(req.body.data);
             const productExist = await Products.findOne({ name: data.name });
             const productDeleted = await Products.findOneDeleted({ name: data.name });
             if (productExist) {

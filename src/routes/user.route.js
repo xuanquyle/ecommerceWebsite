@@ -16,14 +16,13 @@ router.get('/auth/verify', userRoute.verifyEmail)
 // customer route 
 router.post('/auth/login', userRoute.login)
 router.post('/auth/register', userRoute.register)
+router.post('/me/:id/change-password', /*authMiddleware.verifyTokenAndUserAuthorization,*/userRoute.changePassword)
 router.get('/me/:id', authMiddleware.verifyTokenAndUserAuthorization, userRoute.getDetailUser)
-router.put('/:id', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userRoute.updateUser)
+router.put('/me/:id', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userRoute.updateUser)
+router.post('/me/:id/address', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userRoute.createUserAddress)
+router.delete('/me/:id/address/:address_id', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userRoute.deleteUserAddress)
 router.delete('/:id', /*authMiddleware.verifyTokenAndAdmin,*/userRoute.deleteUser)
 router.get('/', /*authMiddleware.verifyTokenAndAdmin,*/ userRoute.getAllUser)
-
-// customer_address route
-router.post('/address/:id/add', userRoute.createUserAddress)
-router.delete('/address/:id/delete/:address_id', userRoute.deleteUserAddress)
 
 
 module.exports = router;
