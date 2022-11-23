@@ -48,32 +48,32 @@ class OrderController {
     }
     async createOrder(req, res, next) {
         try {
+
             //check user exists
             const userExist = await Users.findById(req.params.id)
             if (!userExist) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin tài khoản của bạn')
             // check product exists
-            let arrProduct = [];
-            req.body.orderItems.forEach(async item => {
-                let product = await Products.findById(item.product);
-                if (product)
-                    arrProduct.push(product)
-            })
-            console.log(arrProduct)
-            console.log(arrProduct.length, "-------->", req.body.orderItems.length)
-            if (arrProduct.length !== req.body.orderItems.length) throw new ErrorHandler.NotFoundError('Một vài sản phẩm trong đơn hàng không được tìm thấy')
 
+            const arrProduct = req.body.orderItems.map(item => item.product)
+            const products = await Products.find({ _id: { $in: arrProduct } })
+            if (products.length !== req.body.orderItems.length) throw new ErrorHandler.NotFoundError('Một vài sản phẩm trong đơn hàng không tồn tại')
             // create order
-            let orderItems = []
-            req.body.orderItems.forEach(async item => {
-                const itemAvailable = await Products.findOne({ 'options.$._id': item.option, 'options.$.qty': item.qty })
-                if (!itemAvailable) throw new ErrorHandler.BadRequestError(`Sản phẩm #${item.option} không còn đủ #${qty} số lượng để đáp ứng đơn hàng`)
-                orderItems.push({
-                    product: item.product,
-                    option: item.option,
-                    qty: item.qty
+            let err = ''
+            for (let i = 0; i < req.body.orderItems.length; i++) {
+                const productAvailable = await Products.findOne({
+                    _id: req.body.orderItems[i].product,
+                    options: {
+                        $elemMatch: {
+                            _id: req.body.orderItems[i].option,
+                            qty: { $gte: Math.abs(req.body.orderItems[i].qty) }
+                        }
+                    }
                 })
-            })
-            if (!orderItems.length) throw new ErrorHandler.BadRequestError('Không có sản phẩm nào được đặt')
+                if (!productAvailable) err += `< Sản phẩm #${req.body.orderItems[i].product} không đủ số lượng yêu cầu trong đơn hàng >`;
+            }
+            if (err != '') throw new ErrorHandler.BadRequestError(err)
+
+            const orderItems = req.body.orderItems.map(item => ({ product: item.product, option: item.option, qty: item.qty }))
             const newOder = new Orders({
                 user: req.params.id,
                 orderItems: orderItems,

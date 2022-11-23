@@ -18,14 +18,15 @@ class CartController {
         try {
             const userExist = await Users.findById(req.params.id);
             if (!userExist) throw new ErrorHandler.NotFoundError('Không tìm thấy tài khoản của bạn')
-            const productExist = await Products.findById(req.body.product_id)
+            const productExist = await Products.findById(req.body.product)
             if (!productExist) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm')
 
-            const productInCart = await Carts.find({ user: req.params.id, cartItems: { $elemMatch: { product: req.body.product_id } } })
+            const productInCart = await Carts.find({ user: req.params.id, cartItems: { $elemMatch: { product: req.body.product} } })
             if (productInCart.length) throw new ErrorHandler.BadRequestError('Sản phẩm đã có trong giỏ hàng')
 
             const newCartItem = {
-                product: req.body.product_id,
+                product: req.body.product,
+                option: req.body.option,
                 qty: req.body.qty
             }
             const cartExist = await Carts.findOne({ user: req.params.id })

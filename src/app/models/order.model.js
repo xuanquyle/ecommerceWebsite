@@ -4,6 +4,7 @@ const ObjectId = Schema.ObjectId;
 
 const OrderItemSchema = new Schema({
     product: { type: String, required: true, ref: 'product' },
+    option: { type: String, require: true, ref: 'product.option' },
     qty: { type: Number, required: true }
 })
 

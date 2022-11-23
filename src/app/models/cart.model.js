@@ -4,8 +4,8 @@ const ObjectId = Schema.ObjectId;
 
 const CartItemSchema = new Schema({
     product: { type: String, required: true, ref: 'product' },
-    qty: { type: Number, required: true },
-    purchasedAt: { type: Date, default: null }
+    option: { type: String, require: true },
+    qty: { type: Number, required: true }
 })
 
 const CartSchema = new Schema({
@@ -13,5 +13,5 @@ const CartSchema = new Schema({
     cartItems: [CartItemSchema]
 })
 
-const cartModel=mongoose.model('cart',CartSchema)
+const cartModel = mongoose.model('cart', CartSchema)
 module.exports = cartModel;

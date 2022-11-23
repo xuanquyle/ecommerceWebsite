@@ -41,8 +41,8 @@ class ProductController {
                 .skip((perPage * page) - perPage) // Trong page đầu tiên sẽ bỏ qua giá trị là 0
                 .limit(perPage)
             if (!products.length)
-                throw new ErrorHandler.NotFoundError('Không có sản phẩm nào');
-            return res.status(200).json(products)
+                return res.status(200).json([]);
+            return res.status(200).json(products);
         }
         catch (err) {
             throw new ErrorHandler.BadRequestError(err.message);
