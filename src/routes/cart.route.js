@@ -1,12 +1,12 @@
 var express = require('express');
 app = express();
 const router = express.Router();
-
+const authMiddleware =require('../app/middlewares/auth.middleware')
 const cartRoute = require('../app/controllers/cart.controller');
 
-router.get('/:id',cartRoute.index);
-router.post('/:id',cartRoute.addToCart);
-router.put('/:id',cartRoute.updateCart);
-router.delete('/:id',cartRoute.deleteCart);
+router.get('/me/:id',authMiddleware.verifyTokenAndUserAuthorization,cartRoute.getUserCart);
+router.post('/me/:id',authMiddleware.verifyTokenAndUserAuthorization,cartRoute.addToCart);
+router.put('/me/:id',/*authMiddleware.verifyTokenAndUserAuthorization,*/cartRoute.updateCart);
+router.delete('/me/:id',/*authMiddleware.verifyTokenAndUserAuthorization,*/cartRoute.deleteCart);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const Orders = require('../models/order.model');
 const Users = require('../models/user.model');
 const Products = require('../models/product.model');
+const Carts = require('../models/cart.model')
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.ObjectId;
 const ErrorHandler = require('../errors/errorHandler')
@@ -49,26 +50,30 @@ class OrderController {
         try {
             //check user exists
             const userExist = await Users.findById(req.params.id)
-            if (!userExist) throw new ErrorHandler.NotFoundError('User not found')
+            if (!userExist) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin tài khoản của bạn')
             // check product exists
             let arrProduct = [];
-            req.body.orderItems.forEach(item => arrProduct.push(item.product))
-            const productExist = await Products.find({ _id: { "$in": arrProduct } })
-            if (!productExist.length) throw new ErrorHandler.NotFoundError('Product not found')
-            /// SÁNG MAI LÀM
-            // else {
-            //         if (productExist.qty < req.body.orderItems)
-            //     }
+            req.body.orderItems.forEach(async item => {
+                let product = await Products.findById(item.product);
+                if (product)
+                    arrProduct.push(product)
+            })
+            console.log(arrProduct)
+            console.log(arrProduct.length, "-------->", req.body.orderItems.length)
+            if (arrProduct.length !== req.body.orderItems.length) throw new ErrorHandler.NotFoundError('Một vài sản phẩm trong đơn hàng không được tìm thấy')
 
             // create order
             let orderItems = []
-            let totalPrice = 0;
-            req.body.orderItems.forEach(item => {
+            req.body.orderItems.forEach(async item => {
+                const itemAvailable = await Products.findOne({ 'options.$._id': item.option, 'options.$.qty': item.qty })
+                if (!itemAvailable) throw new ErrorHandler.BadRequestError(`Sản phẩm #${item.option} không còn đủ #${qty} số lượng để đáp ứng đơn hàng`)
                 orderItems.push({
                     product: item.product,
+                    option: item.option,
                     qty: item.qty
                 })
             })
+            if (!orderItems.length) throw new ErrorHandler.BadRequestError('Không có sản phẩm nào được đặt')
             const newOder = new Orders({
                 user: req.params.id,
                 orderItems: orderItems,
@@ -78,8 +83,11 @@ class OrderController {
                 paymentMethod: req.body.paymentMethod
             })
             const createdOrder = await newOder.save()
-            if (!createdOrder.length)
+            if (!createdOrder)
                 throw new ErrorHandler.BadRequestError('Can not create your order. Please try again ')
+
+            const cart_id = req.body.cart_id;
+            await Carts.findOneAndDelete({ _id: cart_id })
             res.status(201).json(createdOrder)
         }
         catch (err) {

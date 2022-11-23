@@ -41,17 +41,17 @@ class ProductController {
                 .skip((perPage * page) - perPage) // Trong page đầu tiên sẽ bỏ qua giá trị là 0
                 .limit(perPage)
             if (!products.length)
-                throw new ErrorHandler.NotFoundError('Can not get products');
+                throw new ErrorHandler.NotFoundError('Không có sản phẩm nào');
             return res.status(200).json(products)
         }
         catch (err) {
-            throw new ErrorHandler.BadRequestError('err.message');
+            throw new ErrorHandler.BadRequestError(err.message);
         }
     }
     async getAllProduct(req, res, next) {
         try {
             const products = await Products.find();
-            if (!products.length) throw new ErrorHandler.NotFoundError('Product not found');
+            if (!products.length) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm nào');
             return res.status(200).json(products)
         }
         catch (err) {
@@ -71,7 +71,7 @@ class ProductController {
     async getDetailProduct(req, res, next) {
         try {
             const product = await Products.findOne({ slug: req.params.slug });
-            if (!product) throw new ErrorHandler.NotFoundError('Product not found');
+            if (!product) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm');
             return res.status(200).json(product)
         }
         catch (err) {
@@ -81,11 +81,10 @@ class ProductController {
     // // [POST] /product
     async createProduct(req, res, next) {
         try {
-            let err = [];
-            req.body.name ? err : err.push({ name: 'Product name is required' });
-            req.body.description ? err : err.push({ description: 'Product description is required' });
-            req.body.short_description ? err : err.push({ short_description: 'Product short_description is required' });
-            req.body.category ? err : err.push({ category: 'Product category is required' });
+            let err = '';
+            req.body.name ? err : err += 'Product name is required';
+            req.body.category ? err : err += 'Product category is required';
+            if (err !== '') throw new ErrorHandler.ValidationError(err)
 
             const data = JSON.parse(req.body.data);
             const productExist = await Products.findOne({ name: data.name });

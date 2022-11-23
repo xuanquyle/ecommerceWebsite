@@ -1,3 +1,4 @@
+// const errorHandler= require ('../middlewares/err.middleware')
 module.exports = {
 	NotFoundError: class NotFoundError extends Error {
 		constructor(message) {
@@ -8,9 +9,9 @@ module.exports = {
 	},
 	NoData: class NoData extends Error {
 		constructor(message) {
-			super();
+			super(message);
 			this.name = 'NoData';
-			this.status = 200;
+			this.status = 400;
 			this.messageObject = message;
 		}
 	},

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-
+const ErrorHandler = require('../errors/errorHandler')
 class authMiddleware {
 
     verifyToken(req, res, next) {
@@ -7,14 +7,12 @@ class authMiddleware {
         if (token) {
             const accessToken = token.split(" ")[1];
             jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
-                if (err) {
-                    res.status(403).json("Token is not valid!");
-                }
+                if (err) throw new ErrorHandler.ForbiddenError('Hết thời gian đăng nhập. Vui lòng đăng nhập lại')
                 req.user = user;
                 next();
             });
         } else {
-            res.status(401).json("You're not authenticated");
+            throw new ErrorHandler.ForbiddenError("Vui lòng đăng nhập để thực hiện");
         }
     }
     verifyTokenAndUserAuthorization = (req, res, next) => {
@@ -22,7 +20,7 @@ class authMiddleware {
             if (req.user._id === req.params.id) {
                 next();
             } else {
-                res.status(403).json("You're not allowed to do that!");
+                throw new ErrorHandler.ForbiddenError("Vui lòng đăng nhập để thực hiện");
             }
         });
     };
@@ -32,7 +30,7 @@ class authMiddleware {
             if (req.user.id === req.params.id || req.user.isAdmin) {
                 next();
             } else {
-                res.status(403).json("You're not allowed to do that!");
+                throw new ErrorHandler.ForbiddenError("Vui lòng đăng nhập để thực hiện");
             }
         });
     };

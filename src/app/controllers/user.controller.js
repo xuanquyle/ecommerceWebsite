@@ -17,10 +17,11 @@ const ErrorHandler = require('../errors/errorHandler')
 class UserController {
     async login(req, res, next) {
         try {
-            const user = await Users.findOne({ email: req.body.email });
+            const user = await Users.findOneWithDeleted({ email: req.body.email });
             if (!user) throw new ErrorHandler.NotFoundError('Không tìm thấy email người dùng')
             const validPassword = await bcrypt.compare(req.body.password, user.password);
             if (!validPassword) throw new ErrorHandler.ForbiddenError('Sai mật khẩu. Vui lòng đăng nhập lại');
+            if (user.deleted) throw new ErrorHandler.NotFoundError('Tài khoản đã bị khóa. Vui lòng liên hệ với chúng tôi để biết rõ nguyên nhân')
             if (user.verifiedAt === null) throw new ErrorHandler.ForbiddenError('Tài khoản chưa được xác thực. Vui lòng kiểm tra email');
             if (user && validPassword && user.verifiedAt) {
                 const accessToken = generateToken.generateAccessToken(user);
@@ -171,13 +172,12 @@ class UserController {
 
     async deleteUser(req, res, next) {
         try {
-            const deletedUser = await Users.delete({ _id: req.params.id, })
+            const deletedUser = await Users.delete({ _id: req.params.id })
             if (!deletedUser) throw new ErrorHandler.NotFoundError('User not found')
-            res.status(200).json(`Xóa người dùng ${deletedUser} thành công`)
+            res.status(200).json(`Đã chặn người dùng ${req.params.id} thành công`)
         } catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
         }
-
     }
 
     // USER_ADDRESS controller

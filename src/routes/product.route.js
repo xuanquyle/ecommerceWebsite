@@ -4,7 +4,6 @@ const router = express.Router();
 const upload = require('../app/middlewares/upload.middleware')
 const productRoute = require('../app/controllers/product.controller');
 const authMiddleware = require('../app/middlewares/auth.middleware')
-const Products = require('../app/models/product.model');
 
 // Product
 

@@ -4,7 +4,8 @@ const ObjectID = Schema.ObjectID;
 
 const CategorySchema = new Schema({
     name: { type: String, required: true },
-    description: { type: String, required: false }
+    description: { type: String, required: false },
+    image: { type: String, require: false }
 })
 
 const Category = mongoose.model('category', CategorySchema)

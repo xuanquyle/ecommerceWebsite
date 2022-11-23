@@ -17,6 +17,7 @@ const sendMail = (to, subject, htmlContent) => {
         from: mailConfig.FROM_ADDRESS,
         to: to,
         subject: subject,
+        text: '',
         html: htmlContent
     }
     transport.sendMail(options);

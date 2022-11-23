@@ -1,6 +1,6 @@
 const Categories = require('../models/category.model');
 const ErrorHandler = require('../errors/errorHandler');
-
+const fs = require('fs')
 class CategoryController {
     // [GET] /api/categories
     async index(req, res, next) {
@@ -29,13 +29,26 @@ class CategoryController {
     async createNewCategory(req, res, next) {
         try {
             const categoryExist = await Categories.findOne({ name: req.body.name });
-            if (categoryExist) throw new ErrorHandler.BadRequestError('Category exist in database. Please try again')
+            if (categoryExist) {
+                if (req.file && fs.existsSync(`src/public/images/${req.file.filename}`))
+                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
+                        if (err) throw new Error(err.message);
+                    });
+                throw new ErrorHandler.BadRequestError('Category exist in database. Please try again')
+            }
             const category = new Categories({
                 name: req.body.name,
-                description: req.body.description
+                description: req.body.description,
+                image: req.file ? `public/images/${req.file.filename}` : ''
             })
             const createdCategory = await category.save();
-            if (!createdCategory) throw new ErrorHandler.BadRequestError('Can not create new Category. Please try again')
+            if (!createdCategory) {
+                if (req.file && fs.existsSync(`src/public/images/${req.file.filename}`))
+                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
+                        if (err) throw new Error(err.message);
+                    });
+                throw new ErrorHandler.BadRequestError('Can not create new Category. Please try again')
+            }
             res.status(200).json(createdCategory)
         }
         catch (err) {
@@ -49,10 +62,23 @@ class CategoryController {
             const updatedCate = await Categories.findByIdAndUpdate(req.params.id, {
                 $set: {
                     name: req.body.name,
-                    description: req.body.description
+                    description: req.body.description,
+                    image: req.file ? `public/images/${req.file.filename}` : ''
                 }
             })
-            if (!updatedCate) throw new ErrorHandler.NotFoundError('Không tìm thấy phân loại này')
+            if (!updatedCate) {
+                if (req.file && fs.existsSync(`src/public/images/${req.file.filename}`))
+                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
+                        if (err) throw new Error(err.message);
+                    });
+                throw new ErrorHandler.NotFoundError('Không tìm thấy phân loại này')
+            }
+            else{
+                if (fs.existsSync(`src/${updatedCate.image}`))
+                    fs.unlink(`src/${updatedCate.image}`, (err) => {
+                        if (err) throw new Error(err.message);
+                    });
+            }
             res.status(200).json(updatedCate)
 
         } catch (err) {

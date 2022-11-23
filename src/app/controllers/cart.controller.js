@@ -5,10 +5,10 @@ const mongoose = require('mongoose')
 const ObjectId = mongoose.Schema.ObjectId;
 const ErrorHandler = require('../errors/errorHandler')
 class CartController {
-    async index(req, res, next) {
+    async getUserCart(req, res, next) {
         try {
             const cart = await Carts.find({ user: req.params.id }).populate('cartItems.product');
-            if (!cart.length || cart.cartItems.length !== 0) throw new ErrorHandler.NoData('Không có sản phẩm nào trong giỏ hàng')
+            if (!cart.length || cart.cartItems.length !== 0) res.status(200).json('Chưa có sản phẩm nào trong giỏ hàng')
             res.status(200).json(cart)
         } catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
@@ -48,7 +48,7 @@ class CartController {
                 res.status(200).json(addedCart)
             }
         } catch (error) {
-            throw new ErrorHandler.BadRequestError(err.message)
+            throw new ErrorHandler.BadRequestError(error.message)
         }
     }
     async updateCart(req, res, next) {
