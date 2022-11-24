@@ -1,19 +1,19 @@
 import { useState, useEffect, useMemo } from "react"
-import { getAllProduct } from "../../Api";
+import { getAllUSer } from "../../Api";
 import { useTable, useSortBy, useGlobalFilter, usePagination } from "react-table"
 // import ModalProduct from "./ModalProduct";
 import { GlobalFilter } from "../ProductManager/globalFilter";
 
 const UserManager = (props) => {
-    const [product, setProduct] = useState();
+    const [user, setUser] = useState();
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [action, setAction] = useState('create')
     const [selectedProduct, setSelectedProduct] = useState('')
 
     const fetchData = async () => {
         try {
-            const data = await getAllProduct();
-            setProduct(data.data)
+            const data = await getAllUSer();
+            setUser(data.data)
             console.log(data.data);
         } catch (error) {
             console.log(error);
@@ -24,46 +24,50 @@ const UserManager = (props) => {
     }, [])
     const productData = useMemo(() => {
         return (
-            product && product.map((item, index) => {
+            user && user.map((item, index) => {
                 let copy = item
                 copy['stt'] = index + 1
                 const date = new Date(item['updatedAt'])
-                
-                copy['updatedAt'] = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear(); 
+
+                copy['updatedAt'] = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
                 return copy
             })
         )
     }
-        , [product])
+        , [user])
 
     const productsColumns2 = useMemo(() =>
-        (product && product[0]) ?
+        (user && user[0]) ?
             [
                 {
                     Header: "STT",
-                    accessor: Object.keys(product[0])[13]
+                    accessor: Object.keys(user[0])[15]
                 },
                 {
-                    Header: "Tên sản phẩm",
-                    accessor: Object.keys(product[0])[1]
+                    Header: "Email",
+                    accessor: Object.keys(user[0])[1]
                 },
                 {
-                    Header: "Mô tả",
-                    accessor: Object.keys(product[0])[2]
+                    Header: "Họ",
+                    accessor: Object.keys(user[0])[2]
                 },
                 {
-                    Header: "Ngày tạo",
-                    accessor: Object.keys(product[0])[8]
+                    Header: "Tên",
+                    accessor: Object.keys(user[0])[13]
+                },
+                {
+                    Header: "Số điện thoại",
+                    accessor: Object.keys(user[0])[3]
                 },
             ]
             : []
-        , [product])
+        , [user])
     // productsColumns2 ? console.log('sss',productsColumns2): console.log('ff')
     const tableHooks = (hooks) => {
         hooks.visibleColumns.push((columns) => [
             ...columns, {
-                id: "Edit",
-                Header: "Edit",
+                id: "Lock",
+                Header: "Lock",
                 Cell: ({ row }) => {
                     return (
                         <>
@@ -71,9 +75,17 @@ const UserManager = (props) => {
                                 style={{ marginRight: '5px' }}>
                                 <i className="fas fa-eye" style={{ fontWeight: '600', }}></i>
                             </button>
-                            <button className="btn-success rounded" onClick={() => handleEditProduct(row)}>
-                                <i className="fas fa-edit" style={{ fontWeight: '600', }}></i>
-                            </button>
+                            {(row.original.deleted) ? (
+                                <button className="btn-danger rounded" onClick={() => handleEditProduct(row)}>
+                                    <i className="fas fa-lock" style={{ fontWeight: '600', }}></i>
+                                </button>
+                            ) : (
+                                <button className="btn-success rounded" onClick={() => handleEditProduct(row)}>
+                                    <i className=" fas fa-lock-open" style={{ fontWeight: '600', }}></i>
+                                </button>
+
+                            )}
+
 
                         </>
                     )
@@ -129,12 +141,12 @@ const UserManager = (props) => {
     return (
         <>
 
-            {product ? (
+            {user ? (
                 <div>
                     {/* <ModalProduct
                         isOpen={isOpenModal}
                         toggle={toggle}
-                        product={selectedProduct}
+                        user={selectedProduct}
                         action={action}
                         updateData={fetchData} /> */}
 

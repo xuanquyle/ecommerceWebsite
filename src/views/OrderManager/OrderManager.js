@@ -3,26 +3,39 @@ import { getAllProduct } from "../../Api";
 import { useTable, useSortBy, useGlobalFilter, usePagination } from "react-table"
 // import ModalProduct from "./ModalProduct";
 import { GlobalFilter } from "../ProductManager/globalFilter";
+import ModalOrder from "./OrderModal";
 
 const OrderManager = () => {
+    const data = [
+        { id: '637c8748ce9841f2f205c2ef', name: "Xuân Quý", status: 'Chờ xác nhận ', price: '3.500.000', date: '21/11/2022', email: 'xuanquy1214@gmail.com' },
+        { id: '637c8748ce9841f2sf05c2kf', name: "Xuân Quý", status: 'Đang giao hàng', price: '54.500.000', date: '15/11/2022', email: 'xuanquy1214@gmail.com' },
+        { id: '637c8748ce9841fadf05c2et', name: "Tuyên", status: 'Đã nhận hàng', price: '31.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
+        { id: '637c8748ce9841f2f205c2as', name: "Võ Hải Tuyên", status: 'Đã nhận hàng', price: '47.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
+        { id: '637c8748ád9841f2f205c2ef', name: "Xuân Quý", status: 'Đã xác nhận', price: '3.500.000', date: '21/11/2022', email: 'xuanquy1214@gmail.com' },
+        { id: '637c8748ceeff1f2sf05c2kf', name: "Xuân Quý", status: 'Đang giao hàng', price: '54.500.000', date: '15/11/2022', email: 'xuanquy1214@gmail.com' },
+        { id: '637c8748ceasajfadf05c2et', name: "Tuyên", status: 'Đã xác nhận', price: '31.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
+        { id: '637c8748cosifpf2f205c2as', name: "Võ Hải Tuyên", status: 'Đã nhận hàng', price: '47.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
+    ]
     const [product, setProduct] = useState();
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [action, setAction] = useState('create')
     const [selectedProduct, setSelectedProduct] = useState('')
-    const [order, setOrder] = useState();
+    const [order, setOrder] = useState(data);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getAllProduct();
-                setOrder(data.data)
-                // console.log(data.data);
-            } catch (error) {
-                console.log(error);
-            }
-        }
-        fetchData();
-    }, [])
+
+    // setOrder(data)
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const data = await getAllProduct();
+    //             setOrder(data.data)
+    //             // console.log(data.data);
+    //         } catch (error) {
+    //             console.log(error);
+    //         }
+    //     }
+    //     fetchData();
+    // }, [])
     const orderData = useMemo(() => {
         return (
             order && order.map((item, index) => {
@@ -37,24 +50,24 @@ const OrderManager = () => {
         (order && order[0]) ?
             [
                 {
-                    Header: "Mã đơn hàng",
-                    accessor: Object.keys(order[0])[3]
-                },
-                {
-                    Header: "Sản phẩm",
+                    Header: "Họ tên",
                     accessor: Object.keys(order[0])[1]
                 },
                 {
+                    Header: "email",
+                    accessor: Object.keys(order[0])[5]
+                },
+                {
                     Header: "Tổng tiền",
-                    accessor: Object.keys(order[0])[2]
+                    accessor: Object.keys(order[0])[3]
                 },
                 {
                     Header: "Trạng thái",
-                    accessor: Object.keys(order[0])[4]
+                    accessor: Object.keys(order[0])[2]
                 },
                 {
                     Header: "Ngày đặt",
-                    accessor: Object.keys(order[0])[7]
+                    accessor: Object.keys(order[0])[4]
                 },
             ]
             : []
@@ -111,10 +124,11 @@ const OrderManager = () => {
     //MODEL ADD
     //EDIT
     const handleEditProduct = (row) => {
-        // console.log('row', row.original);
-        setSelectedProduct(row.original)
-        setAction('update')
         setIsOpenModal(true)
+        // // console.log('row', row.original);
+        // setSelectedProduct(row.original)
+        // // setAction('update')
+        // setIsOpenModal(true)
     }
 
     const readProduct = (row) => {
@@ -125,6 +139,10 @@ const OrderManager = () => {
     return (
         order &&
         <>
+        <ModalOrder
+                        isOpen={isOpenModal}
+                        toggle={toggle}
+                        order={order[0]}/>
             <div className="title-container">
                 <h5 className="px-3">Quản lý đơn hàng</h5>
                 <hr />

@@ -15,7 +15,9 @@ const MainPage = () => {
                 paddingRight: '0px'}}>
                     <Sidebar />
                 </aside>
-                <aside className="col-md-10 px-0">
+                <aside className="col-md-10 px-0"
+                // style={{ backgroundColor: '#edf1f5'}}
+                >
                     <Outlet />
                 </aside>
             </div>

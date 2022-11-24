@@ -1,5 +1,5 @@
-import "../assets/css//style.min.css"
-import "../assets/css//style.css"
+import "../assets/css/style.min.css"
+import "../assets/css/style.css"
 import { path } from "../ultils/constant"
 import "../assets/bootstrap/dist/css/bootstrap.css"
 // import "../assets/plugins/bower_components/chartist/dist/chartist.min.css"
@@ -15,6 +15,7 @@ import UserManager from "./UserManager/UserManager"
 import OrderManager from "./OrderManager/OrderManager"
 import Login from "./Login/Login"
 import Categories from "./Categories/Categories"
+import Setting from "./Setting/Setting"
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
             <Route path={path.PRODUCTMANAGER} element={<ProductManager />}></Route>
             <Route path={path.USERMANAGER} element={<UserManager />}></Route>
             <Route path={path.ORDERMANAGER} element={<OrderManager />}></Route>
+            <Route path={path.SETTING} element={<Setting />}></Route>
             <Route index element={<Dashboard />}></Route>
           </Route>
           <Route path={path.LOGIN} element={<Login />}></Route>

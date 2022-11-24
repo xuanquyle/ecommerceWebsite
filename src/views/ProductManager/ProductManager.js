@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from "react"
-import { getAllProduct } from "../../Api";
+import { getAllProduct, deleteProduct } from "../../Api";
 import { useTable, useSortBy, useGlobalFilter, usePagination } from "react-table"
 import ModalProduct from "./ModalProduct";
 import { GlobalFilter } from "./globalFilter";
+import { ToastContainer } from "react-toastify";
+import { notify } from '../../ultils/constant';
 
 const ProductManager = (props) => {
     const [product, setProduct] = useState();
@@ -42,7 +44,7 @@ const ProductManager = (props) => {
             [
                 {
                     Header: "STT",
-                    accessor: Object.keys(product[0])[13]
+                    accessor: Object.keys(product[0])[12]
                 },
                 {
                     Header: "Tên sản phẩm",
@@ -50,7 +52,7 @@ const ProductManager = (props) => {
                 },
                 {
                     Header: "Mô tả",
-                    accessor: Object.keys(product[0])[2]
+                    accessor: Object.keys(product[0])[3]
                 },
                 {
                     Header: "Ngày tạo",
@@ -82,19 +84,24 @@ const ProductManager = (props) => {
     const tableHooks = (hooks) => {
         hooks.visibleColumns.push((columns) => [
             ...columns, {
-                id: "Edit",
-                Header: "Edit",
+                id: "---",
+                Header: "---",
                 Cell: ({ row }) => {
                     return (
                         <>
-                            <button className="btn-primary rounded" onClick={() => readProduct(row)}
-                                style={{ marginRight: '5px' }}>
+                            <button className="btn-primary rounded m-2" onClick={() => readProduct(row)}
+                                // style={{ marginRight: '5px' }}
+                                >
                                 <i className="fas fa-eye" style={{ fontWeight: '600', }}></i>
                             </button>
-                            <button className="btn-success rounded" onClick={() => handleEditProduct(row)}>
+                            <button className="btn-success rounded m-2" onClick={() => handleEditProduct(row)}
+                                // style={{ marginRight: '5px' }}
+                                >
                                 <i className="fas fa-edit" style={{ fontWeight: '600', }}></i>
                             </button>
-
+                            <button className="btn-danger rounded m-2" onClick={() => handleDeleteProduct(row)}>
+                                <i className="fas fa-trash" style={{ fontWeight: '600', }}></i>
+                            </button>
                         </>
                     )
 
@@ -139,7 +146,19 @@ const ProductManager = (props) => {
         setAction('update')
         setIsOpenModal(true)
     }
+    // DELETE
+    const handleDeleteProduct = async (row) => {
+        if (window.confirm('Bạn có chắc xóa sản phẩm này ?')) {
+            try {
+                const rep = await deleteProduct(row.original._id);
+                // getProfile();
+                notify('success', 'Sản phẩm đã được xóa')
+                fetchData();
+            } catch (error) {
 
+            }
+        }
+    }
     const readProduct = (row) => {
         setSelectedProduct(row.original)
         setAction('read')
@@ -148,7 +167,8 @@ const ProductManager = (props) => {
 
     return (
         <>
-
+            <ToastContainer 
+            theme="colored"/>
             {product ? (
                 <div>
                     <ModalProduct

@@ -28,4 +28,9 @@ export const notify = (type, content) => {
             position: toast.POSITION.TOP_RIGHT
         });
     }
+    if (type === 'info') {
+        toast.info(content, {
+            position: toast.POSITION.TOP_RIGHT
+        });
+    }
 };

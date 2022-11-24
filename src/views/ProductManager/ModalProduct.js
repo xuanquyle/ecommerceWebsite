@@ -151,7 +151,7 @@ const ModalProduct = (props) => {
                         onCloseRequest={() => setIsOpenImage(false)}
                     />
                 }
-                <ToastContainer />
+                {/* <ToastContainer /> */}
                 {/* CREATE */}
                 {(props.action === 'create') && (
                     <Modal isOpen={props.isOpen} toggle={props.toggle}

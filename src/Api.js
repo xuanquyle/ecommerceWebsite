@@ -1,5 +1,17 @@
 import axios from "axios"
 
+// LOGIN
+
+export const Login = (data) => {
+    return (
+        axios({
+            method: 'post',
+            url: `http://localhost:8080/api/users/auth/login`,
+            data: data
+        })
+    )
+}
+
 export const getAllProduct = () => {
     return axios.get(`http://localhost:8080/api/products/all-product`)
 }
@@ -22,6 +34,23 @@ export const createCategory = (data) => {
     )
 }
 
+export const upateCategory = (id, data) => {
+    return (
+        axios({
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'put',
+            url: `http://localhost:8080/api/categories/${id}`,
+            data: data
+        })
+    )
+}
+
+export const deleteCategory = (id) => {
+    return axios.delete(`http://localhost:8080/api/categories/${id}`)
+}
+
 // PRODUCT
 export const createProduct = (data) => {
     return (
@@ -38,7 +67,19 @@ export const createProduct = (data) => {
         })
     )
 }
+export const deleteProduct = (id) => {
+    return (
+        axios({
+            headers: {
+            },
+            method: 'delete',
+            url: `http://localhost:8080/api/products/${id}`,
+        })
+    )
+}
+
+
 
 export const getAllUSer = () => {
-    return axios.get(`http://localhost:8080/api/products`)
+    return axios.get(`http://localhost:8080/api/users`)
 }

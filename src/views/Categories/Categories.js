@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
-import { getAllCategory, createCategory } from "../../Api";
+import { getAllCategory, createCategory, upateCategory, deleteCategory } from "../../Api";
 import { useTable, useSortBy, useGlobalFilter, usePagination } from "react-table"
 import { GlobalFilter } from "../ProductManager/globalFilter";
 import { useForm } from 'react-hook-form';
@@ -23,7 +23,7 @@ const Categories = () => {
             console.log(error);
         }
     }
-    useEffect(() => {     
+    useEffect(() => {
         fetchData();
     }, [])
     const cateData = useMemo(() => {
@@ -109,23 +109,48 @@ const Categories = () => {
         setIsAdd(true)
     }
     //EDIT
-    const handleEditCate = (row) => { 
-        setIsAdd(false)   
+    const handleEditCate = (row) => {
+        setIsAdd(false)
         reset()
         setSelectedCate(row.original)
         setIsEdit(true)
     }
-    const onDeleteCate = (row) => {
-
+    const onDeleteCate = async (row) => {
+        console.log(row.original);
+        if (window.confirm('Bạn có muốn xóa danh mục này ?')) {
+            try {
+                let rep = await deleteCategory(row.original._id)
+                notify('success', 'Danh mục "' + row.original.name + '" đã được xóa !')
+                fetchData();
+            } catch (error) {
+                notify('error', 'Đã có lỗi xảy ra')
+            }
+        }
     }
     const handleSaveCate = async (data) => {
         if (isAdd) {
             try {
                 let rep = await createCategory(data)
                 notify('success', 'Danh mục "' + data.name + '" đã được thêm !')
+                setIsAdd(false)
+                reset()
                 fetchData();
             } catch (error) {
                 notify('error', 'Đã có lỗi xảy ra')
+            }
+        }
+        if (isEdit) {
+            // console.log('ss',selectedCate)
+            if (window.confirm('Bạn có muốn lưu thông tin thay đổi ?')) {
+                try {
+                    let rep = await upateCategory(selectedCate._id, data)
+                    notify('success', 'Danh mục "' + data.name + '" đã được cập nhập !')
+                    setIsEdit(false)
+                    reset()
+                    fetchData();
+                } catch (error) {
+                    notify('error', 'Đã có lỗi xảy ra')
+                }
             }
         }
         setIsAdd(!isAdd)
@@ -139,7 +164,8 @@ const Categories = () => {
     return (
         arrCate &&
         <>
-            <ToastContainer />
+            <ToastContainer 
+            theme="colored" />
             <div className="title-container">
                 <h5 className="px-3">Quản lý danh mục</h5>
                 <hr />
@@ -153,7 +179,7 @@ const Categories = () => {
                                 <div className="form-group col-md-3">
                                     <label htmlFor="inputEmail4">Tên danh mục</label>
                                     <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={isEdit ? selectedCate.name : ''}
+                                        defaultValue={isEdit ? selectedCate.name : ''}
                                         {...register("name", {
                                             required: true,
                                         })} />
@@ -161,7 +187,7 @@ const Categories = () => {
                                 <div className="form-group col-md-6">
                                     <label htmlFor="inputPassword4">Mô tả</label>
                                     <input type="text" className="form-control" id="inputPassword4" placeholder=""
-                                    defaultValue={isEdit ? selectedCate.description : ''}
+                                        defaultValue={isEdit ? selectedCate.description : ''}
                                         {...register("description", {
                                             // required: true,
                                         })} />
