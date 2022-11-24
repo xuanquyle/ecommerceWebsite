@@ -7,8 +7,8 @@ import Slider from "react-slick";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react"
 import axios from "axios"
-import {getAllProduct} from "../../../api"
-import {path} from "../../../utils/constant"
+import { getAllProduct } from "../../../api"
+import { path } from "../../../utils/constant"
 
 const NewArrivalsContent = (props) => {
     const settings = {
@@ -16,6 +16,31 @@ const NewArrivalsContent = (props) => {
         speed: 500,
         slidesToShow: 5,
         slidesToScroll: 5,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 3,
+                    infinite: true,
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    initialSlide: 2
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
     };
     let arrItem = [
         {
@@ -61,15 +86,15 @@ const NewArrivalsContent = (props) => {
     return (
         // console.log('a',props.arrProduct[0]) &&
         <Slider {...settings}>
-            {props.arrProduct && props.arrProduct.slice(0,10).map((item, index) => {
+            {props.arrProduct && props.arrProduct.slice(0, 10).map((item, index) => {
                 return (
                     <div key={item._id} >
-                        <div className="product product-2" style={{ margin: "0px 10px" }} >
+                        <div className="product product-2 productrending" style={{ margin: "0px 10px" }} >
                             <figure className="product-media">
-                                <Link to={'/ProductDetails/'+ item.slug}>
+                                <Link to={'/ProductDetails/' + item.slug}>
                                     <img src={path.SERVER_URL + '/' + item.thumb} alt="Product image" className="product-image" />
                                 </Link>
-                                <div className="product-action" style={{cursor: 'pointer'}}>
+                                <div className="product-action" style={{ cursor: 'pointer' }}>
                                     <p className="btn-product btn-cart" title="Add to cart"></p>
                                     <p className="btn-product btn-quickview" title="Quick view"></p>
                                 </div>
@@ -79,7 +104,7 @@ const NewArrivalsContent = (props) => {
                                 <div className="product-cat">
                                     <p >{(item.category) ? (item.category.name) : ''}</p>
                                 </div>
-                                <h3 className="product-title"><Link to={"/ProductDetails/" + item.slug }>{item.name}r</Link></h3>
+                                <h3 className="product-title"><Link to={"/ProductDetails/" + item.slug}>{item.name}r</Link></h3>
                                 <div className="product-price">
                                     {item.price}
                                 </div>

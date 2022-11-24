@@ -33,12 +33,14 @@ const Container = () => {
         <>
             <ExPopularCate />
             <div className="container new-arrivals">
-                <NewArrivalTittle/>
-                <NewArrivalsContent 
-                arrProduct={arrProduct} />
+                <NewArrivalTittle />
+                <NewArrivalsContent
+                    arrProduct={arrProduct} />
             </div>
-            <TredingProducts />
-            <Recomandation />
+            <TredingProducts
+                arrProduct={arrProduct} />
+            <Recomandation
+                arrProduct={arrProduct} />
         </>
 
     )

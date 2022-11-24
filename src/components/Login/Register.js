@@ -4,6 +4,7 @@ import {useForm} from "react-hook-form"
 import {Link} from "react-router-dom"
 import "../../utils/constant"
 import { path } from "../../utils/constant";
+import logo from "../../assets/images/demos/demo-4/logo.png"
 
 const Register = () => {
     const {register, handleSubmit, formState: {errors}} = useForm();
@@ -13,9 +14,12 @@ const Register = () => {
     return (
         <div className='login-background'>
             <div className='login-container' style={{height: '550px'}}>
+            <div className="d-flex mt-3 justify-content-center">
+                    <img src={logo} placeholder="Logo" />
+                </div>
                 <div className='login-content'>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="col-12 login-text">Đăng ký</div>
+                        {/* <div className="col-12 login-text">Đăng ký</div> */}
                         <div className="col-12 form-group login-input">
                             <label>Tên tài khoản:</label>
                             <input type="text" className="form-control" placeholder="Email..."

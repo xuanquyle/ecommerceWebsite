@@ -16,7 +16,8 @@ export const path = {
     USERPURECHASED: '/UserProfile/Purchased',
     USERADDRESS: '/UserProfile/Address',
     USERCHANGEPASS: '/UserProfile/ChangePassword',
-    SERVER_URL: 'http://localhost:8080'
+    SERVER_URL: 'http://localhost:8080',
+    BLOG: '/Cart'
 }
 
 export const notify = (type, content) => {

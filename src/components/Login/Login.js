@@ -6,7 +6,10 @@ import { Link, useNavigate } from "react-router-dom"
 import "../../utils/constant"
 import { path } from "../../utils/constant";
 import { login } from "../../store/actions/userActions"
+import logo from "../../assets/images/demos/demo-4/logo.png"
 import { Login as apiLogin } from "../../api";
+import { notify } from '../../utils/constant';
+import { ToastContainer } from 'react-toastify';
 // import { connect } from "react-redux";
 
 const Login = (props) => {
@@ -21,11 +24,11 @@ const Login = (props) => {
             localStorage.setItem('isLoggedIn', JSON.stringify(rep.data.accessToken));
             localStorage.setItem('email', JSON.stringify(rep.data.email));
             localStorage.setItem('id', JSON.stringify(rep.data._id));
-            const saveInfo = {'isLoggedIn': rep.data.accessToken, 'email': rep.data.email, 'id': rep.data._id}
+            const saveInfo = { 'isLoggedIn': rep.data.accessToken, 'email': rep.data.email, 'id': rep.data._id }
             dispatch(login(saveInfo));
             navigate('/');
         } catch (error) {
-
+            notify('error', 'Tên tài khoản hoặc mật khẩu không chính xác !')
         }
 
         // console.log('>>>',data);
@@ -33,13 +36,18 @@ const Login = (props) => {
 
     return (
         <div className='login-background'>
+            <ToastContainer
+                theme="colored" />
             <div className='login-container' style={{ height: '450px' }}>
+                <div className="d-flex mt-3 justify-content-center">
+                    <img src={logo} placeholder="Logo" />
+                </div>
                 <div className='login-content'>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="col-12 login-text">Đăng nhập</div>
+                        {/* <div className="col-12 login-text">Đăng nhập</div> */}
                         <div className="col-12 form-group login-input">
                             <label>Tên tài khoản:</label>
-                            <input type="text" className="form-control" placeholder="Email..."
+                            <input type="email" className="form-control" placeholder="Email..."
                                 {...register("email", {
                                     required: true,
                                     pattern: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/

@@ -116,7 +116,7 @@ const ModalAddress = (props) => {
             if (window.confirm('Bạn có thêm địa chỉ này ?')) {
                 // console.log("data Submit address", dataAddress)
                 try {
-                    const rep = await createAddress(props.user.IsLoggedIn,props.user.id, dataAddress)
+                    const rep = await createAddress(props.user.isLoggedIn,props.user.id, dataAddress)
                     notify('success', 'Thêm địa chỉ thành công !')
                 } catch (error) {
                     // console.log('error',error.response.data.message)

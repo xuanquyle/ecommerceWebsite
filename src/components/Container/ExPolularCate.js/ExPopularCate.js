@@ -1,7 +1,9 @@
 import axios from "axios"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import p from "../../../assets/images/demos/demo-4/cats/2.png"
+import p1 from "../../../assets/images/demos/demo-4/cats/1.png"
+import p2 from "../../../assets/images/demos/demo-4/cats/2.png"
+import p3 from "../../../assets/images/demos/demo-4/cats/3.png"
 import hinh from "../../../assets/images/contact-header-bg.jpg"
 import { getAllCategories } from "../../../api"
 
@@ -22,6 +24,13 @@ const ExPopularCate = () => {
     //     }
 
     // ]
+
+    let arrImage = [
+
+        'http://localhost:8080/public/images/1669193555912v_ng_23.png',
+        'http://localhost:8080/public/images/laptop-png-8.png',
+        'http://localhost:8080/public/images/16691948910721.png'
+    ]
     const [arrCate, setArrCate] = useState();
     useEffect(() => {
         const fetchData = async () => {
@@ -34,7 +43,7 @@ const ExPopularCate = () => {
             }
         }
         fetchData();
-    },[])
+    }, [])
 
 
     return (
@@ -49,7 +58,8 @@ const ExPopularCate = () => {
                                     <div className="cat-block">
                                         <figure>
                                             <span>
-                                                <img src={hinh} alt="Category image" />
+                                                <img src={arrImage[index]} alt="Category image"
+                                                    style={{ width: '100px', heigth: '100px' }} />
                                             </span>
                                         </figure>
 

@@ -8,7 +8,7 @@ const NavBar = () => {
         { id: '001', name: 'Trang chủ', link: path.HOME },
         { id: '002', name: 'Sản phẩm', link: path.PRODUCT },
         { id: '003', name: 'Liên hệ', link: path.CONTACT },
-        // { id: '004', name: 'Phụ kiện', link: path.TABLET }
+        { id: '004', name: 'Blog', link: path.BLOG }
     ]
 
     // Sticky Navigation Bar

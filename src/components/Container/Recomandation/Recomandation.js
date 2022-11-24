@@ -1,6 +1,7 @@
 import p1 from "../../../assets/images/demos/demo-4/products/product-10.jpg";
+import { path } from "../../../utils/constant"
 
-const Recomandation = () => {
+const Recomandation = (props) => {
 
     const arrItem = [
         {
@@ -45,19 +46,19 @@ const Recomandation = () => {
                     <div className="heading-left">
                         <h2 className="title">GỢI Ý HÔM NAY</h2>
                     </div>
-                    <div className="heading-right">
+                    {/* <div className="heading-right">
                         <a href="/" className="title-link">Xem thêm <i className="icon-long-arrow-right"></i></a>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="products">
                     <div className="row justify-content-center">
-                        {arrItem && arrItem.map((item, index) => {
+                        {props.arrProduct && props.arrProduct.slice(0, 8).map((item, index) => {
                             return (
-                                <div className="col-6 col-md-4 col-lg-3" key={item.id}>
+                                <div className="col-6 col-md-4 col-lg-3" key={item._id}>
                                     <div className="product product-2">
                                         <figure className="product-media">
                                             <a href="/">
-                                                <img src={p1} alt="Product image" className="product-image" />
+                                                <img src={path.SERVER_URL + '/' + item.thumb} alt="Product image" className="product-image" />
                                             </a>
                                             <div className="product-action">
                                                 <a href="#" className="btn-product btn-cart" title="Add to cart"><span>Thêm vào giỏ</span></a>
@@ -66,17 +67,17 @@ const Recomandation = () => {
                                         </figure>
                                         <div className="product-body">
                                             <div className="product-cat">
-                                                <a href="#">{item.cate}</a>
+                                                <a href="#">{item.category.name}</a>
                                             </div>
-                                            <h3 className="product-title"><a href="product.html">{item.tittle}</a></h3>
-                                            <div className="product-price">
+                                            <h3 className="product-title"><a href="product.html">{item.name}</a></h3>
+                                            {/* <div className="product-price">
                                                 $214.49
-                                            </div>
+                                            </div> */}
                                             <div className="ratings-container">
                                                 <div className="ratings">
-                                                    <div className="ratings-val" style={{ width: item.rating }}></div>
+                                                    <div className="ratings-val" style={{ width: '100%' }}></div>
                                                 </div>
-                                                <span className="ratings-text">( {item.review} Reviews )</span>
+                                                <span className="ratings-text">( {'5'} Reviews )</span>
                                             </div>
                                         </div>
                                     </div>

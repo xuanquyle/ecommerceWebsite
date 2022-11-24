@@ -18686,6 +18686,7 @@ button:focus {
 .icon-envira:before {
     content: '\f299'
 }
+
 /* .icon-signout {
     position: relative;
 }*/
@@ -18693,7 +18694,7 @@ button:focus {
     content: "\f08b";
     font-family: FontAwesome !important;
     font-size: 2.5rem
-} 
+}
 
 .icon-glide:before {
     content: '\f2a5'
@@ -20181,3 +20182,42 @@ input[type=email]:disabled,
 input[type=number]:disabled {
     background: #fff;
 } */
+.productrending {
+    max-height: 395px !important;
+    min-height: 395px !important;
+    /* heig
+    ht: 100% !important; */
+}
+
+
+.product-2 {
+    background-color: #fff;
+}
+
+.product-2 .product-media,
+.productrending .product-media {
+    padding: 75px 0px;
+    background-color: #fff;
+}
+
+.product-2 .product-media a {
+    display: flex;
+    justify-content: center;
+}
+.productrending .product-media {
+    max-height: 50%;
+    padding: 0;
+    margin: 25px;
+}
+.productrending  .product-body {
+    margin: 50px 0px;
+}
+.productrending .product-media img, .productrending .product-media a img  {
+    height: 150px ;
+}
+.product-2 .product-media a img {
+    width: 70%;
+}
+.productrending .product-media a img {
+    width: 100%;
+}

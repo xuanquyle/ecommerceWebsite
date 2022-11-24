@@ -26,6 +26,7 @@ const Filters = (props) => {
         { id: '000', ram: 'ALL', content: 'Tất cả' },
         { id: '001', ram: '2', content: '2GB' },
         { id: '002', ram: '4', content: '4GB' },
+        { id: '003', ram: '6', content: '6GB' },
         { id: '005', ram: '8', content: '8GB' },
         { id: '004', ram: '12', content: '12GB' },
         { id: '006', ram: '16', content: '16GB' },

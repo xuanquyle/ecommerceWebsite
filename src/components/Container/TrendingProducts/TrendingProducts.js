@@ -3,13 +3,39 @@ import p2 from "../../../assets/images/demos/demo-4/products/product-6.jpg";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import { path } from "../../../utils/constant"
 
-const TrendingProducts = () => {
+const TrendingProducts = (props) => {
     const settings = {
         infinite: true,
         speed: 500,
         slidesToShow: 4,
         slidesToScroll: 4,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 3,
+                    infinite: true,
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    initialSlide: 2
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
     };
     const arr = [
         { id: '001', image: '', cate: 'Điện thoại', tittle: 'Bose - SoundSport  wireless headphones', price: '199.99', rating_val: '80%', rating_text: '4' },
@@ -23,11 +49,12 @@ const TrendingProducts = () => {
         alert('a');
     }
     return (
+        props.arrProduct &&
         <>
             <div className="mb-5"></div>
 
             <div className="pt-5 pb-6"
-            style={{backgroundColor: 'rgb(211, 228, 243)'}}>
+                style={{ backgroundColor: 'rgb(211, 228, 243)' }}>
                 <div className="container trending-products">
                     <div className="heading heading-flex mb-5">
                         <div className="heading-left">
@@ -47,11 +74,13 @@ const TrendingProducts = () => {
                                 <div className="tab-pane p-0 fade show active" id="trending-top-tab" role="tabpanel" aria-labelledby="trending-top-link">
                                     <div className="owl-carousel owl-full carousel-equal-height carousel-with-shadow" data-toggle="owl" >
                                         <Slider {...settings}>
-                                            {arr && arr.map((item, index) => {
+                                            {props.arrProduct && props.arrProduct.map((item, index) => {
                                                 return (
-                                                    <div className="product product-2" key={item.id}>
+                                                    <div className="product product-2 productrending" key={item._id}
+                                                        style={{ height: '390px !important' }}>
                                                         <figure className="product-media">
-                                                            <img src={p2} alt="Product image"
+                                                            <img src={path.SERVER_URL + '/' + item.thumb} alt="Product image"
+                                                                style={{ maxHeight: '70%' }}
                                                                 className="product-image"
                                                                 onClick={(e) => { addClick() }} />
 
@@ -61,19 +90,21 @@ const TrendingProducts = () => {
                                                             </div>
                                                         </figure>
 
-                                                        <div className="product-body">
+                                                        <div className="product-body"
+                                                        // style={{width: '160px'}}
+                                                        >
                                                             <div className="product-cat">
-                                                                <a href="#">{item.cate}</a>
+                                                                <a href="#">{item.category.name}</a>
                                                             </div>
-                                                            <h3 className="product-title"><a href="product.html">{item.tittle}</a></h3>
-                                                            <div className="product-price">
-                                                                ${item.price}
-                                                            </div>
+                                                            <h3 className="product-title"><a href="product.html">{item.name}</a></h3>
+                                                            {/* <div className="product-price">
+                                                                {item.name}
+                                                            </div> */}
                                                             <div className="ratings-container">
                                                                 <div className="ratings">
-                                                                    <div className="ratings-val" style={{ width: item.rating_val }}></div>
+                                                                    <div className="ratings-val" style={{ width: '80%' }}></div>
                                                                 </div>
-                                                                <span className="ratings-text">( {item.rating_text} Reviews )</span>
+                                                                <span className="ratings-text">( {'10'} Reviews )</span>
                                                             </div>
 
                                                             {/* <div className="product-nav product-nav-dots">

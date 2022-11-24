@@ -5,7 +5,7 @@ const Login = (data) => {
     return (
         axios({
             method: 'post',
-            url: `http://localhost:8080/api/users/login`,
+            url: `http://localhost:8080/api/users/auth/login`,
             data: data
         })
     )
@@ -19,7 +19,7 @@ const getProfileUser = (accessToken, id) => {
                 "token": `Bearer ${accessToken}`
             },
             method: 'get',
-            url: `http://localhost:8080/api/users/${id}`,
+            url: `http://localhost:8080/api/users/me/${id}`,
         })
     )
 }
@@ -31,7 +31,7 @@ const updateProfile = (accessToken, id, data) => {
                 "token": `Bearer ${accessToken}`
             },
             method: 'put',
-            url: `http://localhost:8080/api/users/${id}`,
+            url: `http://localhost:8080/api/users/me/${id}`,
             data: data
         })
     )
@@ -57,7 +57,7 @@ const deleteAddress = (accessToken, idUser, idAddress) => {
                 "token": `Bearer ${accessToken}`
             },
             method: 'delete',
-            url: `http://localhost:8080/api/users/address/${idUser}/delete/${idAddress}`,
+            url: `http://localhost:8080/api/users/me/${idUser}/address/${idAddress}`,
         })
     )
 }
@@ -85,7 +85,7 @@ const createAddress = (accessToken, id, data) => {
                 "token": `Bearer ${accessToken}`
             },
             method: 'post',
-            url: `http://localhost:8080/api/users/address/${id}/add`,
+            url: `http://localhost:8080/api/users/me/${id}/address`,
             data: data
         })
     )
@@ -100,8 +100,8 @@ const getAllProduct = () => {
 const getFiltersProduct = (params) => {
     const paramsData = new URLSearchParams({
         category: params.cate === 'ALL' ? '' : params.cate,
-        max_price: params.price === 'ALL' ? '' : Number(params.price * 1000000000),
-        min_price: params.price === 'ALL' ? '' : Number((params.price - 5) * 1000000000),
+        max_price: params.price === 'ALL' ? '' : Number(params.price * 1000000),
+        min_price: params.price === 'ALL' ? '' : Number((params.price - 5) * 1000000),
         max_ram: params.ram === 'ALL' ? '' : params.ram,
         min_ram: params.ram === 'ALL' ? '' : params.ram,
         max_rom: params.rom === 'ALL' ? '' : params.rom,
@@ -133,8 +133,51 @@ const getAllCategories = () => {
 const getAddress = () => {
     return axios.get(`http://localhost:8080/api/categories`)
 }
+
+// CART
+const addToCart = (accessToken, id, data) => {
+    return (
+        axios({
+            headers: {
+                // 'content-type': 'multipart/form-data',
+                "Access-Control-Allow-Origin": "*",
+                "token": `Bearer ${accessToken}`
+            },
+            method: 'post',
+            url: `http://localhost:8080/api/carts/me/${id}`,
+            data: data
+        })
+    )
+}
+const getCartById = (accessToken, id,) => {
+    return (
+        axios({
+            headers: {
+                // 'content-type': 'multipart/form-data',
+                "Access-Control-Allow-Origin": "*",
+                "token": `Bearer ${accessToken}`
+            },
+            method: 'get',
+            url: `http://localhost:8080/api/carts/me/${id}`,
+        })
+    )
+}
+
+const deleteItemInCart = (accessToken, id, data) => {
+    return (
+        axios({
+            headers: {
+                // 'content-type': 'multipart/form-data',
+                "Access-Control-Allow-Origin": "*",
+                "token": `Bearer ${accessToken}`
+            },
+            method: 'delete',
+            url: `http://localhost:8080/api/carts/${id}/add`,
+        })
+    )
+}
 // 
 export {
     getAllProvinces, getDistrict, getAllProduct, getProductBySlug, getAllCategories, getWard, Login,
-    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct
+    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct, addToCart, getCartById
 }

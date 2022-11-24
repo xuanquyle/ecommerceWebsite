@@ -86,17 +86,17 @@ const Address = (props) => {
                                     return (
                                         <tr key={item._id}>
                                             <td className="product-col">
-                                                <div className="product">
+                                                <div className="product1">
                                                     {item.customer_name}
                                                 </div>
                                             </td>
                                             <td className="product-col">
-                                                <div className="product">
+                                                <div className="product1">
                                                     {item.customer_phone}
                                                 </div>
                                             </td>
                                             <td className="product-col">
-                                                <div className="product">
+                                                <div className="product1">
                                                     {item.address}
                                                 </div>
                                             </td>

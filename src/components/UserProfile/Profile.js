@@ -22,13 +22,16 @@ const Profile = (props) => {
     }
     const onSubmit = async (data) => {
         // console.log('data submit profile', data)
-        try {
-            const rep = await updateProfile(props.user.isLoggedIn, props.user.id, data);
-            getProfile();
-            setIsEdit(false)
-            notify('info', 'Cập nhập thông tin thành công')
-        } catch (error) {
+        if (window.confirm('Bạn có thêm địa chỉ này ?')) {
+            // console.log("data Submit address", dataAddress)
+            try {
+                const rep = await updateProfile(props.user.isLoggedIn, props.user.id, data);
+                getProfile();
+                setIsEdit(false)
+                notify('info', 'Cập nhập thông tin thành công')
+            } catch (error) {
 
+            }
         }
     }
 
@@ -104,7 +107,7 @@ const Profile = (props) => {
                                             // defaultValue={profile.birth}
                                             disabled={isEdit ? '' : 'disabled'}
                                             {...register("birth", {
-                                                value: (new Date(profile.birth)).toISOString().substring(0,10)
+                                                value: (new Date(profile.birth)).toISOString().substring(0, 10)
                                                 // required: true,
                                             })} />
                                     </div>

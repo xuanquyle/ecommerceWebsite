@@ -5,6 +5,7 @@ import queryString from "query-string"
 import { getFiltersProduct } from "../../api";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { filter as funFilter } from "../../store/actions/filterAction"
+import { path } from "../../utils/constant"
 
 
 const Laptop = (props) => {
@@ -88,8 +89,9 @@ const Laptop = (props) => {
     const fetchDataProductFilters = async () => {
         try {
             let arrProduct = await getFiltersProduct(props.filters);
-            // console.log("FILTWERS", arrProduct)
+            // console.log("FILTWERS", Object.keys(arrProduct.data).length)
             setArrProduct(arrProduct.data);
+            setPagination({ ...pagination, totalRow: Object.keys(arrProduct.data).length })
         } catch (error) {
 
         }
@@ -107,10 +109,13 @@ const Laptop = (props) => {
                         {arrProduct && arrProduct.slice(filter.limit * (filter.page - 1), filter.limit * (filter.page - 1) + filter.limit).map((item, index) => {
                             return (
                                 <div className="col-6 col-md-4 col-lg-3" key={item._id}>
-                                    <div className="product product-2">
-                                        <figure className="product-media">
-                                            <a href="/">
-                                                <img src={p1} alt="Product" className="product-image" />
+                                    <div className="product product-2"
+                                        style={{ backgroundColor: '#fff' }}>
+                                        <figure className="product-media pt-3 pb-3"
+                                            style={{ backgroundColor: '#fff' }}>
+                                            <a href="/" className="d-flex justify-content-center">
+                                                <img src={path.SERVER_URL + '/' + item.thumb} alt="Product" className="product-image"
+                                                style={{width: '70%'}} />
                                             </a>
                                             {/* <div className="product-action">
                                                 <a href="#" className="btn-product btn-cart" title="Add to cart"><span>Thêm vào giỏ</span></a>
