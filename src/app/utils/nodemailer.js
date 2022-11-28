@@ -1,12 +1,13 @@
-const nodeMailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const mailConfig = require('../../config/mail');
-require('dotenv/config');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const sendMail = (to, subject, htmlContent) => {
-    const transport = nodeMailer.createTransport({
+    const transport = nodemailer.createTransport({
         host: mailConfig.HOST,
         port: mailConfig.PORT,
-        secure: false,
+        secure:false,
         auth: {
             user: mailConfig.USERNAME,
             pass: mailConfig.PASSWORD,
@@ -17,9 +18,8 @@ const sendMail = (to, subject, htmlContent) => {
         from: mailConfig.FROM_ADDRESS,
         to: to,
         subject: subject,
-        text: '',
         html: htmlContent
     }
-    transport.sendMail(options);
+    return transport.sendMail(options)
 }
-module.exports = { sendMail }
+module.exports = {sendMail}

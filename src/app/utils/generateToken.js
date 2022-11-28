@@ -7,7 +7,7 @@ module.exports = {
                 isAdmin:user.isAdmin
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: "2m" }
+            { expiresIn: process.env.JWT_ACCESS_TIME }
         );
     },
 
@@ -18,7 +18,7 @@ module.exports = {
                 isAdmin:user.isAdmin
             },
             process.env.JWT_REFRESH_KEY,
-            { expiresIn: "1w" }
+            { expiresIn: process.env.JWT_REFRESH_TIME }
         );
     }
 }

@@ -7,7 +7,8 @@ const Tokens = require('../models/token.model')
 const validate = require('email-validator');
 const jwt = require('jsonwebtoken');
 const mailer = require('../utils/nodemailer');
-const mailContent = require('../utils/email');
+const mailContent = require('../utils/templateEmail');
+const schedule = require('node-schedule')
 const dotenv = require('dotenv');
 dotenv.config();
 // let refreshTokens = [];
@@ -22,7 +23,6 @@ class UserController {
             const validPassword = await bcrypt.compare(req.body.password, user.password);
             if (!validPassword) throw new ErrorHandler.ForbiddenError('Sai mật khẩu. Vui lòng đăng nhập lại');
             if (user.deleted) throw new ErrorHandler.NotFoundError('Tài khoản đã bị khóa. Vui lòng liên hệ với chúng tôi để biết rõ nguyên nhân')
-            if (user.verifiedAt === null) throw new ErrorHandler.ForbiddenError('Tài khoản chưa được xác thực. Vui lòng kiểm tra email');
             if (user && validPassword && user.verifiedAt) {
                 const accessToken = generateToken.generateAccessToken(user);
                 const refreshToken = generateToken.generateRefreshToken(user);
@@ -37,18 +37,17 @@ class UserController {
                 const expired_at = new Date();
                 expired_at.setDate(expired_at.getDate() + 7);
 
-                const newToken = new Tokens({
+                const newRefreshToken = new Tokens({
                     user: user._id,
-                    token: refreshToken,
+                    refreshToken: refreshToken,
                     expiredAt: expired_at
                 })
-                const savedTokens = await newToken.save()
-                if (!savedTokens) throw new ErrorHandler.BadRequestError('Có lỗi xảy ra. Vui lòng đăng nhập lại')
+                const savedRefreshTokens = await newRefreshToken.save()
+                if (!savedRefreshTokens) throw new ErrorHandler.BadRequestError('Có lỗi xảy ra. Vui lòng đăng nhập lại')
 
                 const { password, ...orther } = user._doc;
                 return res.status(200).json({ ...orther, accessToken });
             }
-
         } catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
         }
@@ -81,14 +80,42 @@ class UserController {
             if (!user) throw new ErrorHandler.ServerError('Không thể đăng ký. Vui lòng kiểm tra lại');
 
             const hashedEmail = await bcrypt.hash(user.email, parseInt(process.env.BCRYPT_SALT_ROUND));
-            if (!hashedEmail) throw new ErrorHandler.ServerError('Không thể đăng ký ngay lúc này. Vui lòng kiểm tra lại');
+            if (!hashedEmail) throw new ErrorHandler.BadRequestError('Không thể đăng ký ngay lúc này. Vui lòng kiểm tra lại');
             const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/auth/verify?email=${user.email}&token=${hashedEmail}`;
 
+            let scheduledJob = schedule.scheduleJob(`*/${process.env.EMAIL_VERIFY_EXPIED_TIME} * * * *`, async () => {
+                console.log('Job run');
+                await Users.findOneAndDelete({ _id: user._id, verifiedAt: null });
+                scheduledJob.cancel();
+            });
+            const content = 'Bạn đang yêu cầu đăng ký tài khoản tại Mola shop. Vui lòng nhấp vào nút bên dưới để xác minh địa chỉ email của bạn'
             const subject = `VERIFY YOUR EMAIL FOR COUNTINUE SHOP`;
-            mailer.sendMail(user.email, subject, mailContent(url))
+            const sended = await mailer.sendMail(user.email, subject, mailContent(url, content, `Verify Your Email`, user.email))
+            if (!sended) throw new ErrorHandler.BadRequestError('Không thể xác thực email, vui lòng thử lại')
             res.status(200).json("Vui lòng kiểm tra email để xác thực tài khoản")
         } catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
+        }
+    }
+    async forgotPassword(req, res, next) {
+        try {
+            const user = await Users.findOne({ email: req.params.email })
+            if (!user) throw new ErrorHandler.BadRequestError('Không tìm thấy email người dùng')
+            const resetPasswordToken = jwt.sign(
+                {
+                    email: user.email,
+                },
+                process.env.JWT_RESET_KEY,
+                { expiresIn: process.env.JWT_RESET_TIME }
+            );
+            const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/auth/verify-reset-password?email=${user.email}&token=${resetPasswordToken}`;
+            const content = 'Bạn đang yêu cầu đặt lại mật khẩu tại Mola shop. Vui lòng nhấp vào nút bên dưới để tiếp tục'
+            const subject = `CONFIRM RESET PASSWORD`;
+            const sended = await mailer.sendMail(user.email, subject, mailContent(url, content, `RESET YOUR ACCOUNT PASSWORD`, user.email))
+            if (!sended) throw new ErrorHandler.BadRequestError('Không thể xác thực email, vui lòng thử lại')
+            res.status(200).json("Vui lòng kiểm tra email để tiếp tục")
+        } catch (error) {
+            throw new ErrorHandler.BadRequestError(err.message);
         }
     }
     async changePassword(req, res, next) {
@@ -118,12 +145,11 @@ class UserController {
         } catch (error) {
             throw new ErrorHandler.BadRequestError(error.message)
         }
-
     }
 
     async getAllUser(req, res, next) {
         try {
-            const users = await Users.find()
+            const users = await Users.findWithDeleted()
             if (!users.length) throw new ErrorHandler.NotFoundError('User not found')
             const allUser = users.map(user => {
                 const { password, ...orther } = user._doc;
@@ -235,53 +261,102 @@ class UserController {
 
     // REQUEST REFRESH TOKEN
     async requestRefreshToken(req, res, next) {
-        const refreshToken = req.cookies.refreshToken;
-        const accessToken = req.headers.token;
-        //Send error if token is not valid
-        if (!refreshToken) throw new ErrorHandler.ForbiddenError("Bạn chưa đăng nhập");
-        if (!accessToken) throw new ErrorHandler.ForbiddenError("Hết thời gian chờ. Vui lòng đăng nhập lại");
+        try {
+            const refreshToken = req.cookies.refreshToken;
+            if (!req.headers.token) throw new ErrorHandler.ForbiddenError("Bạn chưa đăng nhập");
+            //Send error if token is not valid
+            if (!refreshToken) throw new ErrorHandler.ForbiddenError("Bạn chưa đăng nhập");
+            const accessToken = jwt.verify(req.headers.token.split(" ")[1], process.env.JWT_ACCESS_KEY)
+            if (!accessToken) throw new ErrorHandler.ForbiddenError("Vui lòng đăng nhập");
 
-        const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
-        if (!payload) throw new ErrorHandler.ForbiddenError('Bạn không có quyền truy cập');
-        const tokenExist = await Tokens.findOne({
-            user: payload._id,
-            token: refreshToken,
-            expiredAt: { $gte: new Date() }
-        })
-        if (!tokenExist) throw new ErrorHandler.ForbiddenError('Không thể xác thực');
-        const newAccessToken = generateToken.generateAccessToken({ _id: payload._id, isAdmin: payload.isAdmin });
-        const newRefreshToken = generateToken.generateRefreshToken({ _id: payload._id, isAdmin: payload.isAdmin });
-        res.cookie("refreshToken", newRefreshToken, {
-            httpOnly: true,
-            secure: false,
-            path: "/",
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
-        res.status(200).json({
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-        });
+            const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY);
+            if (!payload) throw new ErrorHandler.ForbiddenError("Bạn chưa đăng nhập");
+            const tokenExist = await Tokens.findOne({
+                user: payload._id,
+                refreshToken: refreshToken,
+                expiredAt: { $gte: Date.now() }
+            })
+            if (!tokenExist) throw new ErrorHandler.ForbiddenError('Không thể thực hiện yêu cầu. Vui lòng đăng nhập lại');
+            const newAccessToken = generateToken.generateAccessToken({ _id: payload._id, isAdmin: payload.isAdmin });
+            const newRefreshToken = generateToken.generateRefreshToken({ _id: payload._id, isAdmin: payload.isAdmin });
+            res.cookie("refreshToken", newRefreshToken, {
+                httpOnly: true,
+                secure: false,
+                path: "/",
+                sameSite: "strict",
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            });
+            const expired_at = new Date();
+            expired_at.setDate(expired_at.getDate() + 7);
+            await Tokens.insertMany({ user: payload._id, refreshToken: newRefreshToken, expiredAt:expired_at })
+            res.status(200).json({
+                accessToken: newAccessToken,
+                refreshToken: newRefreshToken,
+            });
+        }
+        catch (error) {
+            throw new ErrorHandler.BadRequestError(error.message)
+        }
     }
 
 
     // Email verification
-    verifyEmail(req, res, next) {
+    async verifyEmail(req, res, next) {
         try {
-            bcrypt.compare(req.query.email, req.query.token, async (err, result) => {
-                if (result == false) throw new ErrorHandler.ForbiddenError('Không thể xác thực tài khoản. Vui lòng thử lại')
-                {
-                    const user = await Users.findOne({ email: req.query.email });
-                    if (!user) throw new ErrorHandler.NotFoundError('User not found')
-                    user.verifiedAt = Date.now()
-                    const registeredUser = await user.save()
-                    if (!registeredUser) throw new ErrorHandler.ServerError('Có lỗi, vui lòng thử lại sau')
-                    res.status(200).json(`Xác thực thành công tài khoản email ${req.query.email}`)
-                }
-            })
+            const verifiedUser = await bcrypt.compare(req.query.email, req.query.token)
+            if (!verifiedUser) throw new ErrorHandler.ForbiddenError('Không thể xác thực tài khoản. Vui lòng thử lại')
+            const user = await Users.findOne({ email: req.query.email });
+            if (!user) throw new ErrorHandler.NotFoundError('User not found')
+            user.verifiedAt = Date.now()
+            const registeredUser = await user.save()
+            if (!registeredUser) throw new ErrorHandler.ServerError('Có lỗi, vui lòng thử lại sau')
+            res.status(200).json(`Xác thực thành công tài khoản email ${req.query.email}`)
         }
         catch (err) {
             throw ErrorHandler.BadRequestError(err.message)
+        }
+    }
+    async verifyResetPassword(req, res, next) {
+        try {
+            const { email, token } = req.query;
+            res.cookie("resetToken", token, {
+                httpOnly: true,
+                secure: false,
+                path: "/",
+                sameSite: "strict",
+                maxAge: 5 * 60 * 1000
+            });
+            res.cookie("email", email, {
+                httpOnly: true,
+                secure: false,
+                path: "/",
+                sameSite: "strict",
+                maxAge: 5 * 60 * 1000
+            });
+
+            res.json('Xác nhận email thành công. 5p đổi mật khẩu')
+        } catch (error) {
+            throw new ErrorHandler.BadRequestError(error.message)
+        }
+    }
+    async resetPassword(req, res, next) {
+        try {
+            const resetToken = req.cookies.resetToken
+            const email = req.cookies.email
+            if (!resetToken) throw new ErrorHandler.BadRequestError('Không có token')
+            const payload = jwt.verify(resetToken, process.env.JWT_RESET_KEY)
+            if (!payload) throw new ErrorHandler.BadRequestError('Mã xác thực không đúng hoặc hết hạn')
+            if (!payload.email === email) throw new ErrorHandler.BadRequestError('token không đúng')
+            const user = await Users.findOne({ email: email })
+            if (!user) throw new ErrorHandler.BadRequestError('Không tìm thấy email tài khoản')
+            const hashed = await bcrypt.hash(req.body.newPassword, parseInt(process.env.BCRYPT_SALT_ROUND))
+            user.password = hashed;
+            const changedUser = await user.save();
+            if (!changedUser) throw new ErrorHandler.BadRequestError('Không thể lưu mật khẩu mới')
+            res.status(200).json('Đổi mật khẩu thành công')
+        }
+        catch (error) {
+            throw new ErrorHandler.BadRequestError(error.message)
         }
     }
 }

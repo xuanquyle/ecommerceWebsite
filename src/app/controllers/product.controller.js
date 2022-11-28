@@ -112,7 +112,6 @@ class ProductController {
                         ram: option.ram,
                         price: option.price,
                         qty: option.qty,
-                        image: option.image
                     }
                     if (!options.filter(value =>
                         value.color == option.color
@@ -178,21 +177,22 @@ class ProductController {
     // [PUT] /product/:id
     async updateProduct(req, res, next) {
         try {
+            const data = JSON.parse(req.body.data)
             const updateProduct = await Products.findByIdAndUpdate(
                 req.params.id,
                 {
                     $set: {
-                        name: req.body.name,
-                        description: req.body.description,
-                        short_description: req.body.short_description,
-                        thumb: req.file.filename,
-                        category: req.body.category,
-                        options: req.body.options
+                        name: data.name,
+                        description: data.description,
+                        short_description: data.short_description,
+                        thumb: req.file ? `public / images /${req.file.filename}` : '',
+                        category: data.category,
+                        options: data.options
                     }
                 }
             )
             if (!updateProduct) throw new ErrorHandler.NotFoundError('Product not found')
-            if (fs.existsSync(`src / public / images / ${updateProduct.thumb}`))
+            if (req.file&&fs.existsSync(`src / public / images / ${updateProduct.thumb}`))
                 fs.unlink(`src / public / images / ${updateProduct.thumb}`, (err) => {
                     if (err) throw new Error(err.message);
                 });

@@ -1,4 +1,5 @@
-const dotenv = require('dotenv/config')
+const dotenv = require('dotenv');
+dotenv.config();
 module.exports = {
     MAILER: process.env.MAIL_MAILER,
     HOST: process.env.MAIL_HOST,

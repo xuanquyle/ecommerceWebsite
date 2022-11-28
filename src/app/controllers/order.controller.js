@@ -31,15 +31,18 @@ class OrderController {
             req.query.hasOwnProperty('successDelivered') ? filter = { "status.successDeliveredAt": { "$ne": null } } : filter = filter;
             req.query.hasOwnProperty('canceled') ? filter = { "canceledAt": { "$ne": null } } : filter = filter;
             Object.assign(filter, { user: req.params.id })
-            const order = await Orders.findOne(filter).populate('user').populate('orderItems.product')
-            if (!order) {
+            let orders = await Orders.find(filter).populate('user').populate('orderItems.product')
+            if (!orders.length) {
                 res.status(200);
                 throw new ErrorHandler.NoData('No orders yet')
             }
-            const { user, ...orther } = order._doc;
-            const { password, ...user_orther } = user._doc;
-            const userOrder = Object.assign({}, { ...orther }, { user: { ...user_orther } });
-            res.status(200).json(userOrder)
+            orders = orders.map(order => {
+                const { user, ...orther } = order._doc;
+                const { password, ...user_orther } = user._doc;
+                order = Object.assign({}, { ...orther }, { user: { ...user_orther } });
+                return order
+            })
+            res.status(200).json(orders)
         }
         catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
@@ -48,7 +51,6 @@ class OrderController {
     }
     async createOrder(req, res, next) {
         try {
-
             //check user exists
             const userExist = await Users.findById(req.params.id)
             if (!userExist) throw new ErrorHandler.NotFoundError('Không tìm thấy thông tin tài khoản của bạn')
@@ -80,7 +82,9 @@ class OrderController {
                 shippingAddress: req.body.shippingAddress,
                 shippingPrice: req.body.shippingPrice,
                 totalPrice: req.body.totalPrice,
-                paymentMethod: req.body.paymentMethod
+                paymentMethod: req.body.paymentMethod,
+                customer_name: req.body.customer_name,
+                customer_phone: req.body.customer_phone
             })
             const createdOrder = await newOder.save()
             if (!createdOrder)

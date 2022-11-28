@@ -2,7 +2,7 @@ const Carts = require('../models/cart.model')
 const Products = require('../models/product.model')
 const Users = require('../models/user.model')
 const mongoose = require('mongoose')
-const ObjectId = mongoose.Schema.ObjectId;
+const ObjectId = mongoose.Types.ObjectId;
 const ErrorHandler = require('../errors/errorHandler')
 class CartController {
     async getUserCart(req, res, next) {
@@ -53,12 +53,13 @@ class CartController {
     }
     async updateCart(req, res, next) {
         try {
+
             if (req.body.qty && req.body.qty > 0) {
                 const updatedCart = await Carts.findOneAndUpdate({
                     user: req.params.id,
                     cartItems: {
                         $elemMatch: {
-                            _id: req.body.id
+                            _id: req.body._id
                         }
                     }
                 }, {
@@ -70,23 +71,13 @@ class CartController {
                 res.status(200).json(updatedCart)
             }
             else {
-                if (req.body.qty === 0) {
-                    const updatedCart = await Products.findByIdAndUpdate(req.params.id,
-                        {
-                            "$pull":
-                            {
-                                options: {
-                                    $elemMatch:
-                                        { _id: new ObjectId(req.body.option_id) }
-                                }
-                            }
-                        },
-                        { safe: true, multi: true }, (err, product) => {
-                            if (!err) {
-                                res.status(200).json(updatedCart)
-                            }
-                            else throw new ErrorHandler.BadRequestError(err.message)
-                        });
+                if (req.body.qty == 0) {
+                    let cart = await Carts.findOne({ user: req.params.id })
+                    if (!cart) throw new ErrorHandler.NotFoundError("Không tìm thấy sản phẩm trong giỏ hàng")
+                    cart.cartItems = cart.cartItems.filter(item => item._id != req.body._id)
+                    const updatedCart = cart.save();
+                    if (!updatedCart) throw new ErrorHandler.BadRequestError('Không thể update')
+                    res.status(200).json('Đã cập nhật giỏ hàng')
                 }
             }
             throw new ErrorHandler.BadRequestError('Không thể cập nhật giỏ hàng')
@@ -97,24 +88,12 @@ class CartController {
     }
     async deleteCart(req, res, next) {
         try {
-            const deletedCart = await Carts.findOneAndUpdate(
-                {
-                    user: req.params.id,
-                    cartItems: {
-                        $elemMatch: {
-                            _id: req.body.id
-                        }
-                    }
-                },
-                {
-                    "$pull":
-                    {
-                        cartItems: { _id: req.body.id }
-                    }
-                },
-                { safe: true, multi: true })
-            if (!deletedCart) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm trong giỏ hàng')
-            res.status(200).json(`Xóa sản phẩm #${deletedCart._id} khỏi giỏ hàng thành công`)
+            let cart = await Carts.findOne({ user: req.params.id })
+            if (!cart) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm')
+            cart.cartItems = cart.cartItems.filter(item => item._id != req.body._id)
+            const newCart = await cart.save();
+            if (!newCart) throw new ErrorHandler.BadRequestError('Không thể xóa sản phẩm')
+            res.status(200).json(`Xóa sản phẩm #${req.body._id} khỏi giỏ hàng thành công`)
         } catch (error) {
             throw new ErrorHandler.BadRequestError(error.message)
         }
