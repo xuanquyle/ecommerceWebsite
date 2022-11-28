@@ -3,11 +3,17 @@ import axios from "axios"
 import hinh from "../assets/images/products/table/product-1.jpg"
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form';
-import { connect } from "react-redux";
-import { getCartById, getProfileUser } from '../api';
-import { path } from '../utils/constant';
+import { getCartById, getProfileUser, addOrder, deleteItemInCart } from '../api';
+import { notify, path } from '../utils/constant';
+import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { connect, useDispatch, useSelector } from "react-redux";
+import { cart as cartAction } from "../store/actions/cartAction"
 
 const Cart = (props) => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch();
+    const userselector = useSelector(state => state);
     const { register, handleSubmit, reset, setValue, control, formState: { errors } } = useForm();
     const [cart, setCart] = useState();
     const [curOption, setCurOption] = useState(0);
@@ -22,15 +28,15 @@ const Cart = (props) => {
         shippingAddress: '',
         totalPrice: '',
         email: '',
-        phone: '',
-        address: '',
-        name: ''
+        customer_phone: '',
+        customer_name: '',
+        shippingPrice: 0,
     })
     const onChaneQuantity = (event, op) => {
         const temp = cart.map(item =>
             item.id === op.id ? { ...item, quantity: event.target.value } : item
         )
-        console.log(temp)
+        // console.log(temp)
         setCart(temp);
     }
 
@@ -57,7 +63,7 @@ const Cart = (props) => {
         setIsOrder(!isOrder)
     }
     const fetchDataCart = async () => {
-        console.log(props.user.isLoggedIn, props.user.id)
+        // console.log(props.user.isLoggedIn, props.user.id)
         try {
             const rep = await getCartById(props.user.isLoggedIn, props.user.id)
             setCart(rep.data[0])
@@ -74,7 +80,11 @@ const Cart = (props) => {
             })
             setTotalPrice(totalTemp)
             setCurOption(temp)
-            console.log(temp);
+            localStorage.removeItem('amoutInCart');
+            localStorage.setItem('amoutInCart', JSON.stringify(rep.data[0].cartItems.length));
+            let data = {amountIncart: rep.data[0].cartItems.length}
+            dispatch(cartAction(data));
+            // console.log(temp);
         } catch (error) {
 
         }
@@ -84,23 +94,50 @@ const Cart = (props) => {
         setName(address.addresses[e].customer_name)
         setPhone(address.addresses[e].customer_phone)
     }
-    const onSubmitOrder = (data) => {
-        setOrder({
+    const onSubmitOrder = async (data) => {
+        const newData = ({
             ...order,
             email: data.email,
-            phone: data.phone,
-            address: data.address,
-            name: data.name
+            customer_phone: data.phone,
+            shippingAddress: data.shippingAddress,
+            customer_name: data.name,
+            shippingPrice: 0,
         })
-        console.log("data submit", data, order)
+        // console.log(newData)
+        if (window.confirm('Bạn có chắc muốn đặt hàng ?')) {
+            try {
+                let res = await addOrder(props.user.isLoggedIn, props.user.id, newData)
+                // console.log(res);
+                setIsOrder(false);
+                fetchDataCart();
+                notify('success', 'Đặt hàng thành công !')
+            } catch (error) {
+
+            }
+        }
+        // console.log("data submit", data, order)
     }
     useEffect(() => {
         fetchDataCart();
     }, [])
 
+    const removeItemInCart = async (item) => {
+        if (window.confirm('Bạn có chắc muốn xóa sản phẩm này ra khỏi giỏ ?')) {
+            console.log('check item', item);
+            try {
+                let res = await deleteItemInCart(props.user.isLoggedIn, props.user.id, item)
+                fetchDataCart()
+                notify('success', 'Sản phẩm đã được xóa khỏi giỏ !')
+            } catch (error) {
+
+            }
+        }
+    }
     return (
         <>
-            {!isOrder && cart && cart.cartItems && (
+            <ToastContainer
+                theme='colored' />
+            {!isOrder && cart && cart.cartItems ? (
                 <div className='container mt-5'>
                     <div className='row'>
                         <aside className='col-lg-9'>
@@ -146,7 +183,8 @@ const Cart = (props) => {
                                                     <p>{item.qty}</p>
                                                 </td>
                                                 <td className="total-col">{' ' + (curOption[index][0].price * item.qty).toLocaleString('de-DE')}&nbsp; <sup>₫</sup></td>
-                                                <td className="remove-col"><button className="btn-remove"><i className="icon-close"></i></button></td>
+                                                <td className="remove-col"><button className="btn-ms btn-danger rounded"
+                                                    onClick={() => removeItemInCart(item)}><i className="icon-close"></i></button></td>
                                             </tr>
                                         )
                                     })}
@@ -168,6 +206,14 @@ const Cart = (props) => {
                         </aside>
                     </div>
                 </div>
+            ) : (!isOrder ?
+                <div className='d-flex justify-content-center align-items-center'
+                    style={{ width: '100%', height: '500px' }}>
+                    <h3
+                        style={{ color: '#39f ', fontFamily: 'Arial, Helvetica, sans-serif' }}
+                    >Trong giỏ không sản phẩm nào !</h3>
+                </div>
+                : <></>
             )}
 
             {/* ORDER */}
@@ -203,7 +249,7 @@ const Cart = (props) => {
                                     <div className="form-row">
                                         <div className="form-group col-md-6">
                                             <input type="Họ và tên" className="form-control" id="inputEmail4" placeholder="Họ và tên (Bắt buộc)"
-                                                value={name}
+                                                defaultValue={name}
                                                 style={{ borderRadius: '20px' }}
                                                 {...register("name", {
                                                     required: true,
@@ -214,7 +260,7 @@ const Cart = (props) => {
                                         <div className="form-group col-md-6">
                                             <input type="text" className="form-control" id="inputPassword4" placeholder="Số điện thoại (Bắt buộc)"
                                                 style={{ borderRadius: '20px' }}
-                                                value={phone}
+                                                defaultValue={phone}
                                                 {...register("phone", {
                                                     required: true,
                                                     value: phone
@@ -227,7 +273,7 @@ const Cart = (props) => {
                                         <div className="form-group col-md-12">
                                             <select className="form-control" id="inputAddress"
                                                 style={{ borderRadius: '20px' }}
-                                                {...register("address", {
+                                                {...register("shippingAddress", {
                                                     required: true,
                                                     onChange: (e) => onChangeAddress(e.target.options.selectedIndex)
                                                 })}>
@@ -239,15 +285,6 @@ const Cart = (props) => {
                                             </select>
                                         </div>
                                     </div>
-                                    {/* <div className="form-group">
-                                        <h6 htmlFor="exampleFormControlTextarea1">Ghi chú</h6>
-                                        <textarea className="form-control" id="exampleFormControlTextarea1" rows="8"
-                                            placeholder=''
-                                            style={{ borderRadius: '20px' }}
-                                            {...register("note", {
-                                                // required: true
-                                            })} ></textarea>
-                                    </div> */}
                                     <h6 className='mt-2'>Tổng tiền</h6>
                                     <div className="form-row mt-2">
                                         <div className="form-group col-md-12">
@@ -255,7 +292,7 @@ const Cart = (props) => {
                                                 // defaultValue={'1000000000000'}
                                                 disabled
                                                 style={{ borderRadius: '20px' }}
-                                                {...register("phone", {
+                                                {...register("totalprice", {
                                                     value: totalPrice
                                                     // required: true,
                                                     // minLength: 6

@@ -13,7 +13,7 @@ const UserProfile = (props) => {
     const menu = [
         { id: '1', title: 'Thông tin tài khoản', link: path.USERPROFILE },
         { id: '2', title: 'Địa chỉ', link: path.USERADDRESS },
-        { id: '3', title: 'Đơn mua', link: path.USERPURECHASED },
+        { id: '3', title: 'Đơn hàng', link: path.USERPURECHASED },
         { id: '4', title: 'Đổi mật khẩu', link: path.USERCHANGEPASS },
         { id: '5', title: 'Đăng xuất', link: path.HOME },
     ]

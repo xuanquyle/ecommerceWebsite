@@ -3,27 +3,68 @@ import axios from "axios"
 import { Link } from 'react-router-dom'
 import { notify } from "../../utils/constant"
 import { ToastContainer } from 'react-toastify';
+import { connect, useSelector } from "react-redux";
+import { getUserOrder } from '../../api';
+import ModalOrder from './ModalOrder';
 
-const Purchased = () => {
-    const [cart, setCart] = useState([
-        { id: '637c8748ce9841f2f205c2ef', name: 'Chờ xác nhận ', price: '3.500.000', quantity: '21/11/2022', a: 'elastic runner ' },
-        { id: '637c8748ce9841f2sf05c2kf', name: 'Đang giao ', price: '54.500.000', quantity: '15/11/2022', a: 'elastic runner ' },
-        { id: '637c8748ce9841fadf05c2et', name: 'Đã nhận hàng', price: '31.500.000', quantity: '14/11/2022', a: 'elastic runner ' },
-        { id: '637c8748ce9841f2f205c2as', name: 'Đã nhận hàng', price: '47.500.000', quantity: '14/11/2022', a: 'elastic runner ' },
-    ]);
-    const onClickRead = () => {
-        notify('success', 'Đặt hàng thành công !')
+const Purchased = (props) => {
+    const [userOrder, setUserOrder] = useState()
+    const [userSelected, setUserSelected] = useState();
+    const [status, setCStatus] = useState()
+    const [isOpenModal, setIsOpenModal] = useState(false)
+    const onClickRead = (item) => {
+        // console.log(item);
+        setUserSelected(item)
+        setIsOpenModal(true)
+    }
+
+    const fetchDateOrderUser = async () => {
+        try {
+            let res = await getUserOrder(props.user.isLoggedIn, props.user.id)
+            console.log(res);
+            setUserOrder(res.data);
+        } catch (error) {
+
+        }
+    }
+
+    const getStatus = (arr) => {
+        if (arr.deliveredAt === null)
+            return (
+                <span className='badge badge-secondary'>Chờ xác nhận</span>
+            )
+        if (arr.deliveryStartedAt === null)
+            return (
+                <span className=' badge badge-warning'>Đang giao hàng</span>
+            )
+        if (arr.receivedAt === null)
+            return (
+                <span className=' badge badge-success'>Đã nhận hàng</span>
+            )
+    }
+    useEffect(() => {
+        fetchDateOrderUser();
+    }, [])
+
+    const toggle = () => {
+        setIsOpenModal(!isOpenModal);
     }
     return (
         <div className="col-md-8">
             <ToastContainer theme='colored' />
+            <ModalOrder
+                isOpen={isOpenModal}
+                toggle={toggle}
+                order={userSelected}
+                reloadData={fetchDateOrderUser} 
+            />
             <div className="card mb-3">
                 <div className="card-body">
                     <div className="row">
                         <table className="table table-cart table-mobile" style={{ margin: '10px' }}>
                             <thead>
                                 <tr>
-                                    <th>Mã</th>
+                                    <th>Mã đơn hàng</th>
                                     <th>Trạng thái</th>
                                     <th>Thành tiền</th>
                                     <th>Ngày đặt</th>
@@ -31,45 +72,39 @@ const Purchased = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {cart && cart.map((item, index) => {
+                                {/* {userOrder ? console.log('userOrder', userOrder) : console.log('ss')} */}
+                                {userOrder && userOrder.map((item, index) => {
                                     return (
-                                        <tr key={item.id}
+                                        <tr key={item._id}
                                         >
                                             <td className="product-col">
                                                 <div className="product">
                                                     <h3 className="product-title">
-                                                        <Link to="/ProductDetails">{item.id}</Link>
+                                                        {item._id}
                                                     </h3>
                                                 </div>
                                             </td>
                                             <td className="product-col">
                                                 <div className="product">
                                                     <h3 className="product-title"
-                                                    >
-                                                        {item.name === 'Đã nhận hàng' ? (
-                                                            <Link to="/ProductDetails"
-                                                                style={{ color: 'green' }}>{item.name}</Link>)
-                                                            : (
-                                                                <Link to="/ProductDetails">{item.name}</Link>
-                                                            )}
-
+                                                    >                                        
+                                                        {getStatus(item.status)}
                                                     </h3>
                                                 </div>
                                             </td>
-                                            <td className="product-col">{item.price}<sup>đ</sup></td>
+                                            <td className="product-col">
+                                                <span className="badge badge-danger"
+                                                    style={{ fontSize: '1.4rem' }}>{item.totalPrice.toLocaleString('de-DE')}<sup>đ</sup></span>
+                                            </td>
                                             <td className="product-col">
                                                 <div className="cart-product-quantity">
-                                                    {item.quantity}
-                                                    {/* <input type="text" className="form-control"
-                                                        style={{ fontSize: '16px' }}
-                                                    /> */}
+                                                    {(new Date(item.createdAt)).getDay() + '-' + (new Date(item.createdAt)).getMonth() + '-' + (new Date(item.createdAt)).getFullYear()}
                                                 </div>
                                             </td>
-                                            {/* <td className="product-col">$84.00</td> */}
                                             <td className="product-col">
                                                 <button type="button"
                                                     className="btn-info btn-sm"
-                                                    onClick={onClickRead}
+                                                    onClick={(e) => onClickRead(item)}
                                                     style={{ fontSize: '1.4rem' }}><i className="icon-eye"></i></button>
                                             </td>
                                         </tr>
@@ -77,9 +112,6 @@ const Purchased = () => {
                                 })}
                             </tbody>
                         </table>
-                        {/* <div className="col-sm-12 mt-2 mb-2 mr-2" style={{ display: 'flex', justifyContent: 'right' }}>
-                            <button className="btn btn-info">Thêm địa chỉ</button>
-                        </div> */}
                     </div>
                 </div>
             </div>
@@ -87,4 +119,11 @@ const Purchased = () => {
     )
 }
 
-export default Purchased
+const mapStateToProp = state => {
+    return {
+        user: state.userLogin
+    }
+}
+
+
+export default connect(mapStateToProp)(Purchased);

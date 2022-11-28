@@ -10,6 +10,15 @@ const Login = (data) => {
         })
     )
 }
+const Register = (data) => {
+    return (
+        axios({
+            method: 'post',
+            url: `http://localhost:8080/api/users/auth/register`,
+            data: data
+        })
+    )
+}
 const getProfileUser = (accessToken, id) => {
     return (
         axios({
@@ -92,6 +101,9 @@ const createAddress = (accessToken, id, data) => {
 }
 // END API ADDRESS
 
+// USERCART
+
+
 const getAllProduct = () => {
     return axios.get(`http://localhost:8080/api/products`);
 }
@@ -172,12 +184,58 @@ const deleteItemInCart = (accessToken, id, data) => {
                 "token": `Bearer ${accessToken}`
             },
             method: 'delete',
-            url: `http://localhost:8080/api/carts/${id}/add`,
+            url: `http://localhost:8080/api/carts/me/${id}`,
+            data: data
         })
     )
 }
-// 
+// ORDER
+const getUserOrder = (accessToken, id) => {
+    return (
+        axios({
+            headers: {
+                // 'content-type': 'multipart/form-data',
+                "Access-Control-Allow-Origin": "*",
+                "token": `Bearer ${accessToken}`
+            },
+            method: 'get',
+            url: `http://localhost:8080/api/orders/me/${id}`,
+        })
+    )
+}
+
+const addOrder = (accessToken, id, data) => {
+    return (
+        axios({
+            headers: {
+                // 'content-type': 'multipart/form-data',
+                "Access-Control-Allow-Origin": "*",
+                "token": `Bearer ${accessToken}`
+            },
+            method: 'post',
+            url: `http://localhost:8080/api/orders/${id}`,
+            data: data
+        })
+    )
+}
+
+const cancelOrder = (accessToken, id) => {
+    // id : order id
+    return (
+        axios({
+            headers: {
+                // 'content-type': 'multipart/form-data',
+                "Access-Control-Allow-Origin": "*",
+                "token": `Bearer ${accessToken}`
+            },
+            method: 'put',
+            url: `http://localhost:8080/api/orders/me/${id}/cancel-order`,
+        })
+    )
+}
+
 export {
     getAllProvinces, getDistrict, getAllProduct, getProductBySlug, getAllCategories, getWard, Login,
-    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct, addToCart, getCartById
+    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct, addToCart, getCartById, deleteItemInCart, Register,
+    addOrder, getUserOrder, cancelOrder
 }

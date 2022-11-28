@@ -12,12 +12,13 @@ import Option from "./Option"
 import { path } from "../../utils/constant"
 import { notify } from "../../utils/constant"
 import { ToastContainer } from 'react-toastify'
-import { connect } from "react-redux";
 import { addToCart as apiAddToCart } from '../../api';
-
+import { connect, useDispatch, useSelector } from "react-redux";
+import { cart as cartAction } from "../../store/actions/cartAction"
 
 const ProductDetailsTop = (props) => {
     const navigate = useNavigate()
+    const dispatch = useDispatch();
     const [product, setProduct] = useState(props.product)
     const [curIdOption, setCurIdOption] = useState('')
     const [curColor, setCurColor] = useState(props.product.options[0].color)
@@ -26,7 +27,7 @@ const ProductDetailsTop = (props) => {
     const [fullOption, setFullOption] = useState(true);
     const [price, setPrice] = useState(props.product.options[0].price);
     const [qty, setQty] = useState(1);
-    // console.log('detail', props.product)
+    
     const [color, setColor] = useState(props.product.options.map((item, index) => {
         return (
             { 'id': item._id, 'op': item.color, 's': 1 }
@@ -94,6 +95,12 @@ const ProductDetailsTop = (props) => {
                 try {
                     const rep = await apiAddToCart(props.user.isLoggedIn, props.user.id, newData)
                     notify('success', 'Thêm vào giỏ thành công !')
+                    
+                    // ACTION
+                    localStorage.removeItem('amoutInCart');
+                    localStorage.setItem('amoutInCart', JSON.stringify(Number(props.cart.amountIncart) + 1));
+                    let data = { amountIncart: Number(props.cart.amountIncart) + 1}
+                    dispatch(cartAction(data));
                 } catch (error) {
                     notify('error', error.response.data.message)
                 }
@@ -223,7 +230,8 @@ const ProductDetailsTop = (props) => {
 }
 const mapStateToProp = state => {
     return {
-        user: state.userLogin
+        user: state.userLogin,
+        cart: state.cart
     }
 }
 

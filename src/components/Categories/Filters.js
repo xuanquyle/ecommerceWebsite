@@ -18,8 +18,8 @@ const Filters = (props) => {
         { id: '000', price: 'ALL', content: 'Tất cả' },
         { id: '001', price: '10', content: 'Dưới 10 triệu' },
         { id: '002', price: '15', content: 'Từ 10 đến 15 triệu' },
-        { id: '005', price: '25', content: 'Từ 15 đến 20 triệu' },
-        { id: '004', price: '20', content: 'Từ 20 đến 25 triệu' },
+        { id: '005', price: '20', content: 'Từ 15 đến 20 triệu' },
+        { id: '004', price: '25', content: 'Từ 20 đến 25 triệu' },
         { id: '006', price: '30', content: 'Trên 25 triệu' },
     ];
     const arrRam = [

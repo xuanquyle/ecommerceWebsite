@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Search from "../Search/Search";
 import NavBar from "../Nav/NavBar";
 import { Link } from "react-router-dom";
@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../store/actions/userActions";
 import { connect } from "react-redux";
+import { cart as cartAction } from "../../store/actions/cartAction"
+import { getCartById } from '../../api';
 
 const Header = (props) => {
 
@@ -22,10 +24,29 @@ const Header = (props) => {
         localStorage.removeItem('email');
         localStorage.removeItem('id');
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('amountInCart');
         dispatch(logout());
         console.log(">>>", userselector)
         nav(path.HOME);
     }
+
+    const fetchDataCart = async () => {
+        // console.log(props.user.isLoggedIn, props.user.id)
+        try {
+            const rep = await getCartById(props.user.isLoggedIn, props.user.id)
+            localStorage.removeItem('amoutInCart');
+            localStorage.setItem('amoutInCart', JSON.stringify(rep.data[0].cartItems.length));
+            let data = { amountIncart: rep.data[0].cartItems.length }
+            dispatch(cartAction(data));
+            // console.log(temp);
+        } catch (error) {
+
+        }
+    }
+
+    useEffect(() => {
+        fetchDataCart();
+    }, [])
     return (
         <>
             <div className="page-wrapper">
@@ -47,7 +68,14 @@ const Header = (props) => {
                                     <Link to={path.CART} className="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                                         <div className="icon">
                                             <i className="icon-shopping-cart"></i>
-                                            <span className="cart-count">2</span>
+                                            {(props.user && props.cart && props.user.isLoggedIn !== '')
+                                                ? (
+                                                    <span className="cart-count">
+                                                        {props.cart.amountIncart}
+                                                    </span>
+                                                ) : (
+                                                    <></>
+                                                )}
                                         </div>
                                         <p>Giỏ hàng</p>
                                     </Link>
@@ -96,7 +124,8 @@ const Header = (props) => {
 
 const mapStateToProp = state => {
     return {
-        user: state.userLogin
+        user: state.userLogin,
+        cart: state.cart
     }
 }
 export default connect(mapStateToProp)(Header);

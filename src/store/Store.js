@@ -10,22 +10,26 @@ import {
 
 } from './reducers/userReducer';
 import { filterReducer } from './reducers/filterReducer'
+import { cartReducer } from './reducers/cartReducer';
 const reducer = combineReducers({
     userLogin: userLoginReducer,
     filters: filterReducer,
+    cart: cartReducer
 })
 // login
-// const userInfoFromLocalStorage = localStorage.getItem('userLogin') ? JSON.parse(localStorage.getItem('userLogin')) : null;
+
 const emailF = localStorage.getItem('email') ? JSON.parse(localStorage.getItem('email')) : null;
 const userIsLoggedINFromLocalStorage = localStorage.getItem('isLoggedIn') ? JSON.parse(localStorage.getItem('isLoggedIn')) : '';
 const idF = localStorage.getItem('id') ? JSON.parse(localStorage.getItem('id')) : '';
-// userInfoFromLocalStorage ? console.log(userInfoFromLocalStorage) : console.log('eo');
-// console.log(userIsLoggedINFromLocalStorage);
+
+// FILTER
 const priceF = localStorage.getItem('price') ? JSON.parse(localStorage.getItem('price')) : 'ALL';
 const ramF = localStorage.getItem('ram') ? JSON.parse(localStorage.getItem('ram')) : 'ALL';
 const romF = localStorage.getItem('rom') ? JSON.parse(localStorage.getItem('rom')) : 'ALL';
 const cateF = localStorage.getItem('cate') ? JSON.parse(localStorage.getItem('cate')) : 'ALL';
 const paginationF = localStorage.getItem('pagination') ? JSON.parse(localStorage.getItem('pagination')) : '';
+// CART
+const amountInCartF = localStorage.getItem('amoutInCart') ? JSON.parse(localStorage.getItem('amoutInCart')) : '';
 
 const initialState = {
     userLogin: {
@@ -39,6 +43,9 @@ const initialState = {
         ram: ramF,
         rom: romF, 
         pagination: paginationF
+    },
+    cart: {
+        amountInCart: amountInCartF
     }
 };
 
