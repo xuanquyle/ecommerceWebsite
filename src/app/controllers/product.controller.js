@@ -51,8 +51,9 @@ class ProductController {
     async getAllProduct(req, res, next) {
         try {
             let search;
-            if (req.query.hasOwnProperty('_search') && req.query.column && req.query.content) search = Object.assign({}, { [req.query.colunm]: `/${content}/i` })
-            const products = await Products.find();
+            if (req.query.hasOwnProperty('_search') && req.query.column && req.query.content) search = Object.assign({}, { [req.query.column]: { $regex: req.query.content } })
+            console.log(search);
+            const products = await Products.find(search);
             if (!products.length) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm nào');
             return res.status(200).json(products)
         }
