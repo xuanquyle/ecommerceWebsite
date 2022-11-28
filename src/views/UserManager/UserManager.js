@@ -67,7 +67,7 @@ const UserManager = (props) => {
         hooks.visibleColumns.push((columns) => [
             ...columns, {
                 id: "Lock",
-                Header: "Lock",
+                Header: "",
                 Cell: ({ row }) => {
                     return (
                         <>
@@ -85,8 +85,6 @@ const UserManager = (props) => {
                                 </button>
 
                             )}
-
-
                         </>
                     )
 
@@ -158,11 +156,11 @@ const UserManager = (props) => {
                     <div className="container mt-2">
                         <div className="content-container">
                             <div className="mb-3 mt-3 d-flex flex-row align-items-center">
-                                <button className="btn btn-primary"
+                                {/* <button className="btn btn-primary"
                                     onClick={handleAddProduct}>
                                     <i className="fas fa-plus" style={{ fontWeight: '600', marginRight: '5px' }}></i>
                                     Thêm sản phẩm
-                                </button>
+                                </button> */}
                                 <span className="ml-5 mr-1">Tìm kiếm:</span>
                                 <GlobalFilter
                                     preGlobalFilteredRows={preGlobalFilteredRows}

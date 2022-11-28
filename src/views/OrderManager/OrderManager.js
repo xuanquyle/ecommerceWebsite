@@ -61,10 +61,10 @@ const OrderManager = () => {
                     Header: "Tổng tiền",
                     accessor: Object.keys(order[0])[3]
                 },
-                {
-                    Header: "Trạng thái",
-                    accessor: Object.keys(order[0])[2]
-                },
+                // {
+                //     Header: "Trạng thái",
+                //     accessor: Object.keys(order[0])[2]
+                // },
                 {
                     Header: "Ngày đặt",
                     accessor: Object.keys(order[0])[4]
@@ -75,7 +75,23 @@ const OrderManager = () => {
 
     const tableHooks = (hooks) => {
         hooks.visibleColumns.push((columns) => [
-            ...columns, {
+            ...columns,
+            {
+                id: "Trạng thái",
+                Header: "Trạng thái",
+                Cell: ({ row }) => {
+                    return (
+                        <>
+                            <button className="btn-primary rounded" onClick={() => readProduct(row)}
+                                style={{ marginRight: '5px' }}>
+                                {row.original.status}
+                            </button>
+                        </>
+                    )
+
+                }
+            },
+            {
                 id: "Edit",
                 Header: "Edit",
                 Cell: ({ row }) => {
@@ -139,10 +155,10 @@ const OrderManager = () => {
     return (
         order &&
         <>
-        <ModalOrder
-                        isOpen={isOpenModal}
-                        toggle={toggle}
-                        order={order[0]}/>
+            {/* <ModalOrder
+                isOpen={isOpenModal}
+                toggle={toggle}
+                order={order[0]} /> */}
             <div className="title-container">
                 <h5 className="px-3">Quản lý đơn hàng</h5>
                 <hr />

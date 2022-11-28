@@ -164,8 +164,8 @@ const Categories = () => {
     return (
         arrCate &&
         <>
-            <ToastContainer 
-            theme="colored" />
+            <ToastContainer
+                theme="colored" />
             <div className="title-container">
                 <h5 className="px-3">Quản lý danh mục</h5>
                 <hr />

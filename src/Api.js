@@ -67,6 +67,23 @@ export const createProduct = (data) => {
         })
     )
 }
+
+export const updateProduct = (data, id) => {
+    return (
+        axios({
+            headers: {
+                // 'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data'
+                // 'Content-Type': `multipart/form-data; boundary=${data._boundary}`
+            },
+            method: 'put',
+            url: `http://localhost:8080/api/products/${id}`,
+            data: data
+        })
+    )
+}
+
 export const deleteProduct = (id) => {
     return (
         axios({

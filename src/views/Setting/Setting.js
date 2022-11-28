@@ -7,6 +7,10 @@ const Setting = () => {
     const [image, setImage] = useState();
     const [previewImage, setPreviewImage] = useState();
     const [isOpenImage, setIsOpenImage] = useState(false)
+    const arrIamge = [
+        { id: '1', name: 'anh1.jpg' },
+        { id: '2', name: 'anh1.jpg' }
+    ]
 
     const onChangeImage = (e) => {
 
@@ -53,56 +57,16 @@ const Setting = () => {
                                         // required: true
                                     })} />
                             </div>
-                            <div className="form-group col-md-3">
-                                <label htmlFor="exampleFormControlFile1" className='btn btn-outline-info'>
-                                    Tải ảnh
-                                    <i className="fas fa-upload" style={{ fontWeight: '600', marginLeft: '10px' }}></i>
-                                </label>
-                                <div className='preview-image'
-                                    style={{ backgroundImage: `url(${previewImage})` }}
-                                    onClick={() => setIsOpenImage(true)}>
-                                </div>
-                                <input type="file" className="form-control-file" id="exampleFormControlFile1"
-                                    hidden multiple
-                                    {...register("thumb", {
-                                        onChange: (e) => onChangeImage(e.target.files),
-                                        // multiple: true, 
-                                        // required: true
-                                    })} />
-                            </div>
-                            <div className="form-group col-md-3">
-                                <label htmlFor="exampleFormControlFile1" className='btn btn-outline-info'>
-                                    Tải ảnh
-                                    <i className="fas fa-upload" style={{ fontWeight: '600', marginLeft: '10px' }}></i>
-                                </label>
-                                <div className='preview-image'
-                                    style={{ backgroundImage: `url(${previewImage})` }}
-                                    onClick={() => setIsOpenImage(true)}>
-                                </div>
-                                <input type="file" className="form-control-file" id="exampleFormControlFile1"
-                                    hidden multiple
-                                    {...register("thumb", {
-                                        onChange: (e) => onChangeImage(e.target.files),
-                                        // multiple: true, 
-                                        // required: true
-                                    })} />
-                            </div>
-                            <div className="form-group col-md-3">
-                                <label htmlFor="exampleFormControlFile1" className='btn btn-outline-info'>
-                                    Tải ảnh
-                                    <i className="fas fa-upload" style={{ fontWeight: '600', marginLeft: '10px' }}></i>
-                                </label>
-                                <div className='preview-image'
-                                    style={{ backgroundImage: `url(${previewImage})` }}
-                                    onClick={() => setIsOpenImage(true)}>
-                                </div>
-                                <input type="file" className="form-control-file" id="exampleFormControlFile1"
-                                    hidden multiple
-                                    {...register("thumb", {
-                                        onChange: (e) => onChangeImage(e.target.files),
-                                        // multiple: true, 
-                                        // required: true
-                                    })} />
+                            <div className="form-group col-md-9">
+                                {arrIamge.map((item) => {
+                                    return (
+                                        <div key={item.id}>
+                                            <span className='mr-5'>{item.name}</span>
+                                            <button className='btn-sm  btn-danger'>x</button>
+                                        </div>
+                                    )
+
+                                })}
                             </div>
                         </div>
                         <button className='btn btn-primary'>Lưu</button>

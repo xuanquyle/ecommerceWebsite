@@ -3,7 +3,7 @@ import React from 'react';
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import Option from './Option';
-import { getAllCategory, createProduct } from '../../Api';
+import { getAllCategory, createProduct, updateProduct } from '../../Api';
 import { ToastContainer } from 'react-toastify';
 import { notify } from '../../ultils/constant';
 import Lightbox from 'react-18-image-lightbox';
@@ -21,7 +21,7 @@ const ModalProduct = (props) => {
     const [arrCate, setArrCate] = useState();
     const [numOption, setNumOption] = useState(props.product ? Object.keys(props.product.options).length : '1');
     const [image, setImage] = useState();
-    const [previewImage, setPreviewImage] = useState();
+    const [previewImage, setPreviewImage] = useState(props.product ? 'http://localhost:8080/' + props.product.thumb : '');
     const [isOpenImage, setIsOpenImage] = useState(false)
     // 
     var curNumOptions = props.product.options ? Object.keys(props.product.options).length : '0';
@@ -29,6 +29,7 @@ const ModalProduct = (props) => {
         reset()
         setNumOption(props.product ? Object.keys(props.product.options).length : '1')
         curNumOptions = props.product.options ? Object.keys(props.product.options).length : '0';
+        setPreviewImage(props.product.thum !== "" ? 'http://localhost:8080/' + props.product.thumb : '')
     }, [props.product])
 
     const fetchCate = async () => {
@@ -80,9 +81,9 @@ const ModalProduct = (props) => {
         // Array.from(image).map((item) => {
         //     formData.append("image", item);
         // })
-        // console.log('data', newdata.name)
+
         try {
-            const data = await createProduct(formData);
+            const res = await createProduct(formData, data._id);
             notify('success', 'Tạo sản phẩm thành công !')
         } catch (error) {
             // console.log(error);
@@ -93,12 +94,12 @@ const ModalProduct = (props) => {
         props.toggle();
         onResetFrom();
     }
-    const onSubmitUpdate = (data) => {
+    const onSubmitUpdate = async (data) => {
         let newdata = data
         let option = []
         for (let i = 0; i < numOption; i++) {
             let copy = {
-                'ram': Number(data['ram' + i]), 'rom': Number(data['rom' + i]), 'color': Number(data['color' + i]),
+                'ram': Number(data['ram' + i]), 'rom': Number(data['rom' + i]), 'color': data['color' + i],
                 'qty': Number(data['qty' + i]), 'price': Number(data['price' + i])
             }
             option.push(copy)
@@ -111,8 +112,20 @@ const ModalProduct = (props) => {
             delete newdata['price' + i]
         }
         newdata['options'] = option;
-        console.log('dt', image);
-        newdata['image'] = image;
+        const formData = new FormData();
+        formData.append("thumb", image);
+        formData.append('data', JSON.stringify(newdata));
+        // for (const pair of formData.entries()) {
+        //     console.log(`${pair[0]}, ${pair[1]}`);
+        // }
+        // console.log('data', props.product._id)
+        try {
+            const data = await updateProduct(formData, props.product._id);
+            notify('success', 'Cập nhập sản phẩm thành công !')
+        } catch (error) {
+            // console.log(error);
+            //    if (error) notify('error', error.response.data.message)
+        }
         props.updateData();
         onResetFrom();
         props.toggle();
@@ -366,6 +379,23 @@ const ModalProduct = (props) => {
                                             required: true
                                         })} ></textarea>
                                 </div>
+                                <div className="form-group">
+                                    <label htmlFor="exampleFormControlFile1" className='btn btn-outline-info'>
+                                        Tải ảnh
+                                        <i className="fas fa-upload" style={{ fontWeight: '600', marginLeft: '10px' }}></i>
+                                    </label>
+                                    <div className='preview-image'
+                                        style={{ backgroundImage: `url(${previewImage})` }}
+                                        onClick={() => setIsOpenImage(true)}>
+                                    </div>
+                                    <input type="file" className="form-control-file" id="exampleFormControlFile1"
+                                        hidden multiple
+                                        {...register("thumb", {
+                                            onChange: (e) => onChangeImage(e.target.files),
+                                            // multiple: true, 
+                                            // required: true
+                                        })} />
+                                </div>
                                 <button type="submit" className="btn btn-primary">Lưu</button>
                                 <button className="btn btn-warning ml-5"
                                     onClick={onResetFrom}>
@@ -454,6 +484,23 @@ const ModalProduct = (props) => {
                                         placeholder='Mô tả chi tiết...'
                                         value={props.product.description}
                                         disabled ></textarea>
+                                </div>
+                                <div className="form-group">
+                                    {/* <label htmlFor="exampleFormControlFile1" className='btn btn-outline-info'>
+                                        Tải ảnh
+                                        <i className="fas fa-upload" style={{ fontWeight: '600', marginLeft: '10px' }}></i>
+                                    </label> */}
+                                    <div className='preview-image'
+                                        style={{ backgroundImage: `url(${previewImage})` }}
+                                        onClick={() => setIsOpenImage(true)}>
+                                    </div>
+                                    {/* <input type="file" className="form-control-file" id="exampleFormControlFile1"
+                                        hidden multiple
+                                        {...register("thumb", {
+                                            onChange: (e) => onChangeImage(e.target.files),
+                                            // multiple: true, 
+                                            // required: true
+                                        })} /> */}
                                 </div>
                             </form>
                         </ModalBody>
