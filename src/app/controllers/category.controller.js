@@ -3,7 +3,7 @@ const ErrorHandler = require('../errors/errorHandler');
 const fs = require('fs')
 class CategoryController {
     // [GET] /api/categories
-    async index(req, res, next) {
+    async getAllCategory(req, res, next) {
         try {
             const categories = await Categories.find()
             if (!categories.length) throw new ErrorHandler.NotFoundError('Category not found')

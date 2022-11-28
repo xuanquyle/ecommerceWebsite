@@ -50,6 +50,8 @@ class ProductController {
     }
     async getAllProduct(req, res, next) {
         try {
+            let search;
+            if (req.query.hasOwnProperty('_search') && req.query.column && req.query.content) search = Object.assign({}, { [req.query.colunm]: `/${content}/i` })
             const products = await Products.find();
             if (!products.length) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm nào');
             return res.status(200).json(products)
@@ -81,12 +83,14 @@ class ProductController {
     // // [POST] /product
     async createProduct(req, res, next) {
         try {
-            let err = '';
-            req.body.name ? err : err += 'Product name is required';
-            req.body.category ? err : err += 'Product category is required';
-            if (err !== '') throw new ErrorHandler.ValidationError(err)
+
 
             const data = JSON.parse(req.body.data);
+            let err = '';
+            data.name ? err : err += 'Product name is required';
+            data.category ? err : err += 'Product category is required';
+            if (err !== '') throw new ErrorHandler.ValidationError(err)
+
             const productExist = await Products.findOne({ name: data.name });
             const productDeleted = await Products.findOneDeleted({ name: data.name });
             if (productExist) {
@@ -133,8 +137,8 @@ class ProductController {
             });
             const productCreated = await newProduct.save()
             if (!productCreated) {
-                if (req.file && fs.existsSync(`src/ public / images / ${req.file.filename}`))
-                    fs.unlink(`src / public / images / ${req.file.filename}`, (err) => {
+                if (req.file && fs.existsSync(`src/public/images/${req.file.filename}`))
+                    fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
                         if (err) throw new Error(err.message);
                     });
                 throw new ErrorHandler.BadRequestError('Can not create product')
@@ -185,15 +189,15 @@ class ProductController {
                         name: data.name,
                         description: data.description,
                         short_description: data.short_description,
-                        thumb: req.file ? `public / images /${req.file.filename}` : '',
+                        thumb: req.file ? `public/images/${req.file.filename}` : '',
                         category: data.category,
                         options: data.options
                     }
                 }
             )
             if (!updateProduct) throw new ErrorHandler.NotFoundError('Product not found')
-            if (req.file&&fs.existsSync(`src / public / images / ${updateProduct.thumb}`))
-                fs.unlink(`src / public / images / ${updateProduct.thumb}`, (err) => {
+            if (req.file && fs.existsSync(`src/public/images/${updateProduct.thumb}`))
+                fs.unlink(`src/public/images/${updateProduct.thumb}`, (err) => {
                     if (err) throw new Error(err.message);
                 });
 

@@ -83,8 +83,8 @@ class OrderController {
                 shippingPrice: req.body.shippingPrice,
                 totalPrice: req.body.totalPrice,
                 paymentMethod: req.body.paymentMethod,
-                customer_name: req.body.customer_name,
-                customer_phone: req.body.customer_phone
+                customerName: req.body.customer_name,
+                customerPhone: req.body.customer_phone
             })
             const createdOrder = await newOder.save()
             if (!createdOrder)
@@ -147,11 +147,11 @@ class OrderController {
     async cancelOrder(req, res, next) {
         try {
             const order = await Orders.findOne({ _id: req.params.order_id, canceledAt: null })
-            if (!order.length) throw new ErrorHandler.NotFoundError('Order not found')
-            if (order.status.deliveryStartedAt != null) throw new ErrorHandler.NotFoundError('The order has been delivered to the carrier, cannot be cancelled')
+            if (!order) throw new ErrorHandler.NotFoundError('Không tìm thấy đơn hàng')
+            if (order.status.deliveryStartedAt != null) throw new ErrorHandler.NotFoundError('Đơn hàng đã được giao cho đơn vị vận chuyển. Không thể hủy đơn')
             order.canceledAt = Date.now();
             const canceledOrder = await order.save();
-            if (!canceledOrder.length) throw new ErrorHandler.BadRequestError('Can not cancel order. Please try again')
+            if (!canceledOrder) throw new ErrorHandler.BadRequestError('Không thể hủy đơn hàng. Vui lòng thử lại sau')
             res.status(200).json(canceledOrder)
         }
         catch (err) {

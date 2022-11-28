@@ -17,20 +17,20 @@ class authMiddleware {
     }
     verifyTokenAndUserAuthorization = (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user._id === req.params.id) {
+            if (req.user && req.user._id === req.params.id) {
                 next();
             } else {
-                throw new ErrorHandler.ForbiddenError("Vui lòng đăng nhập để thực hiện");
+                throw new ErrorHandler.ForbiddenError("Không có quyền truy cập");
             }
         });
     };
 
     verifyTokenAndAdmin = (req, res, next) => {
         this.verifyToken(req, res, () => {
-            if (req.user.id === req.params.id || req.user.isAdmin) {
+            if (req.user && req.user.isAdmin) {
                 next();
             } else {
-                throw new ErrorHandler.ForbiddenError("Vui lòng đăng nhập để thực hiện");
+                throw new ErrorHandler.ForbiddenError("Không có quyền truy cập");
             }
         });
     };
