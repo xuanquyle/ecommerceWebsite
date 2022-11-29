@@ -33,18 +33,21 @@ const OrderManager = () => {
                 <span className='badge badge-danger'>Đã hủy đơn</span>
             )
         }
-        if (arr.status.receivedAt === null)
+        if (arr.status.deliveredAt !== null)
             return (
-                <span className=' badge badge-secondary'>Chờ xác nhận</span>
+                <span className=' badge badge-primary'>Đã nhận hàng</span>
             )
-        if (arr.status.deliveryStartedAt === null)
+        if (arr.status.deliveryStartedAt !== null)
             return (
                 <span className=' badge badge-warning'>Đang giao hàng</span>
             )
-        if (arr.status.deliveredAt === null)
+        if (arr.status.receivedAt !== null)
             return (
-                <span className=' badge badge-success'>Đã nhận hàng</span>
+                <span className=' badge badge-success'>Đã xác nhận</span>
             )
+        return (
+            <span className=' badge badge-secondary'>Chờ xác nhận</span>
+        )
     }
 
     const orderData = useMemo(() => {
@@ -161,7 +164,7 @@ const OrderManager = () => {
         setSelectedOrder(row.original)
         setIsOpenModal(true)
     }
-    
+
     return (
         order &&
         <>
@@ -169,6 +172,7 @@ const OrderManager = () => {
                 isOpen={isOpenModal}
                 toggle={toggle}
                 order={selectedOrder}
+                reFetchData={fetchData}
             />
             <div className="title-container">
                 <h5 className="px-3">Quản lý đơn hàng</h5>

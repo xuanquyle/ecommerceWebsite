@@ -108,12 +108,17 @@ export const getAllOrder = () => {
 }
 
 export const updateStatusOrder = (idOrder, data) => {
-    axios({
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        method: 'put',
-        url: `http://localhost:8080/api/orders/${idOrder}/update_status`,
-        data: data
-    })
+    return (
+        axios({
+            headers: {
+                // 'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data'
+                // 'Content-Type': `multipart/form-data; boundary=${data._boundary}`
+            },
+            method: 'put',
+            url: `http://localhost:8080/api/orders/${idOrder}/update-status`,
+            data: data
+        })
+    )
 }

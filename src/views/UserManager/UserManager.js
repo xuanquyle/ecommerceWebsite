@@ -3,6 +3,7 @@ import { getAllUSer } from "../../Api";
 import { useTable, useSortBy, useGlobalFilter, usePagination } from "react-table"
 // import ModalProduct from "./ModalProduct";
 import { GlobalFilter } from "../ProductManager/globalFilter";
+import ModalUser from "./ModalUser";
 
 const UserManager = (props) => {
     const [user, setUser] = useState();
@@ -13,7 +14,7 @@ const UserManager = (props) => {
         try {
             const data = await getAllUSer();
             setUser(data.data)
-            console.log(data.data);
+            console.log('user', data.data);
         } catch (error) {
             console.log(error);
         }
@@ -21,13 +22,12 @@ const UserManager = (props) => {
     useEffect(() => {
         fetchData();
     }, [])
-    const productData = useMemo(() => {
+    const userData = useMemo(() => {
         return (
             user && user.map((item, index) => {
                 let copy = item
                 copy['stt'] = index + 1
                 const date = new Date(item['updatedAt'])
-
                 copy['updatedAt'] = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
                 return copy
             })
@@ -35,28 +35,28 @@ const UserManager = (props) => {
     }
         , [user])
 
-    const productsColumns2 = useMemo(() =>
+    const userColumns = useMemo(() =>
         (user && user[0]) ?
             [
                 {
                     Header: "STT",
-                    accessor: Object.keys(user[0])[15]
+                    accessor: 'stt'
                 },
                 {
                     Header: "Email",
-                    accessor: Object.keys(user[0])[1]
+                    accessor: 'email'
                 },
                 {
                     Header: "Họ",
-                    accessor: Object.keys(user[0])[2]
+                    accessor: 'firstname'
                 },
                 {
                     Header: "Tên",
-                    accessor: Object.keys(user[0])[13]
+                    accessor: 'lastname'
                 },
                 {
                     Header: "Số điện thoại",
-                    accessor: Object.keys(user[0])[3]
+                    accessor: 'phone'
                 },
             ]
             : []
@@ -70,16 +70,16 @@ const UserManager = (props) => {
                 Cell: ({ row }) => {
                     return (
                         <>
-                            <button className="btn-primary rounded" onClick={() => readProduct(row)}
+                            <button className="btn-primary rounded" onClick={() => readUser(row)}
                                 style={{ marginRight: '5px' }}>
                                 <i className="fas fa-eye" style={{ fontWeight: '600', }}></i>
                             </button>
                             {(row.original.deleted) ? (
-                                <button className="btn-danger rounded" onClick={() => handleDeleteProduct(row)}>
+                                <button className="btn-danger rounded" onClick={() => lockUser(row)}>
                                     <i className="fas fa-lock" style={{ fontWeight: '600', }}></i>
                                 </button>
                             ) : (
-                                <button className="btn-success rounded" onClick={() => handleEditProduct(row)}>
+                                <button className="btn-success rounded" onClick={() => unLockUser(row)}>
                                     <i className=" fas fa-lock-open" style={{ fontWeight: '600', }}></i>
                                 </button>
 
@@ -93,7 +93,7 @@ const UserManager = (props) => {
         )
     }
     const tableIn = useTable(
-        { columns: productsColumns2, data: productData, initialState: { pageIndex: 0 } },
+        { columns: userColumns, data: userData, initialState: { pageIndex: 0 } },
         useGlobalFilter,
         tableHooks,
         useSortBy,
@@ -116,30 +116,29 @@ const UserManager = (props) => {
 
     const { pageIndex, pageSize } = state;
     const toggle = () => setIsOpenModal(!isOpenModal);
-    //MODEL ADD
-    const handleAddProduct = () => {
-        setIsOpenModal(true)
-    }
-    //EDIT
-    const handleEditProduct = (row) => {
-        // console.log('row', row.original);
-        setSelectedProduct(row.original)
 
+    //READ
+    const readUser = (row) => {
+        setSelectedUser(row.original)
         setIsOpenModal(true)
     }
-    // DELTE
-    const readProduct = (row) => {
-        setSelectedProduct(row.original)
-        setAction('read')
-        setIsOpenModal(true)
+
+    // LOCK
+    const lockUser = (row) => {
+
     }
+
+    const unLockUser = (row) => {
+
+    }
+
 
     return (
         <>
 
             {user ? (
                 <div>
-                    <ModalProduct
+                    <ModalUser
                         isOpen={isOpenModal}
                         toggle={toggle}
                         user={selectedUser}

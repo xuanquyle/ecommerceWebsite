@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form"
 import { notify } from "../../ultils/constant"
 import { ToastContainer } from 'react-toastify';
 import { connect } from "react-redux";
+import { updateStatusOrder } from "../../Api"
 
 const ModalOrder = (props) => {
     const { register, handleSubmit, reset, keepValues, control, formState: { errors } } = useForm();
@@ -21,30 +22,38 @@ const ModalOrder = (props) => {
                 <span className='badge badge-danger'>Đã hủy đơn</span>
             )
         }
-        if (arr.status.receivedAt === null)
+        if (arr.status.deliveredAt !== null)
             return (
-                <span className=' badge badge-secondary'>Chờ xác nhận</span>
+                <span className=' badge badge-primary'>Đã nhận hàng</span>
             )
-        if (arr.deliveryStartedAt === null)
+        if (arr.status.deliveryStartedAt !== null)
             return (
                 <span className=' badge badge-warning'>Đang giao hàng</span>
             )
-        if (arr.deliveredAt === null)
+        if (arr.status.receivedAt !== null)
             return (
-                <span className=' badge badge-success'>Đã nhận hàng</span>
+                <span className=' badge badge-success'>Đã xác nhận</span>
             )
+        return (
+            <span className=' badge badge-secondary'>Chờ xác nhận</span>
+        )
     }
 
     const updateStatus = async (status, idOrder) => {
-        if (window.confirm('Bạn có chắc muốn xxx ?')) {
+        if (window.confirm('Bạn có chắc muốn thay đổi trạng thái ?')) {
             try {
-                let data = [{ status: status.target.value }]
+                let data = { status: status.target.value }
                 console.log('status', data, idOrder)
+                const res = await updateStatusOrder(idOrder, data)
+                // console.log('ssssssss', res)
+                notify('success', 'Cập nhập trạng thái thành công')
                 reset({
                     status: ''
                 })
+                props.reFetchData();
             } catch (error) {
-
+                console.log('errr', error)
+                notify('error', error.data.response.message)
             }
         } else reset({
             status: ''
@@ -180,9 +189,10 @@ const ModalOrder = (props) => {
                                 <label htmlFor="inputEmail4">Ngày xác nhận</label>
                                 <input type="text" className="form-control" id="inputEmail4"
                                     defaultValue={
-                                        props.order.status.deliveredAt !== null
-                                            ? (new Date(props.order.status.deliveredAt)).getDate() + '-' + (Number((new Date(props.order.status.deliveredAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.deliveredAt)).getFullYear()
-                                            : ''}
+                                        props.order.status.receivedAt !== null
+                                            ? (new Date(props.order.status.receivedAt)).getDate() + '-' + (Number((new Date(props.order.status.receivedAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.receivedAt)).getFullYear()
+                                            : ''
+                                    }
                                     readOnly />
                             </div>
                             <div className="form-group col-md-3">
@@ -199,8 +209,8 @@ const ModalOrder = (props) => {
                                 <label htmlFor="inputEmail4">Ngày nhận hàng</label>
                                 <input type="text" className="form-control" id="inputEmail4"
                                     defaultValue={
-                                        props.order.status.receivedAt !== null
-                                            ? (new Date(props.order.status.receivedAt)).getDate() + '-' + (Number((new Date(props.order.status.receivedAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.receivedAt)).getFullYear()
+                                        props.order.status.deliveredAt !== null
+                                            ? (new Date(props.order.status.deliveredAt)).getDate() + '-' + (Number((new Date(props.order.status.deliveredAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.deliveredAt)).getFullYear()
                                             : ''
                                     }
                                     readOnly />
@@ -217,7 +227,7 @@ const ModalOrder = (props) => {
                             <div className="form-group col-md-2">
                                 <label htmlFor="inputAddress">Trạng thái</label>
                                 <br />
-                                {getStatus(props.order.status)}
+                                {getStatus(props.order)}
                             </div>
                             <div className="form-group col-md-4">
                                 <label htmlFor="inputAddress">Cập nhập trạng thái</label>
@@ -227,7 +237,7 @@ const ModalOrder = (props) => {
                                         onChange: (e, idOrder) => updateStatus(e, props.order._id)
                                     })}>
                                     <option value={''}></option>
-                                    <option value={'canceled'}>Hủy đơn hàng</option>
+                                    {/* <option value={'canceled'}>Hủy đơn hàng</option> */}
                                     <option value={'received'}>Xác nhận đơn hàng</option>
                                     <option value={'deliveryStarted'}>Đang giao hàng</option>
                                     <option value={'deliveredAt'}>Đã nhận hàng</option>

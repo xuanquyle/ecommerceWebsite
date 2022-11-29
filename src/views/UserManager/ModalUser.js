@@ -22,17 +22,59 @@ const ModalUser = (props) => {
                 <ModalHeader toggle={props.toggle} close={closeBtn}>Chi tiết đơn hàng</ModalHeader>
                 <ModalBody className='p-5'>
                     <form>
-                        {/* <div className="form-row">
+                        <div className="form-row">
                             <div className="form-group col-md-4">
-                                <label htmlFor="inputEmail4">Mã đơn hàng</label>
+                                <label htmlFor="inputEmail4">Mã khách hàng</label>
                                 <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={props.order._id}
+                                    defaultValue={props.user._id}
                                     readOnly />
                             </div>
-                            <div className="form-group col-md-8">
+                            <div className="form-group col-md-4">
                                 <label htmlFor="inputPassword4">Email</label>
-                                <input type="text" className="form-control" id="inputPassword4" placeholder="Tên sản phẩm..."
-                                    defaultValue={props.order.user.email}
+                                <input type="text" className="form-control" id="inputPassword4" placeholder=""
+                                    defaultValue={props.user.email}
+                                    readOnly
+                                // {...register("email", {
+                                //     // required: true,
+                                //     // minLength: 6
+                                // })} 
+                                />
+                            </div>
+                            <div className="form-group col-md-4">
+                                <label htmlFor="inputPassword4">Số điện thoại</label>
+                                <input type="text" className="form-control" id="inputPassword4" placeholder=""
+                                    defaultValue={props.user.phone}
+                                    readOnly
+                                // {...register("email", {
+                                //     // required: true,
+                                //     // minLength: 6
+                                // })} 
+                                />
+                            </div>
+
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group col-md-4">
+                                <label htmlFor="inputEmail4">Họ</label>
+                                <input type="text" className="form-control" id="inputEmail4"
+                                    defaultValue={props.user.firstname}
+                                    readOnly />
+                            </div>
+                            <div className="form-group col-md-4">
+                                <label htmlFor="inputPassword4">Tên</label>
+                                <input type="text" className="form-control" id="inputPassword4" placeholder=""
+                                    defaultValue={props.user.lastname}
+                                    readOnly
+                                // {...register("email", {
+                                //     // required: true,
+                                //     // minLength: 6
+                                // })} 
+                                />
+                            </div>
+                            <div className="form-group col-md-4">
+                                <label htmlFor="inputPassword4">Giới tính</label>
+                                <input type="text" className="form-control" id="inputPassword4" placeholder=""
+                                    defaultValue={props.user.sex}
                                     readOnly
                                 // {...register("email", {
                                 //     // required: true,
@@ -41,162 +83,40 @@ const ModalUser = (props) => {
                                 />
                             </div>
                         </div>
-
                         <div className="form-row">
-                            <div className="form-group col-md-4">
-                                <label >Tên sản phẩm</label>
-                            </div>
-                            <div className="form-group col-md-2">
-                                <label >Màu</label>
-                            </div>
-                            <div className="form-group col-md-2">
-                                <label >Ram</label>
-                            </div>
-                            <div className="form-group col-md-2">
-                                <label >Rom</label>
-                            </div>
-                            <div className="form-group col-md-2">
-                                <label >Số lượng</label>
-                            </div>
-                        </div>
-                        {props.order.orderItems && props.order.orderItems.map((item, index) => {
-                            return (
-                                item.product.options.map((item2) => {
-                                    if (item.option === item2._id)
-                                        return (
-                                            <div className="form-row" key={item2._id}>
-                                                <div className="form-group col-md-4">
-                                                    <input type="text" className="form-control" id="inputEmail4"
-                                                        defaultValue={item.product.name}
-                                                        readOnly />
-                                                </div>
-                                                <div className="form-group col-md-2">
-                                                    <input type="text" className="form-control" id="inputEmail4"
-                                                        defaultValue={item2.color}
-                                                        readOnly />
-                                                </div>
-                                                <div className="form-group col-md-2">
-                                                    <input type="text" className="form-control" id="inputEmail4"
-                                                        defaultValue={item2.ram}
-                                                        readOnly />
-                                                </div>
-                                                <div className="form-group col-md-2">
-                                                    <input type="text" className="form-control" id="inputEmail4"
-                                                        defaultValue={item2.rom}
-                                                        readOnly />
-                                                </div>
-                                                <div className="form-group col-md-2">
-                                                    <input type="text" className="form-control" id="inputEmail4"
-                                                        defaultValue={item.qty}
-                                                        readOnly />
-                                                </div>
-                                            </div>
-                                        )
-                                })
-                            )
-                        })}
-                        <div className="form-row">
-                            <div className="form-group col-md-4">
-                                <label htmlFor="inputEmail4">Họ tên</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={props.order.customerName}
-                                    readOnly />
-                            </div>
-                            <div className="form-group col-md-4">
-                                <label htmlFor="inputEmail4">Số điện thoại</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={props.order.customerPhone}
-                                    readOnly />
-                            </div>
-                            <div className="form-group col-md-4">
-                                <label htmlFor="inputEmail4">Ngày đặt</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={
-                                        props.order.status.createdAt !== null
-                                            ? (new Date(props.order.status.createdAt)).getDate() + '-' + (Number((new Date(props.order.status.createdAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.createdAt)).getFullYear()
-                                            : ''
-                                    }
-                                    readOnly />
-                            </div>
-
-                        </div>
-                        <div className="form-row">
-                            <div className="form-group col-md-8">
-                                <label htmlFor="inputEmail4">Địa chỉ</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={props.order.shippingAddress}
-                                    readOnly />
-                            </div>
-                        </div>
-                        <div className="form-row">
-                            <div className="form-group col-md-3">
-                                <label htmlFor="inputEmail4">Ngày đặt</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={
-                                        props.order.status.createdAt !== null
-                                            ? (new Date(props.order.status.createdAt)).getDate() + '-' + (Number((new Date(props.order.status.createdAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.createdAt)).getFullYear()
-                                            : ''
-                                    }
-                                    readOnly />
-                            </div>
-                            <div className="form-group col-md-3">
-                                <label htmlFor="inputEmail4">Ngày xác nhận</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={
-                                        props.order.status.deliveredAt !== null
-                                            ? (new Date(props.order.status.deliveredAt)).getDate() + '-' + (Number((new Date(props.order.status.deliveredAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.deliveredAt)).getFullYear()
-                                            : ''}
-                                    readOnly />
-                            </div>
-                            <div className="form-group col-md-3">
-                                <label htmlFor="inputEmail4">Ngày vận chuyển</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={
-                                        props.order.status.deliveryStartedAt !== null
-                                            ? (new Date(props.order.status.deliveryStartedAt)).getDate() + '-' + (Number((new Date(props.order.status.deliveryStartedAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.deliveryStartedAt)).getFullYear()
-                                            : ''
-                                    }
-                                    readOnly />
-                            </div>
-                            <div className="form-group col-md-3">
-                                <label htmlFor="inputEmail4">Ngày nhận hàng</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={
-                                        props.order.status.receivedAt !== null
-                                            ? (new Date(props.order.status.receivedAt)).getDate() + '-' + (Number((new Date(props.order.status.receivedAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.receivedAt)).getFullYear()
-                                            : ''
-                                    }
-                                    readOnly />
-                            </div>
-                        </div>
-                        <div className="form-row">
-                            <div className="form-group col-md-4">
-                                <label htmlFor="inputEmail4">Thành tiền</label>
-                                <input type="text" className="form-control" id="inputEmail4"
-                                    style={{ color: 'red' }}
-                                    defaultValue={props.order.totalPrice.toLocaleString('de-DE')}
-                                    readOnly />
-                            </div>
-                            <div className="form-group col-md-2">
-                                <label htmlFor="inputAddress">Trạng thái</label>
-                                <br />
-                                {getStatus(props.order.status)}
-                            </div>
-                            <div className="form-group col-md-4">
-                                <label htmlFor="inputAddress">Cập nhập trạng thái</label>
+                            <div className="form-group col-md-12">
                                 <select className="form-control" id="inputAddress"
-                                    {...register("status", {
+                                    defaultValue={props.user.addresses && props.user.addresses[0] ? props.user.addresses[0].id : ''}
+                                    {...register("address", {
                                         // required: true,
-                                        onChange: (e, idOrder) => updateStatus(e, props.order._id)
                                     })}>
-                                    <option value={''}></option>
-                                    <option value={'canceled'}>Hủy đơn hàng</option>
-                                    <option value={'received'}>Xác nhận đơn hàng</option>
-                                    <option value={'deliveryStarted'}>Đang giao hàng</option>
-                                    <option value={'deliveredAt'}>Đã nhận hàng</option>
+                                    {props.user.addresses && props.user.addresses.map((item, index) => {
+                                        return (
+                                            <option value={item._id} key={item._id}>{item.address}</option>
+                                        )
+                                    })}
                                 </select>
                             </div>
-                        </div> */}
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group col-md-4">
+                                <label htmlFor="inputEmail4">Ngày tạo</label>
+                                <input type="text" className="form-control" id="inputEmail4"
+                                    defaultValue={props.user.createdAt}
+                                    readOnly />
+                            </div>
+                            <div className="form-group col-md-4">
+                                <label htmlFor="inputPassword4">Ngày cập nhập</label>
+                                <input type="text" className="form-control" id="inputPassword4" placeholder=""
+                                    defaultValue={props.user.updatedAt}
+                                    readOnly
+                                // {...register("email", {
+                                //     // required: true,
+                                //     // minLength: 6
+                                // })} 
+                                />
+                            </div>
+                        </div>
                     </form>
                     {/* </div> */}
                 </ModalBody>
