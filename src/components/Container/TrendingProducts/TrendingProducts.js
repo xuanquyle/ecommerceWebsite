@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { path } from "../../../utils/constant"
+import { Link } from "react-router-dom";
 
 const TrendingProducts = (props) => {
     const settings = {
@@ -46,7 +47,7 @@ const TrendingProducts = (props) => {
     ]
 
     const addClick = (e) => {
-        alert('a');
+        // alert('a');
     }
     return (
         props.arrProduct &&
@@ -79,11 +80,13 @@ const TrendingProducts = (props) => {
                                                     <div className="product product-2 productrending" key={item._id}
                                                         style={{ height: '390px !important' }}>
                                                         <figure className="product-media">
-                                                            <img src={path.SERVER_URL + '/' + item.thumb} alt="Product image"
-                                                                style={{ maxHeight: '70%' }}
-                                                                className="product-image"
-                                                                onClick={(e) => { addClick() }} />
-
+                                                            <Link to={'/ProductDetails/' + item.slug}>
+                                                                <img src={path.SERVER_URL + '/' + item.thumb} alt="Product image"
+                                                                    style={{ maxHeight: '70%' }}
+                                                                    className="product-image"
+                                                                // onClick={(e) => { addClick() }} 
+                                                                />
+                                                            </Link>
                                                             <div className="product-action">
                                                                 <p className="btn-product btn-cart" title="Add to cart" style={{ cursor: 'pointer' }}><span>thêm vào giỏ</span></p>
                                                                 <p className="btn-product btn-quickview" title="Quick view" style={{ cursor: 'pointer' }}><span>xem nhanh</span></p>
@@ -94,7 +97,7 @@ const TrendingProducts = (props) => {
                                                         // style={{width: '160px'}}
                                                         >
                                                             <div className="product-cat">
-                                                                <a href="#">{item.category.name}</a>
+                                                                <Link to={'/ProductDetails/' + item.slug}>{item.category.name}</Link>
                                                             </div>
                                                             <h3 className="product-title"><a href="product.html">{item.name}</a></h3>
                                                             {/* <div className="product-price">

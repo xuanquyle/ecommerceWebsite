@@ -7,6 +7,7 @@ import { connect, useSelector } from "react-redux";
 import { getUserOrder } from '../../api';
 import ModalOrder from './ModalOrder';
 
+
 const Purchased = (props) => {
     const [userOrder, setUserOrder] = useState()
     const [userSelected, setUserSelected] = useState();
@@ -28,18 +29,26 @@ const Purchased = (props) => {
         }
     }
 
-    const getStatus = (arr) => {
-        if (arr.deliveredAt === null)
+    const getStatus = (arr, canceledAt) => {
+        if (canceledAt !== null) {
             return (
-                <span className='badge badge-secondary'>Chờ xác nhận</span>
+                <span className='badge badge-danger'>Đã hủy đơn</span>
+            )
+        }
+        if (arr.receivedAt === null)
+            return (
+                <span className=' badge badge-secondary'>Chờ xác nhận</span>
             )
         if (arr.deliveryStartedAt === null)
             return (
-                <span className=' badge badge-warning'>Đang giao hàng</span>
+                <span className=' badge badge-primary'>Đã xác nhận</span>
             )
-        if (arr.receivedAt === null)
+        if (arr.deliveredAt === null)
             return (
-                <span className=' badge badge-success'>Đã nhận hàng</span>
+                <span className='badge badge-warning'>Đang giao hàng</span>
+            )
+            return (
+                <span className='badge badge-success'>Đã nhận hàng</span>
             )
     }
     useEffect(() => {
@@ -56,7 +65,7 @@ const Purchased = (props) => {
                 isOpen={isOpenModal}
                 toggle={toggle}
                 order={userSelected}
-                reloadData={fetchDateOrderUser} 
+                reloadData={fetchDateOrderUser}
             />
             <div className="card mb-3">
                 <div className="card-body">
@@ -73,7 +82,7 @@ const Purchased = (props) => {
                             </thead>
                             <tbody>
                                 {/* {userOrder ? console.log('userOrder', userOrder) : console.log('ss')} */}
-                                {userOrder && userOrder.map((item, index) => {
+                                {userOrder && userOrder.slice(0).reverse().map((item, index) => {
                                     return (
                                         <tr key={item._id}
                                         >
@@ -87,8 +96,8 @@ const Purchased = (props) => {
                                             <td className="product-col">
                                                 <div className="product">
                                                     <h3 className="product-title"
-                                                    >                                        
-                                                        {getStatus(item.status)}
+                                                    >
+                                                        {getStatus(item.status, item.canceledAt)}
                                                     </h3>
                                                 </div>
                                             </td>
@@ -98,7 +107,7 @@ const Purchased = (props) => {
                                             </td>
                                             <td className="product-col">
                                                 <div className="cart-product-quantity">
-                                                    {(new Date(item.createdAt)).getDay() + '-' + (new Date(item.createdAt)).getMonth() + '-' + (new Date(item.createdAt)).getFullYear()}
+                                                    {(new Date(item.createdAt)).getDate() + '-' + (Number((new Date(item.createdAt)).getMonth()) + 1) + '-' + (new Date(item.createdAt)).getFullYear()}
                                                 </div>
                                             </td>
                                             <td className="product-col">

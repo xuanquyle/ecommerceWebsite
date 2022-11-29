@@ -1,5 +1,6 @@
 import p1 from "../../../assets/images/demos/demo-4/products/product-10.jpg";
 import { path } from "../../../utils/constant"
+import { Link } from "react-router-dom";
 
 const Recomandation = (props) => {
 
@@ -57,17 +58,17 @@ const Recomandation = (props) => {
                                 <div className="col-6 col-md-4 col-lg-3" key={item._id}>
                                     <div className="product product-2">
                                         <figure className="product-media">
-                                            <a href="/">
+                                            <Link to={'/ProductDetails/' + item.slug}>
                                                 <img src={path.SERVER_URL + '/' + item.thumb} alt="Product image" className="product-image" />
-                                            </a>
+                                            </Link>
                                             <div className="product-action">
-                                                <a href="#" className="btn-product btn-cart" title="Add to cart"><span>Thêm vào giỏ</span></a>
-                                                <a href="popup/quickView.html" className="btn-product btn-quickview" title="Quick view"><span>Xem nhanh</span></a>
+                                                {/* <a href="#" className="btn-product btn-cart" title="Add to cart"><span>Thêm vào giỏ</span></a>
+                                                <a href="popup/quickView.html" className="btn-product btn-quickview" title="Quick view"><span>Xem nhanh</span></a> */}
                                             </div>
                                         </figure>
                                         <div className="product-body">
                                             <div className="product-cat">
-                                                <a href="#">{item.category.name}</a>
+                                                <Link to={'/ProductDetails/' + item.slug}>{item.category.name}</Link>
                                             </div>
                                             <h3 className="product-title"><a href="product.html">{item.name}</a></h3>
                                             {/* <div className="product-price">

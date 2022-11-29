@@ -67,22 +67,32 @@ const Cart = (props) => {
         try {
             const rep = await getCartById(props.user.isLoggedIn, props.user.id)
             setCart(rep.data[0])
+            console.log("data", rep)
             let totalTemp = 0
-            const temp = rep.data[0].cartItems.map((item) => {
+            let temp = rep.data[0].cartItems.map((item) => {
                 return (
                     item.product.options.map((item2) => {
                         if (item2._id === item.option) {
                             totalTemp += Number(item2.price) * Number(item.qty)
-                            // console.log('total',item2.price,item.qt)                           
+                            // console.log('total', item2.color)
                             return item2;
                         }
                     }))
             })
             setTotalPrice(totalTemp)
+            temp = temp.map((item) => {
+                return (item.filter(function (element) {
+                    return element !== undefined;
+                }))
+            })
+            // console.log('check tem 2', temp2)
             setCurOption(temp)
+
+            // console.log('temp', temp)
             localStorage.removeItem('amoutInCart');
             localStorage.setItem('amoutInCart', JSON.stringify(rep.data[0].cartItems.length));
-            let data = {amountIncart: rep.data[0].cartItems.length}
+            console.log(rep.data[0].cartItems.length)
+            let data = { amountIncart: rep.data[0].cartItems.length }
             dispatch(cartAction(data));
             // console.log(temp);
         } catch (error) {
@@ -110,6 +120,11 @@ const Cart = (props) => {
                 // console.log(res);
                 setIsOrder(false);
                 fetchDataCart();
+                localStorage.removeItem('amoutInCart');
+                localStorage.setItem('amoutInCart', JSON.stringify(0));
+                // console.log(rep.data[0].cartItems.length)
+                let data = { amountIncart: 0 }
+                dispatch(cartAction(data));
                 notify('success', 'Đặt hàng thành công !')
             } catch (error) {
 

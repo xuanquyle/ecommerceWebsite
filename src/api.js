@@ -19,6 +19,22 @@ const Register = (data) => {
         })
     )
 }
+
+const changePassword = (accessToken,id,data) => {
+    return (
+        axios({
+            headers: {
+                // 'content-type': 'multipart/form-data',
+                "Access-Control-Allow-Origin": "*",
+                "token": `Bearer ${accessToken}`
+            },
+            method: 'post',
+            url: `http://localhost:8080/api/users/me/${id}/change-password`,
+            data: data
+        })
+    )
+}
+
 const getProfileUser = (accessToken, id) => {
     return (
         axios({
@@ -213,13 +229,13 @@ const addOrder = (accessToken, id, data) => {
                 "token": `Bearer ${accessToken}`
             },
             method: 'post',
-            url: `http://localhost:8080/api/orders/${id}`,
+            url: `http://localhost:8080/api/orders/me/${id}`,
             data: data
         })
     )
 }
 
-const cancelOrder = (accessToken, id) => {
+const cancelOrder = (accessToken, id, order_id) => {
     // id : order id
     return (
         axios({
@@ -229,13 +245,13 @@ const cancelOrder = (accessToken, id) => {
                 "token": `Bearer ${accessToken}`
             },
             method: 'put',
-            url: `http://localhost:8080/api/orders/me/${id}/cancel-order`,
+            url: `http://localhost:8080/api/orders/me/${id}/cancel-order/${order_id}`,
         })
     )
 }
 
 export {
-    getAllProvinces, getDistrict, getAllProduct, getProductBySlug, getAllCategories, getWard, Login,
-    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct, addToCart, getCartById, deleteItemInCart, Register,
-    addOrder, getUserOrder, cancelOrder
+    getAllProvinces, getDistrict, getAllProduct, getProductBySlug, getAllCategories, getWard, Login, changePassword,
+    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct, addToCart, getCartById, deleteItemInCart, 
+    Register, addOrder, getUserOrder, cancelOrder
 }

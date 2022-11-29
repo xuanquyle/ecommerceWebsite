@@ -18,14 +18,27 @@ const ModalOrder = (props) => {
     }
 
     const getStatus = (arr) => {
-        if (arr.deliveredAt === null)
+        if (arr.receivedAt === null)
             return (
-                <div className='d-flex justify-content-center align-items-center'>
-                    <span className='badge badge-secondary'
-                        style={{ fontSize: '1.4rem' }}>Chờ xác nhận</span>
-                    <button className='btn-danger rounded ml-3'
-                        onClick={onCancelOrder}>Hủy đơn hàng
-                    </button>
+                <div className='d-flex align-items-center'>
+                    {props.order.canceledAt === null
+                        ? (
+                            <span className='badge badge-secondary'
+                                style={{ fontSize: '1.4rem' }}>Chờ xác nhận</span>
+                        ) : (
+                            <span className='badge badge-danger'
+                                style={{ fontSize: '1.4rem' }}>Đơn đã hủy</span>
+                        )
+
+                    }
+
+                    {props.order.canceledAt === null
+                        ? (
+                            <button className='btn-danger rounded ml-3'
+                                onClick={onCancelOrder}>Hủy đơn hàng
+                            </button>
+                        ) : ''}
+
                 </div>
             )
         if (arr.deliveryStartedAt === null)
@@ -33,7 +46,7 @@ const ModalOrder = (props) => {
                 <span className=' badge badge-warning'
                     style={{ fontSize: '1.4rem' }}>Đang giao hàng</span>
             )
-        if (arr.receivedAt === null)
+        if (arr.deliveredAt === null)
             return (
                 <span className=' badge badge-success'
                     style={{ fontSize: '1.4rem' }}>Đã nhận hàng</span>
@@ -44,8 +57,10 @@ const ModalOrder = (props) => {
         if (window.confirm('Bạn có chắc muốn hủy đơn hàng này ?')) {
             try {
                 console.log(props.order._id)
-                let res = await cancelOrder(props.user.isLoggedIn, props.order._id)
-                console.log(res);
+                let res = await cancelOrder(props.user.isLoggedIn, props.user.id, props.order._id)
+                // console.log(res);
+                notify('success', 'Đã hủy đơn hàng thành công')
+                props.toggle();
             } catch (error) {
 
             }
@@ -55,7 +70,7 @@ const ModalOrder = (props) => {
     return (
         props.order &&
         <div>
-            <ToastContainer />
+            <ToastContainer theme='colored' />
             <Modal isOpen={props.isOpen} toggle={props.toggle}
                 size="lg" style={{ maxWidth: '900px', width: '100%' }}>
                 <ModalHeader toggle={props.toggle} close={closeBtn}>Chi tiết đơn hàng</ModalHeader>
@@ -138,19 +153,23 @@ const ModalOrder = (props) => {
                             <div className="form-group col-md-4">
                                 <label htmlFor="inputEmail4">Họ tên</label>
                                 <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={props.order.user.name}
+                                    defaultValue={props.order.customerName}
                                     readOnly />
                             </div>
                             <div className="form-group col-md-4">
-                                <label htmlFor="inputEmail4">Thành tiền</label>
+                                <label htmlFor="inputEmail4">Số điện thoại</label>
                                 <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={props.order.totalPrice.toLocaleString('de-DE')}
+                                    defaultValue={props.order.customerPhone}
                                     readOnly />
                             </div>
                             <div className="form-group col-md-4">
                                 <label htmlFor="inputEmail4">Ngày đặt</label>
                                 <input type="text" className="form-control" id="inputEmail4"
-                                    defaultValue={(new Date(props.order.createdAt)).getDay() + '-' + (new Date(props.order.createdAt)).getMonth() + '-' + (new Date(props.order.createdAt)).getFullYear()}
+                                    defaultValue={
+                                        props.order.status.createdAt !== null
+                                            ? (new Date(props.order.status.createdAt)).getDate() + '-' + (Number((new Date(props.order.status.createdAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.createdAt)).getFullYear()
+                                            : ''
+                                    }
                                     readOnly />
                             </div>
 
@@ -160,6 +179,56 @@ const ModalOrder = (props) => {
                                 <label htmlFor="inputEmail4">Địa chỉ</label>
                                 <input type="text" className="form-control" id="inputEmail4"
                                     defaultValue={props.order.shippingAddress}
+                                    readOnly />
+                            </div>
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group col-md-3">
+                                <label htmlFor="inputEmail4">Ngày đặt</label>
+                                <input type="text" className="form-control" id="inputEmail4"
+                                    defaultValue={
+                                        props.order.status.createdAt !== null
+                                            ? (new Date(props.order.status.createdAt)).getDate() + '-' + (Number((new Date(props.order.status.createdAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.createdAt)).getFullYear()
+                                            : ''
+                                    }
+                                    readOnly />
+                            </div>
+                            <div className="form-group col-md-3">
+                                <label htmlFor="inputEmail4">Ngày xác nhận</label>
+                                <input type="text" className="form-control" id="inputEmail4"
+                                    defaultValue={
+                                        props.order.status.deliveredAt !== null
+                                            ? (new Date(props.order.status.deliveredAt)).getDate() + '-' + (Number((new Date(props.order.status.deliveredAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.deliveredAt)).getFullYear()
+                                            : ''}
+                                    readOnly />
+                            </div>
+                            <div className="form-group col-md-3">
+                                <label htmlFor="inputEmail4">Ngày vận chuyển</label>
+                                <input type="text" className="form-control" id="inputEmail4"
+                                    defaultValue={
+                                        props.order.status.deliveryStartedAt !== null
+                                            ? (new Date(props.order.status.deliveryStartedAt)).getDate() + '-' + (Number((new Date(props.order.status.deliveryStartedAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.deliveryStartedAt)).getFullYear()
+                                            : ''
+                                    }
+                                    readOnly />
+                            </div>
+                            <div className="form-group col-md-3">
+                                <label htmlFor="inputEmail4">Ngày nhận hàng</label>
+                                <input type="text" className="form-control" id="inputEmail4"
+                                    defaultValue={
+                                        props.order.status.receivedAt !== null
+                                            ? (new Date(props.order.status.receivedAt)).getDate() + '-' + (Number((new Date(props.order.status.receivedAt)).getMonth()) + 1) + '-' + (new Date(props.order.status.receivedAt)).getFullYear()
+                                            : ''
+                                    }
+                                    readOnly />
+                            </div>
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group col-md-4">
+                                <label htmlFor="inputEmail4">Thành tiền</label>
+                                <input type="text" className="form-control" id="inputEmail4"
+                                    style={{ color: 'red' }}
+                                    defaultValue={props.order.totalPrice.toLocaleString('de-DE')}
                                     readOnly />
                             </div>
                             <div className="form-group col-md-4">

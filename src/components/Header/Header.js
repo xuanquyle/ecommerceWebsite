@@ -37,6 +37,7 @@ const Header = (props) => {
             localStorage.removeItem('amoutInCart');
             localStorage.setItem('amoutInCart', JSON.stringify(rep.data[0].cartItems.length));
             let data = { amountIncart: rep.data[0].cartItems.length }
+            console.log('cart', rep.data[0].cartItems.length)
             dispatch(cartAction(data));
             // console.log(temp);
         } catch (error) {
@@ -44,6 +45,9 @@ const Header = (props) => {
         }
     }
 
+    useEffect(() => {
+        fetchDataCart();
+    }, [props.cart.amountIncart])
     useEffect(() => {
         fetchDataCart();
     }, [])
@@ -68,7 +72,7 @@ const Header = (props) => {
                                     <Link to={path.CART} className="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                                         <div className="icon">
                                             <i className="icon-shopping-cart"></i>
-                                            {(props.user && props.cart && props.user.isLoggedIn !== '')
+                                            {(props.user && props.cart && props.cart.amountIncart && props.user.isLoggedIn !== '')
                                                 ? (
                                                     <span className="cart-count">
                                                         {props.cart.amountIncart}
@@ -101,13 +105,13 @@ const Header = (props) => {
                                                         : 'Tài khoản'}
                                                 </p>
                                             </Link>
-                                            <Link className="dropdown-toggle ml-3"
+                                            <div className="d-flex align-items-center ml-3"
                                                 style={{ fontFamily: 'aria !important' }}>
                                                 <span onClick={handleLogout}
                                                     style={{ fontSize: '1.4rem', }}>
                                                     <i className="icon-signout"></i>
                                                 </span>
-                                            </Link>
+                                            </div>
                                         </>
                                     )}
                                 </div>

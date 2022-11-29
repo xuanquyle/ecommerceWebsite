@@ -29,7 +29,7 @@ const romF = localStorage.getItem('rom') ? JSON.parse(localStorage.getItem('rom'
 const cateF = localStorage.getItem('cate') ? JSON.parse(localStorage.getItem('cate')) : 'ALL';
 const paginationF = localStorage.getItem('pagination') ? JSON.parse(localStorage.getItem('pagination')) : '';
 // CART
-const amountInCartF = localStorage.getItem('amoutInCart') ? JSON.parse(localStorage.getItem('amoutInCart')) : '';
+const amountInCartF = localStorage.getItem('amoutInCart') ? JSON.parse(localStorage.getItem('amoutInCart')) : 0;
 
 const initialState = {
     userLogin: {
