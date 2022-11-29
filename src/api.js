@@ -20,7 +20,7 @@ const Register = (data) => {
     )
 }
 
-const changePassword = (accessToken,id,data) => {
+const changePassword = (accessToken, id, data) => {
     return (
         axios({
             headers: {
@@ -34,6 +34,21 @@ const changePassword = (accessToken,id,data) => {
         })
     )
 }
+
+// 
+const searchData = (data) => {
+    return (
+        axios({
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'get',
+            url: `http://localhost:8080/api/products/all-product?${data}`,
+            // data: data
+        })
+    )
+}
+// const verifyEmail 
 
 const getProfileUser = (accessToken, id) => {
     return (
@@ -126,10 +141,11 @@ const getAllProduct = () => {
 
 
 const getFiltersProduct = (params) => {
+    // let minPriceTemp = (Number(params.price) === 10) 
     const paramsData = new URLSearchParams({
         category: params.cate === 'ALL' ? '' : params.cate,
-        max_price: params.price === 'ALL' ? '' : Number(params.price * 1000000),
-        min_price: params.price === 'ALL' ? '' : Number((params.price - 5) * 1000000),
+        max_price: params.price === 'ALL' ? '' : (Number(params.price) === 30 ? 1000000000 : Number(params.price * 1000000)),
+        min_price: params.price === 'ALL' ? '' : (Number(params.price) === 10) ? 0 : Number((params.price - 5) * 1000000),
         max_ram: params.ram === 'ALL' ? '' : params.ram,
         min_ram: params.ram === 'ALL' ? '' : params.ram,
         max_rom: params.rom === 'ALL' ? '' : params.rom,
@@ -252,6 +268,6 @@ const cancelOrder = (accessToken, id, order_id) => {
 
 export {
     getAllProvinces, getDistrict, getAllProduct, getProductBySlug, getAllCategories, getWard, Login, changePassword,
-    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct, addToCart, getCartById, deleteItemInCart, 
-    Register, addOrder, getUserOrder, cancelOrder
+    getProfileUser, createAddress, deleteAddress, updateProfile, getFiltersProduct, addToCart, getCartById, deleteItemInCart,
+    Register, addOrder, getUserOrder, cancelOrder, searchData
 }

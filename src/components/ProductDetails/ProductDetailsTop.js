@@ -27,13 +27,45 @@ const ProductDetailsTop = (props) => {
     const [fullOption, setFullOption] = useState(true);
     const [price, setPrice] = useState(props.product.options[0].price);
     const [qty, setQty] = useState(1);
-    
-    const [color, setColor] = useState(props.product.options.map((item, index) => {
-        return (
-            { 'id': item._id, 'op': item.color, 's': 1 }
-        )
-    }))
 
+    const creatArrColor = (arr) => {
+        const temp = props.product.options.map((item, index) => {
+            return (
+                { 'id': item._id, 'op': item.color, 's': 1 }
+            )
+        })
+        console.log('ssss', temp)
+        // temp.map((item, index) => {
+        //     item.map((item2, index2) => {
+        //         if(item.color === item2.color) {
+        //             console.log('>>>', item.color)
+        //         }
+        //     })
+        // })
+        for (let i = 0; i < Object.keys(temp).length - 1; i++) {
+            for (let j = i + 1; j < Object.keys(temp).length; j++) {
+                if (temp[i].op === temp[j].op) {
+                    console.log('>>>', temp[i].op)
+                    delete (temp[j])
+                }
+            }
+        }
+        // var newArr = []
+        // for (var i = 0; i < arr.length; i++) {
+        //     if (newArr.indexOf(arr[i]) === -1) {
+        //         newArr.push(arr[i])
+        //     }
+        // }
+        console.log('temp', temp)
+        return temp
+    }
+
+    // const [color, setColor] = useState(props.product.options.map((item, index) => {
+    //     return (
+    //         { 'id': item._id, 'op': item.color, 's': 1 }
+    //     )
+    // }))
+    const [color, setColor] = useState(creatArrColor())
     const [ram, setRam] = useState(props.product.options.map((item, index) => {
         return (
             (curColor === item.color) ? { 'id': item._id, 'op': item.ram, 's': 1 }
@@ -95,11 +127,11 @@ const ProductDetailsTop = (props) => {
                 try {
                     const rep = await apiAddToCart(props.user.isLoggedIn, props.user.id, newData)
                     notify('success', 'Thêm vào giỏ thành công !')
-                    
+
                     // ACTION
                     localStorage.removeItem('amoutInCart');
                     localStorage.setItem('amoutInCart', JSON.stringify(Number(props.cart.amountIncart) + 1));
-                    let data = { amountIncart: Number(props.cart.amountIncart) + 1}
+                    let data = { amountIncart: Number(props.cart.amountIncart) + 1 }
                     dispatch(cartAction(data));
                 } catch (error) {
                     notify('error', error.response.data.message)
