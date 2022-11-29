@@ -100,3 +100,20 @@ export const deleteProduct = (id) => {
 export const getAllUSer = () => {
     return axios.get(`http://localhost:8080/api/users`)
 }
+
+// ORDER
+
+export const getAllOrder = () => {
+    return axios.get(`http://localhost:8080/api/orders`)
+}
+
+export const updateStatusOrder = (idOrder, data) => {
+    axios({
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        method: 'put',
+        url: `http://localhost:8080/api/orders/${idOrder}/update_status`,
+        data: data
+    })
+}

@@ -1,45 +1,64 @@
 import { useState, useEffect, useMemo } from "react"
-import { getAllProduct } from "../../Api";
+import { getAllOrder } from "../../Api";
 import { useTable, useSortBy, useGlobalFilter, usePagination } from "react-table"
 // import ModalProduct from "./ModalProduct";
 import { GlobalFilter } from "../ProductManager/globalFilter";
-import ModalOrder from "./OrderModal";
+import ModalOrder from "./ModalOrder";
 
 const OrderManager = () => {
-    const data = [
-        { id: '637c8748ce9841f2f205c2ef', name: "Xuân Quý", status: 'Chờ xác nhận ', price: '3.500.000', date: '21/11/2022', email: 'xuanquy1214@gmail.com' },
-        { id: '637c8748ce9841f2sf05c2kf', name: "Xuân Quý", status: 'Đang giao hàng', price: '54.500.000', date: '15/11/2022', email: 'xuanquy1214@gmail.com' },
-        { id: '637c8748ce9841fadf05c2et', name: "Tuyên", status: 'Đã nhận hàng', price: '31.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
-        { id: '637c8748ce9841f2f205c2as', name: "Võ Hải Tuyên", status: 'Đã nhận hàng', price: '47.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
-        { id: '637c8748ád9841f2f205c2ef', name: "Xuân Quý", status: 'Đã xác nhận', price: '3.500.000', date: '21/11/2022', email: 'xuanquy1214@gmail.com' },
-        { id: '637c8748ceeff1f2sf05c2kf', name: "Xuân Quý", status: 'Đang giao hàng', price: '54.500.000', date: '15/11/2022', email: 'xuanquy1214@gmail.com' },
-        { id: '637c8748ceasajfadf05c2et', name: "Tuyên", status: 'Đã xác nhận', price: '31.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
-        { id: '637c8748cosifpf2f205c2as', name: "Võ Hải Tuyên", status: 'Đã nhận hàng', price: '47.500.000', date: '14/11/2022', email: 'vohaituyen12a7@gmail.com' },
-    ]
-    const [product, setProduct] = useState();
+
+    const [order, setOrder] = useState();
     const [isOpenModal, setIsOpenModal] = useState(false)
-    const [action, setAction] = useState('create')
-    const [selectedProduct, setSelectedProduct] = useState('')
-    const [order, setOrder] = useState(data);
+    const [selectedOrder, setSelectedOrder] = useState('')
 
 
-    // setOrder(data)
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const data = await getAllProduct();
-    //             setOrder(data.data)
-    //             // console.log(data.data);
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     }
-    //     fetchData();
-    // }, [])
+    const fetchData = async () => {
+        try {
+            const res = await getAllOrder();
+            setOrder(res.data.reverse())
+            console.log(res.data)
+            Object.keys(res.data[7]).map((item, index) => {
+                console.log(index, item)
+            })
+        } catch (error) {
+            // console.log(error);
+        }
+    }
+    useEffect(() => {
+        fetchData();
+    }, [])
+    const getStatus = (arr) => {
+        if (arr.canceledAt !== null) {
+            return (
+                <span className='badge badge-danger'>Đã hủy đơn</span>
+            )
+        }
+        if (arr.status.receivedAt === null)
+            return (
+                <span className=' badge badge-secondary'>Chờ xác nhận</span>
+            )
+        if (arr.status.deliveryStartedAt === null)
+            return (
+                <span className=' badge badge-warning'>Đang giao hàng</span>
+            )
+        if (arr.status.deliveredAt === null)
+            return (
+                <span className=' badge badge-success'>Đã nhận hàng</span>
+            )
+    }
+
     const orderData = useMemo(() => {
         return (
             order && order.map((item, index) => {
-                return item
+                let copy = item
+                copy['stt'] = index + 1
+                let tempStatus = [
+                    { createdAt: copy['status'].createdAt },
+                    { deliveredAt: copy['status'].deliveredAt },
+                    { deliveryStartedAt: copy['status'].deliveryStartedAt },
+                    { receivedAt: copy['status'].receivedAt },
+                ]
+                return copy
             })
         )
     }
@@ -50,24 +69,20 @@ const OrderManager = () => {
         (order && order[0]) ?
             [
                 {
-                    Header: "Họ tên",
-                    accessor: Object.keys(order[0])[1]
+                    Header: "STT",
+                    accessor: 'stt'
                 },
                 {
-                    Header: "email",
-                    accessor: Object.keys(order[0])[5]
+                    Header: "Mã đơn hàng",
+                    accessor: '_id'
                 },
                 {
-                    Header: "Tổng tiền",
-                    accessor: Object.keys(order[0])[3]
+                    Header: "Tên",
+                    accessor: 'customerName',
                 },
-                // {
-                //     Header: "Trạng thái",
-                //     accessor: Object.keys(order[0])[2]
-                // },
                 {
-                    Header: "Ngày đặt",
-                    accessor: Object.keys(order[0])[4]
+                    Header: "Số điện thoại",
+                    accessor: 'customerPhone',
                 },
             ]
             : []
@@ -81,11 +96,18 @@ const OrderManager = () => {
                 Header: "Trạng thái",
                 Cell: ({ row }) => {
                     return (
+                        getStatus(row.original)
+                    )
+                }
+            },
+            {
+                id: "Ngày đặt",
+                Header: "Ngày đặt",
+                Cell: ({ row }) => {
+                    return (
                         <>
-                            <button className="btn-primary rounded" onClick={() => readProduct(row)}
-                                style={{ marginRight: '5px' }}>
-                                {row.original.status}
-                            </button>
+                            {(new Date(row.original.createdAt)).getDate() + '-' + (Number((new Date(row.original.createdAt)).getMonth()) + 1)
+                                + '-' + (new Date(row.original.createdAt)).getFullYear()}
                         </>
                     )
 
@@ -93,18 +115,14 @@ const OrderManager = () => {
             },
             {
                 id: "Edit",
-                Header: "Edit",
+                Header: "",
                 Cell: ({ row }) => {
                     return (
                         <>
-                            <button className="btn-primary rounded" onClick={() => readProduct(row)}
-                                style={{ marginRight: '5px' }}>
-                                <i className="fas fa-eye" style={{ fontWeight: '600', }}></i>
-                            </button>
-                            <button className="btn-success rounded" onClick={() => handleEditProduct(row)}>
+                            <button className="btn-success rounded m-2" onClick={() => handleEditOrder(row)}
+                            >
                                 <i className="fas fa-edit" style={{ fontWeight: '600', }}></i>
                             </button>
-
                         </>
                     )
 
@@ -137,28 +155,21 @@ const OrderManager = () => {
 
     const { pageIndex, pageSize } = state;
     const toggle = () => setIsOpenModal(!isOpenModal);
-    //MODEL ADD
-    //EDIT
-    const handleEditProduct = (row) => {
-        setIsOpenModal(true)
-        // // console.log('row', row.original);
-        // setSelectedProduct(row.original)
-        // // setAction('update')
-        // setIsOpenModal(true)
-    }
 
-    const readProduct = (row) => {
-        setSelectedProduct(row.original)
-        setAction('read')
+    //EDIT
+    const handleEditOrder = (row) => {
+        setSelectedOrder(row.original)
         setIsOpenModal(true)
     }
+    
     return (
         order &&
         <>
-            {/* <ModalOrder
+            <ModalOrder
                 isOpen={isOpenModal}
                 toggle={toggle}
-                order={order[0]} /> */}
+                order={selectedOrder}
+            />
             <div className="title-container">
                 <h5 className="px-3">Quản lý đơn hàng</h5>
                 <hr />

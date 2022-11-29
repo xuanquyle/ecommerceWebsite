@@ -317,9 +317,10 @@ const ModalProduct = (props) => {
                                     <div className="form-group col-md-4">
                                         <label htmlFor="inputAddress">Danh mục</label>
                                         <select className="form-control" id="inputAddress"
-                                            defaultValue={props.product.category_id}
+                                            defaultValue={props.product.category}
                                             {...register("category", {
                                                 required: true,
+                                                // defaultvalue: props.product.category_id,
                                             })}>
                                             {arrCate && arrCate.map((item, index) => {
                                                 return (

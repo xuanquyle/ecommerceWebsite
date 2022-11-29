@@ -7,8 +7,7 @@ import { GlobalFilter } from "../ProductManager/globalFilter";
 const UserManager = (props) => {
     const [user, setUser] = useState();
     const [isOpenModal, setIsOpenModal] = useState(false)
-    const [action, setAction] = useState('create')
-    const [selectedProduct, setSelectedProduct] = useState('')
+    const [selectedUser, setSelectedUser] = useState('');
 
     const fetchData = async () => {
         try {
@@ -76,7 +75,7 @@ const UserManager = (props) => {
                                 <i className="fas fa-eye" style={{ fontWeight: '600', }}></i>
                             </button>
                             {(row.original.deleted) ? (
-                                <button className="btn-danger rounded" onClick={() => handleEditProduct(row)}>
+                                <button className="btn-danger rounded" onClick={() => handleDeleteProduct(row)}>
                                     <i className="fas fa-lock" style={{ fontWeight: '600', }}></i>
                                 </button>
                             ) : (
@@ -119,17 +118,16 @@ const UserManager = (props) => {
     const toggle = () => setIsOpenModal(!isOpenModal);
     //MODEL ADD
     const handleAddProduct = () => {
-        setAction('create')
         setIsOpenModal(true)
     }
     //EDIT
     const handleEditProduct = (row) => {
         // console.log('row', row.original);
         setSelectedProduct(row.original)
-        setAction('update')
+
         setIsOpenModal(true)
     }
-
+    // DELTE
     const readProduct = (row) => {
         setSelectedProduct(row.original)
         setAction('read')
@@ -141,12 +139,11 @@ const UserManager = (props) => {
 
             {user ? (
                 <div>
-                    {/* <ModalProduct
+                    <ModalProduct
                         isOpen={isOpenModal}
                         toggle={toggle}
-                        user={selectedProduct}
-                        action={action}
-                        updateData={fetchData} /> */}
+                        user={selectedUser}
+                    />
 
                     <div className="title-container">
                         <h5 className="px-3">Quản lý tài khoản</h5>
