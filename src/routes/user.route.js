@@ -11,7 +11,9 @@ const authMiddleware = require('../app/middlewares/auth.middleware');
 router.post('/auth/refresh-token', userRoute.requestRefreshToken)
 
 //VERIFY EMAIL
-router.get('/auth/verify', userRoute.verifyEmail)
+router.get('/auth/verify', userRoute.verifyEmail, (req, res, next) => {
+    res.send('<div><center><p style="margin-top:50px; font-size:30px">Xác thực tài khoản thành công. Vui lòng quay lại trang đăng nhập</p></center></div>')
+})
 
 // customer route 
 router.post('/auth/login', userRoute.login)

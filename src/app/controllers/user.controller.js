@@ -310,7 +310,7 @@ class UserController {
             user.verifiedAt = Date.now()
             const registeredUser = await user.save()
             if (!registeredUser) throw new ErrorHandler.ServerError('Có lỗi, vui lòng thử lại sau')
-            res.status(200).json(`Xác thực thành công tài khoản email ${req.query.email}`)
+            next()
         }
         catch (err) {
             throw ErrorHandler.BadRequestError(err.message)

@@ -101,20 +101,27 @@ class OrderController {
     async updateStatusOrder(req, res, next) {
         try {
             const order = await Orders.findById(req.params.order_id)
-            if (!order) throw new ErrorHandler.NotFoundError('Order not found')
-
+            if (!order) throw new ErrorHandler.NotFoundError('Không tìm thấy đơn hàng')
+            if (order.canceledAt !== null) throw new ErrorHandler.BadRequestError('Đơn hàng đã bị hủy')
             if (req.body.status == 'received')
                 !order.status.receivedAt ? order.status.receivedAt = Date.now() : order.status.receivedAt;
             if (req.body.status == 'deliveryStarted')
                 !order.status.receivedAt ? order.status.receivedAt = order.status.deliveryStartedAt = Date.now() : !order.status.deliveryStartedAt ? order.status.deliveryStartedAt = Date.now() : order.status.deliveryStartedAt;
-            const updatedOrder = await order.save()
-            if (!updatedOrder.length) throw new ErrorHandler.NotFoundError('Order not found')
-            if (req.body.status == 'deliveryStarted') {
+
+
+            let err = '';
+            if (req.body.status == 'received') {
                 order.orderItems.forEach(async (orderItem) => {
-                    const updateProduct = await Products.findByIdAndUpdate(orderItem.product);
-                    if (!updateProduct) throw new ErrorHandler.NotFoundError(`Product ${orderItem.product} not found`)
+                    const updateProduct = await Products.findByIdAndUpdate(orderItem.product, {
+
+                    });
+                    if (!updateProduct)
+                        err += `Sản phẩm ${orderItem.product} không đủ số lượng theo đơn hàng >>>>`
                 })
             }
+            const updatedOrder = await order.save()
+            if (!updatedOrder) throw new ErrorHandler.BadRequestError('Không thể cập nhật đơn hàng')
+            
             res.status(200).json(updatedOrder)
         }
         catch (err) {
