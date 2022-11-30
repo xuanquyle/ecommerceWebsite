@@ -5,6 +5,7 @@ const cartRoute = require('./cart.route');
 const categoryRoute = require('./category.route');
 const orderRoute = require('./order.route');
 const adminRoute = require('./admin.route');
+const pageRoute = require('./page.route');
 const userController = require('../app/controllers/user.controller');
 function routes(app) {
     app.use('/api/products', productRoute);
@@ -13,6 +14,7 @@ function routes(app) {
     app.use('/api/categories', categoryRoute);
     app.use('/api/orders', orderRoute);
     app.use('/api/admin', adminRoute);
+    app.use('/api/page', pageRoute);
     app.use(ErrorMiddleware)
 }
 

@@ -198,8 +198,8 @@ class ProductController {
                 }
             )
             if (!updateProduct) throw new ErrorHandler.NotFoundError('Product not found')
-            if (req.file && fs.existsSync(`src/public/images/${updateProduct.thumb}`))
-                fs.unlink(`src/public/images/${updateProduct.thumb}`, (err) => {
+            if (req.file && fs.existsSync(`src/${updateProduct.thumb}`))
+                fs.unlink(`src/${updateProduct.thumb}`, (err) => {
                     if (err) throw new Error(err.message);
                 });
 

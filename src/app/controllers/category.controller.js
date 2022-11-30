@@ -73,7 +73,7 @@ class CategoryController {
                     });
                 throw new ErrorHandler.NotFoundError('Không tìm thấy phân loại này')
             }
-            else{
+            else {
                 if (fs.existsSync(`src/${updatedCate.image}`))
                     fs.unlink(`src/${updatedCate.image}`, (err) => {
                         if (err) throw new Error(err.message);
@@ -91,6 +91,10 @@ class CategoryController {
         try {
             const deletedCate = await Categories.findByIdAndDelete(req.params.id)
             if (!deletedCate) throw new ErrorHandler.NotFoundError('Không tìm thấy phân loại này')
+            if (fs.existsSync(`src/${deletedCate.image}`))
+                fs.unlink(`src/${deletedCate.image}`, (err) => {
+                    if (err) throw new Error(err.message);
+                });
             res.status(200).json(deletedCate)
         } catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)

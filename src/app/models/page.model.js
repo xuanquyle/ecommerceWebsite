@@ -3,10 +3,13 @@ const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const SliderSchema = new Schema({
-    image1: { type: String, require: true },
-    image2: { type: String, require: true },
-    image3: { type: String, require: true },
-    image4: { type: String, require: true },
-    image5: { type: String, require: true }
+    image: { type: String, require: true },
+    description: { type: String, require: true }
 })
-module.exports = mongoose.model('sliders', SliderSchema)
+const ContactSchema = new Schema({
+    image: { type: String, require: true },
+    description: { type: String, require: true }
+})
+const Slider = mongoose.model('slider', SliderSchema)
+const Contact = mongoose.model('contact', ContactSchema)
+module.exports = { Slider, Contact }
