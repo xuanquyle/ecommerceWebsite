@@ -81,7 +81,7 @@ class UserController {
 
             const hashedEmail = await bcrypt.hash(user.email, parseInt(process.env.BCRYPT_SALT_ROUND));
             if (!hashedEmail) throw new ErrorHandler.BadRequestError('Không thể đăng ký ngay lúc này. Vui lòng kiểm tra lại');
-            const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/auth/verify?email=${user.email}&token=${hashedEmail}`;
+            const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/verify-email?email=${user.email}&token=${hashedEmail}`;
 
             let scheduledJob = schedule.scheduleJob(`*/${process.env.EMAIL_VERIFY_EXPIED_TIME} * * * *`, async () => {
                 console.log('Job run');
@@ -288,7 +288,7 @@ class UserController {
             });
             const expired_at = new Date();
             expired_at.setDate(expired_at.getDate() + 7);
-            await Tokens.insertMany({ user: payload._id, refreshToken: newRefreshToken, expiredAt:expired_at })
+            await Tokens.insertMany({ user: payload._id, refreshToken: newRefreshToken, expiredAt: expired_at })
             res.status(200).json({
                 accessToken: newAccessToken,
                 refreshToken: newRefreshToken,
@@ -302,18 +302,22 @@ class UserController {
 
     // Email verification
     async verifyEmail(req, res, next) {
-        try {
+        function notify(status, message) {
+            this.status = status;
+            this.message = message;
+        }
+        try { 
             const verifiedUser = await bcrypt.compare(req.query.email, req.query.token)
-            if (!verifiedUser) throw new ErrorHandler.ForbiddenError('Không thể xác thực tài khoản. Vui lòng thử lại')
+            if (!verifiedUser) next(new notify('error', `Mã xác thực không đúng`))
             const user = await Users.findOne({ email: req.query.email });
-            if (!user) throw new ErrorHandler.NotFoundError('User not found')
+            if (!user) next(new notify('error', `Không tìm thấy email ${req.query.email}`))
             user.verifiedAt = Date.now()
             const registeredUser = await user.save()
-            if (!registeredUser) throw new ErrorHandler.ServerError('Có lỗi, vui lòng thử lại sau')
-            next()
+            if (!registeredUser) next(new notify('error', `Có lỗi xảy ra. Vui lòng thử lại`))
+            next(new notify('success', `Xác thực thành công email #${registeredUser.email}`))
         }
         catch (err) {
-            throw ErrorHandler.BadRequestError(err.message)
+            next(new notify('error', err.message))
         }
     }
     async verifyResetPassword(req, res, next) {

@@ -17,6 +17,7 @@ class ProductController {
             if (req.query.page)
                 page = req.query.page || 1;
             // Filtering ]
+            const searchQuery = req.query.hasOwnProperty('_search') && req.query.column && req.query.content;
             const categoryQuery = req.query.category;
             const priceQuery = req.query.max_price && req.query.min_price;
             const romQuery = req.query.max_rom && req.query.min_rom;
@@ -26,6 +27,7 @@ class ProductController {
 
             categoryQuery ? query.category = req.query.category : query = query;
 
+            searchQuery ? query[req.query.column] = { $regex: req.query.content } : filter = filter
             priceQuery ?
                 filter = Object.assign(filter, { price: { $lte: req.query.max_price, $gte: req.query.min_price } }) : filter = filter;
             romQuery ?
@@ -34,6 +36,7 @@ class ProductController {
                 filter = Object.assign(filter, { ram: { $lte: req.query.max_ram, $gte: req.query.min_ram } }) : filter = filter;
 
             Object.keys(filter).length === 0 ? query = query : query.options = { $elemMatch: filter };
+            console.log(query)
             const products = await Products
                 .find(query)
                 .populate('category')
@@ -50,9 +53,7 @@ class ProductController {
     }
     async getAllProduct(req, res, next) {
         try {
-            let search;
-            if (req.query.hasOwnProperty('_search') && req.query.column && req.query.content) search = Object.assign({}, { [req.query.column]: { $regex: req.query.content } })
-            console.log(search);
+
             const products = await Products.find(search);
             if (!products.length) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm nào');
             return res.status(200).json(products)

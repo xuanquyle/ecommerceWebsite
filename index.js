@@ -9,7 +9,7 @@ app.use(cookieParser())
 const dotenv = require('dotenv');
 dotenv.config();
 
-const bcrypt = require('bcrypt');
+
 
 var cors = require('cors')
 

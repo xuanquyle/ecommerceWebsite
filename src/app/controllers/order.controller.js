@@ -57,7 +57,8 @@ class OrderController {
             // check product exists
 
             const arrProduct = req.body.orderItems.map(item => item.product)
-            const products = await Products.find({ _id: { $in: arrProduct } })
+            const arrOption = req.body.orderItems.map(item => item.option)
+            const products = await Products.find({ options: { $elemMatch: { id: { $in: arrOption } } } })
             if (products.length !== req.body.orderItems.length) throw new ErrorHandler.NotFoundError('Một vài sản phẩm trong đơn hàng không tồn tại')
             // create order
             let err = ''
@@ -112,16 +113,28 @@ class OrderController {
             let err = '';
             if (req.body.status == 'received') {
                 order.orderItems.forEach(async (orderItem) => {
-                    const updateProduct = await Products.findByIdAndUpdate(orderItem.product, {
-
-                    });
-                    if (!updateProduct)
+                    let product = await Products.findOne(
+                        {
+                            _id: orderItem.product,
+                            options: {
+                                $elemMatch: {
+                                    qty: { $gte: orderItem.qty }
+                                }
+                            }
+                        });
+                    if (!product)
                         err += `Sản phẩm ${orderItem.product} không đủ số lượng theo đơn hàng >>>>`
+                    product.options = product.options.map(item => {
+                        if (item._id == orderItem.option)
+                            item.qty -= orderItem.qty;
+                        return item;
+                    })
+                    await product.save();
                 })
             }
             const updatedOrder = await order.save()
             if (!updatedOrder) throw new ErrorHandler.BadRequestError('Không thể cập nhật đơn hàng')
-            
+
             res.status(200).json(updatedOrder)
         }
         catch (err) {
