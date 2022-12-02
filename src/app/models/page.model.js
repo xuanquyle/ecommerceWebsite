@@ -7,8 +7,10 @@ const SliderSchema = new Schema({
     description: { type: String, require: true }
 })
 const ContactSchema = new Schema({
-    image: { type: String, require: true },
-    description: { type: String, require: true }
+    facebook: { type: String},
+    zalo: { type: String},
+    email: { type: String},
+    instagram: { type: String},
 })
 const Slider = mongoose.model('slider', SliderSchema)
 const Contact = mongoose.model('contact', ContactSchema)

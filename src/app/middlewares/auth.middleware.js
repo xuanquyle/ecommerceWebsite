@@ -7,7 +7,7 @@ class authMiddleware {
         if (token) {
             const accessToken = token.split(" ")[1];
             jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
-                if (err) throw new ErrorHandler.ForbiddenError('Hết thời gian đăng nhập. Vui lòng đăng nhập lại')
+                if (err) throw new ErrorHandler.ForbiddenError('Vui lòng đăng nhập lại')
                 req.user = user;
                 next();
             });

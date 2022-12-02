@@ -15,7 +15,7 @@ class AdminController {
             if (categories.length) {
                 categories.map(async item => {
                     const product = await Products.find({ category: item._id })
-                    if (!productWithCate.hasOwnProperty(item.name)) productWithCate = Object.assign({}, { [item.name]: [] })
+                    if (!productWithCate.hasOwnProperty(item.name)) productWithCate = Object.assign(productWithCate, { [item.name]: [] })
                     productWithCate[item.name] = product;
                 })
             }
@@ -34,7 +34,7 @@ class AdminController {
             if (orders)
                 orders.map(order => {
                     if (order.createdAt.getFullYear() == yearNow && order.status.deliveredAt !== null) {
-                        salesEachMonth[order.createdAt.getMonth()] += order.totalPrice;
+                        salesEachMonth[order.createdAt.getMonth() + 1] += order.totalPrice;
                     }
                 })
             dashboard = Object.assign(dashboard, { salesEachMonth }, { categoryProduct: productWithCate })

@@ -51,6 +51,8 @@ class ProductController {
             throw new ErrorHandler.BadRequestError(err.message);
         }
     }
+
+
     async getAllProduct(req, res, next) {
         try {
             const products = await Products.find();

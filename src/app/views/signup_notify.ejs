@@ -291,7 +291,7 @@
 
 <body>
     <div id="container">
-        <% if(notify.status==='success') {%>
+        <% if(notify.status==='success' ) {%>
             <div id="success-box">
                 <div class="dot"></div>
                 <div class="dot two"></div>
@@ -303,10 +303,13 @@
                 <div class="shadow scale"></div>
                 <div class="message">
                     <h1 class="alert">Success!</h1>
-                    <p><%=notify.message%></p>
+                    <p style="font-size: 120%;">
+                        <%=notify.message%>
+                    </p>
                 </div>
                 <button class="button-box">
-                    <h1 class="green">continue</h1>
+                    <a style="text-decoration: none;" href="http://localhost:3000/login" class="green">Quay về trang
+                        đăng nhập</a>
                 </button>
             </div>
             <% }else {%>
@@ -321,10 +324,13 @@
                     <div class="shadow move"></div>
                     <div class="message">
                         <h1 class="alert">Error!</h1>
-                        <p><%= notify.message%>.
+                        <p style="font-size: 120%;">
+                            <%= notify.message%>
+                        </p>
                     </div>
-                    <button class="button-box">
-                        <h1 class="red">Try again</h1>
+                    <button class=" button-box">
+                        <a style="text-decoration: none;" href="http://localhost:3000/Register" class="red">Quay về
+                            trang đăng ký</a>
                     </button>
                     <% }%>
 

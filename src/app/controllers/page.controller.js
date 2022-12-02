@@ -18,7 +18,7 @@ class PageController {
             // const data = JSON.parse(req.body.data);
             const data = req.body;
             const countSlider = await Sliders.countDocuments();
-            if (countSlider > 5) throw new ErrorHandler.BadRequestError('Chỉ cho phép lưu tối đa 5 slide')
+            if (countSlider > 5) throw new ErrorHandler.BadRequestError('Chỉ cho phép lưu tối đa 6 slide')
             if (!req.file) throw new ErrorHandler.ValidationError('Không tìm thấy ảnh slider')
 
             const slider = new Sliders({
@@ -61,7 +61,7 @@ class PageController {
                 email: req.body.email,
                 facebook: req.body.facebook,
                 zalo: req.body.zalo,
-                phone: req.body.phone
+                instagram: req.body.instagram
             })
             const addedContact = await contact.save()
             if (!addedContact) throw new ErrorHandler.BadRequestError('Có lỗi xảy ra. Thử lại sau')
@@ -78,7 +78,7 @@ class PageController {
                         email: req.body.email,
                         facebook: req.body.facebook,
                         zalo: req.body.zalo,
-                        phone: req.body.phone
+                        instagram: req.body.instagram
                     }
                 }
             )

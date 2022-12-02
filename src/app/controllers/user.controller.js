@@ -81,7 +81,7 @@ class UserController {
 
             const hashedEmail = await bcrypt.hash(user.email, parseInt(process.env.BCRYPT_SALT_ROUND));
             if (!hashedEmail) throw new ErrorHandler.BadRequestError('Không thể đăng ký ngay lúc này. Vui lòng kiểm tra lại');
-            const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/verify-email?email=${user.email}&token=${hashedEmail}`;
+            const url = `${process.env.APP_URl}:${process.env.PORT}/api/users/auth/verify?email=${user.email}&token=${hashedEmail}`;
 
             let scheduledJob = schedule.scheduleJob(`*/${process.env.EMAIL_VERIFY_EXPIED_TIME} * * * *`, async () => {
                 console.log('Job run');
