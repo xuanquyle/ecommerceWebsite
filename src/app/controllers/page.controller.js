@@ -4,9 +4,9 @@ const Contact = pageModel.Contact;
 const ErrorHandler = require('../errors/errorHandler')
 const fs = require('fs')
 class PageController {
-    getAllSlider(req, res, next) {
+    async getAllSlider(req, res, next) {
         try {
-            const sliders = Sliders.find();
+            const sliders = await Sliders.find();
             if (!sliders.length) res.json([])
             res.json(sliders)
         } catch (error) {

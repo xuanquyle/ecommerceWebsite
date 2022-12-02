@@ -53,8 +53,7 @@ class ProductController {
     }
     async getAllProduct(req, res, next) {
         try {
-
-            const products = await Products.find(search);
+            const products = await Products.find();
             if (!products.length) throw new ErrorHandler.NotFoundError('Không tìm thấy sản phẩm nào');
             return res.status(200).json(products)
         }

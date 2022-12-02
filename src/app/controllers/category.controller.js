@@ -28,7 +28,8 @@ class CategoryController {
     // [POST] /api/categories
     async createNewCategory(req, res, next) {
         try {
-            const categoryExist = await Categories.findOne({ name: req.body.name });
+            const data = JSON.parse(req.body.data)
+            const categoryExist = await Categories.findOne({ name: data.name });
             if (categoryExist) {
                 if (req.file && fs.existsSync(`src/public/images/${req.file.filename}`))
                     fs.unlink(`src/public/images/${req.file.filename}`, (err) => {
@@ -37,8 +38,8 @@ class CategoryController {
                 throw new ErrorHandler.BadRequestError('Category exist in database. Please try again')
             }
             const category = new Categories({
-                name: req.body.name,
-                description: req.body.description,
+                name: data.name,
+                description: data.description,
                 image: req.file ? `public/images/${req.file.filename}` : ''
             })
             const createdCategory = await category.save();
@@ -59,10 +60,11 @@ class CategoryController {
     //[PUT] /api/categories/:id
     async updateCategory(req, res, next) {
         try {
+            const data = JSON.parse(req.body.data)
             const updatedCate = await Categories.findByIdAndUpdate(req.params.id, {
                 $set: {
-                    name: req.body.name,
-                    description: req.body.description,
+                    name: data.name,
+                    description: data.description,
                     image: req.file ? `public/images/${req.file.filename}` : ''
                 }
             })
