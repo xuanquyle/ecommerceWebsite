@@ -201,7 +201,7 @@ class ProductController {
             if (!updateProduct) throw new ErrorHandler.NotFoundError('Product not found')
             if (req.file && fs.existsSync(`src/${updateProduct.thumb}`))
                 fs.unlink(`src/${updateProduct.thumb}`, (err) => {
-                    if (err) throw new Error(err.message);
+                    if (err) throw new ErrorHandler.BadRequestError(err.message);
                 });
 
             res.status(200).json(`Update product ${updateProduct._id} successfully`)
