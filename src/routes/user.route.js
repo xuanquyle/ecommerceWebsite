@@ -26,7 +26,8 @@ router.get('/me/:id', authMiddleware.verifyTokenAndUserAuthorization, userContro
 router.put('/me/:id', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userController.updateUser)
 router.post('/me/:id/address', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userController.createUserAddress)
 router.delete('/me/:id/address/:address_id', /*authMiddleware.verifyTokenAndUserAuthorization,*/ userController.deleteUserAddress)
-router.delete('/:id', /*authMiddleware.verifyTokenAndAdmin,*/userController.deleteUser)
+router.delete('/:id', /*authMiddleware.verifyTokenAndAdmin,*/userController.blockUser)
+router.put('/:id/ublock', /*authMiddleware.verifyTokenAndAdmin,*/userController.blockUser)
 router.get('/', /*authMiddleware.verifyTokenAndAdmin,*/ userController.getAllUser)
 
 

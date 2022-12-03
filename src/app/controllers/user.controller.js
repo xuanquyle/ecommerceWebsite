@@ -115,7 +115,7 @@ class UserController {
             if (!sended) throw new ErrorHandler.BadRequestError('Không thể xác thực email, vui lòng thử lại')
             res.status(200).json("Vui lòng kiểm tra email để tiếp tục")
         } catch (error) {
-            throw new ErrorHandler.BadRequestError(err.message);
+            throw new ErrorHandler.BadRequestError(error.message);
         }
     }
     async changePassword(req, res, next) {
@@ -196,19 +196,25 @@ class UserController {
         }
     }
 
-    async deleteUser(req, res, next) {
+    async blockUser(req, res, next) {
         try {
-            const deletedUser = await Users.delete({ _id: req.params.id })
-            if (!deletedUser) throw new ErrorHandler.NotFoundError('User not found')
+            const blockedUser = await Users.delete({ _id: req.params.id })
+            if (! blockedUser) throw new ErrorHandler.NotFoundError('Không tìm thấy người dùng')
             res.status(200).json(`Đã chặn người dùng ${req.params.id} thành công`)
         } catch (err) {
             throw new ErrorHandler.BadRequestError(err.message)
         }
     }
+    
 
-    // USER_ADDRESS controller
-    // [GET] /users/address/:id
-    async getUserAddress(req, res, next) {
+    async unblockUser(req, res, next) {
+        try {
+            const unblockedUser = await Users.restore({ _id: req.params.id })
+            if (!unblockedUser) throw new ErrorHandler.NotFoundError('Không tìm thấy người dùng')
+            res.status(200).json(`Đã bỏ chặn người dùng ${req.params.id} thành công`)
+        } catch (err) {
+            throw new ErrorHandler.BadRequestError(err.message)
+        }
     }
 
     // [POST] /users/address/:id
@@ -338,15 +344,15 @@ class UserController {
                 maxAge: 5 * 60 * 1000
             });
 
-            res.json('Xác nhận email thành công. 5p đổi mật khẩu')
+            res.redirect(`${process.env.CLIENT_URL}/ResetPassword`)
         } catch (error) {
             throw new ErrorHandler.BadRequestError(error.message)
         }
     }
     async resetPassword(req, res, next) {
         try {
-            const resetToken = req.cookies.resetToken
-            const email = req.cookies.email
+            const resetToken = req.body.resetToken
+            const email = req.body.email
             if (!resetToken) throw new ErrorHandler.BadRequestError('Không có token')
             const payload = jwt.verify(resetToken, process.env.JWT_RESET_KEY)
             if (!payload) throw new ErrorHandler.BadRequestError('Mã xác thực không đúng hoặc hết hạn')

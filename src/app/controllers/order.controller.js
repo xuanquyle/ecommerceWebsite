@@ -109,6 +109,10 @@ class OrderController {
             if (req.body.status == 'deliveryStarted')
                 !order.status.receivedAt ? order.status.receivedAt = order.status.deliveryStartedAt = Date.now() : !order.status.deliveryStartedAt ? order.status.deliveryStartedAt = Date.now() : order.status.deliveryStartedAt;
 
+            if (req.body.status == 'delivered') {
+                if (order.status.deliveryStartedAt === null) throw new ErrorHandler.BadRequestError('Đơn hàng chưa được ở trạng thái đang giao hàng');
+                order.status.deliveredAt = Date.now();
+            }
 
             let err = '';
             if (req.body.status == 'received') {
@@ -123,7 +127,7 @@ class OrderController {
                             }
                         });
                     if (!product)
-                        err += `Sản phẩm ${orderItem.product} không đủ số lượng theo đơn hàng >>>>`
+                        err += `Sản phẩm ${orderItem.product} không đủ số lượng theo đơn hàng \n`
                     product.options = product.options.map(item => {
                         if (item._id == orderItem.option)
                             item.qty -= orderItem.qty;

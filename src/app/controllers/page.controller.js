@@ -70,6 +70,10 @@ class PageController {
             throw new ErrorHandler.BadRequestError(error.message)
         }
     }
+    async getContact(req, res, next){
+        const contact = await Contact.find().limit(1);
+        res.json(contact)
+    }
     async updateContact(req, res, next) {
         try {
             const updatedContact = await Contact.findByIdAndUpdate(req.params.id,

@@ -27,7 +27,7 @@ class ProductController {
 
             categoryQuery ? query.category = req.query.category : query = query;
 
-            searchQuery ? query[req.query.column] = { $regex: req.query.content } : filter = filter
+            searchQuery ? query[req.query.column] = { $regex: req.query.content, $options: 'i' } : filter = filter
             priceQuery ?
                 filter = Object.assign(filter, { price: { $lte: req.query.max_price, $gte: req.query.min_price } }) : filter = filter;
             romQuery ?
